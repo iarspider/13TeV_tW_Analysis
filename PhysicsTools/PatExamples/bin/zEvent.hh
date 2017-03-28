@@ -48,7 +48,7 @@ public:
     bool has_trigger(string name)
     {
         return std::find_if(this->triggers.cbegin(), this->triggers.cend(),
-                            [](zHLT trig) { return trig.HLTName == name; }) != this->triggers.cend();
+                            [name](zHLT trig) { return trig.HLTName == name; }) != this->triggers.cend();
     }
 
 private:

@@ -61,14 +61,14 @@ private:
 
 
 public:
-    zElectron(const TLorentzVector &v, float charge, float eta_sc, float dxy, bool is_veto, float invE_invP,
-              float full5x5_sigmaIetaIeta, float dEtaIn, float dPhiIn, float HoverE, int missing_hits,
-              float rel_iso, float d0, float dz)
+    zElectron(const TLorentzVector &v, float charge, float eta_sc, float dxy, float d0, float dz,
+              float full5x5_sigmaIetaIeta, float dEtaIn, float dPhiIn, float HoverE, float invE_invP,
+              float rel_iso, int missing_hits, bool is_veto)
             : zParticle(v, charge),
               eta_sc(eta_sc),
-              dxy(dxy), is_veto(is_veto), invE_invP(invE_invP), full5x5_sigmaIetaIeta(full5x5_sigmaIetaIeta),
-              dEtaIn(dEtaIn), dPhiIn(dPhiIn), HoverE(HoverE), missing_hits(missing_hits), rel_iso(rel_iso), d0(d0),
-              dz(dz)
+              dxy(dxy), d0(d0),
+              dz(dz), full5x5_sigmaIetaIeta(full5x5_sigmaIetaIeta),
+              dEtaIn(dEtaIn), dPhiIn(dPhiIn), HoverE(HoverE), invE_invP(invE_invP), rel_iso(rel_iso), missing_hits(missing_hits), is_veto(is_veto)
     {
         this->check_tight();
     }
