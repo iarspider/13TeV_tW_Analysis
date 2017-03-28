@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    void get_electrons(edm::EventBase &event)
+    void get_electrons(edm::EventBase const &event)
     {
         edm::Handle<std::vector<float> > electronPt;
         event.getByLabel(std::string("electrons:elPt"), electronPt);
@@ -123,7 +123,7 @@ private:
         }
     }
 
-    void get_weight(edm::EventBase &event)
+    void get_weight(edm::EventBase const &event)
     {
         // Handle to the genEventWeight, which I added in eventUserData class
         edm::Handle<double> genEventWeight;
@@ -136,7 +136,7 @@ private:
         this->puNtrueInteractons = *puNtrueIntMC;
     }
 
-    void get_triggers(edm::EventBase &event)
+    void get_triggers(edm::EventBase const &event)
     {
         // Handle to the pass decision of hlt
         edm::Handle<std::vector<float> > HLTdecision;
@@ -155,7 +155,7 @@ private:
         }
     }
 
-    void get_muons(edm::EventBase &event)
+    void get_muons(edm::EventBase const &event)
     {
         // Handle to the muon muonPt
         edm::Handle<std::vector<float> > muonPt;
@@ -190,7 +190,7 @@ private:
         }
     }
 
-    void get_jets(edm::EventBase &event)
+    void get_jets(edm::EventBase const &event)
     {
         // Handle to the jet CSV
         edm::Handle<std::vector<float> > jetCSV;
@@ -291,7 +291,7 @@ private:
         }
     }
 
-    void getMET(edm::EventBase &event)
+    void getMET(edm::EventBase const &event)
     {
     }
 };
