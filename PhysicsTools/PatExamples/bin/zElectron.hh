@@ -73,11 +73,7 @@ public:
         this->check_tight();
     }
 
-    zElectron() : zParticle(), eta_sc(0), dxy(0), is_veto(false), invE_invP(0), full5x5_sigmaIetaIeta(0),
-                  dEtaIn(0), dPhiIn(0), HoverE(0), missing_hits(0), rel_iso(0), d0(0),
-                  dz(0)
-    {
-    }
+    zElectron() = default;
 
     bool get_is_tight()
     {
