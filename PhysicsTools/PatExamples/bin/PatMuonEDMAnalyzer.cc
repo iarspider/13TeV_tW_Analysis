@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
             for (ev.toBegin(); !ev.atEnd(); ++ev, evtID++)
             {
                 edm::EventBase const &event = ev;
-                events.push_back(zEvent(ev));
+                events.push_back(zEvent(event));
             }
         }
         catch (exception &e)
