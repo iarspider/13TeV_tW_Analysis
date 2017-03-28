@@ -107,19 +107,16 @@ private:
         edm::Handle<std::vector<float> > electronDz;
         event.getByLabel(std::string("electrons:elDz"), electronDz);
 
-        zElectron thisElectron;
-
         for (size_t i = 0; i < electronPt->size(); i++)
         {
             TLorentzVector v;
             v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
 
-            thisElectron = zElectron(v, (int) (11.0 * electronCharge->at(i)), electronSCeta->at(i),
-                                     electronDxy->at(i), (electronisVeto->at(i) != 1.), electronooEmooP->at(i),
-                                     electronfullSigmaEtaEta->at(i), electrondEtaIn->at(i), electrondPhiIn->at(i),
-                                     electronHOverE->at(i), (int) electronmissHits->at(i), electronIso03->at(i),
-                                     electronD0->at(i),
-                                     electronDz->at(i));
+            zElectron thisElectron = zElectron(v, electronCharge->at(i), electronSCeta->at(i), electronDxy->at(i),
+                                               electronD0->at(i), electronDz->at(i), electronfullSigmaEtaEta->at(i),
+                                               electrondEtaIn->at(i), electrondPhiIn->at(i), electronHOverE->at(i),
+                                               electronooEmooP->at(i), electronIso03->at(i),
+                                               (int) electronmissHits->at(i), electronisVeto->at(i) == 1);
 
             this->electrons.push_back(thisElectron);
         }
