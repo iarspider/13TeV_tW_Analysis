@@ -1,5 +1,6 @@
 #ifndef INC_13TEV_TW_ANALYSIS_ZEVENT_HH
 #define INC_13TEV_TW_ANALYSIS_ZEVENT_HH
+
 #include <vector>
 #include <string>
 
@@ -30,7 +31,7 @@ private:
     vector<bool> is_clean_jet;
 
 public:
-    zEvent(edm::EventBase &ev)
+    zEvent(edm::EventBase const &ev)
     {
         // Fill event information
         get_weight(ev);
