@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     std::vector<zEvent> events;
     double cNetEvWt = 0;
-    int cTHltEv = 0;
+    int cTHltEv = 0, cVertexEv = 0;
 
     // for(int i=s;i<=n;i++)
     for (int i = 1; i <= n; i++)
@@ -99,16 +99,41 @@ int main(int argc, char *argv[])
         for (auto event = events.begin(); event != events.end(); event++)
         {
             cNetEvWt += event->getWeight();
-            if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3"))
+            if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
+            {
                 cTHltEv++;
+                event->add_flag(make_pair("trigger", true));
+            }
+            else
+            {
+                event->add_flag(make_pair("trigger", false));
+                continue;
+            }
+
+            double Vtx_Cut_z = 24.0;
+            int Vtx_Cut_ndof = 4;
+            double Vtx_Cut_rho = 2.0;
+
+
+            for(size_t iVtx = 0; iVtx < event->getNVtx(); iVtx++) {
+                const zVertex vtx = event->get_vertex(iVtx);
+
+                if (fabs(vtx.z) < Vtx_Cut_z && vtx.dof > Vtx_Cut_ndof && vtx.RHO < Vtx_Cut_rho) {
+                    event->add_flag(make_pair("vertex", true));
+                    cVertexEv++;
+                }
+                else
+                    event->add_flag(make_pair("vertex", false));
+            }
+
         }
     }
 
     cout << "Total number of events processed: " << events.size() << endl;
     cout << "Sum of events Weight : " << cNetEvWt << endl;
     cout << "Total number of events passed HLT cuts: " << cTHltEv << endl;
-    /*
     cout << "Total number of events passed vertex cuts: " << cVertexEv << endl;
+    /*
     cout << "Total number of tight electrons: " << cTTE << endl;
     cout << "Total number of events having only one tight electron: " << cEW1e << endl;
     cout << "Total number of events having exactly two tight electrons: " << cEW2e << endl;

@@ -13,13 +13,50 @@
 
 using namespace std;
 
+typedef std::pair<std::string, bool> zFlag;
+
+struct zVertex
+{
+    float z, dof, RHO;
+};
+
 class zEvent
 {
 private:
     vector<zElectron> electrons;
     vector<zMuon> muons;
     vector<zJet> jets;
-    vector<bool> selection_pass_flags;
+    vector<zFlag> selection_pass_flags;
+    vector<zVertex> vertices;
+
+    size_t nVtx;
+public:
+    size_t getNVtx() const
+    {
+        return nVtx;
+    }
+
+public:
+    void add_flag(zFlag flag)
+    {
+        auto it = std::find_if(this->selection_pass_flags.begin(), this->selection_pass_flags.end(),
+                               [flag](zFlag item) { return flag.first == item.first; });
+        if (it != this->selection_pass_flags.end())
+            selection_pass_flags.erase(it);
+
+        this->selection_pass_flags.push_back(flag);
+    }
+
+    int get_flag(string flag_name)
+    {
+        auto it = std::find_if(this->selection_pass_flags.begin(), this->selection_pass_flags.end(),
+                               [flag_name](zFlag item) { return flag_name == item.first; });
+        if (it != this->selection_pass_flags.end())
+            return it->second ? 0 : 1;
+        else
+            return -1;
+    }
+
     vector<zHLT> triggers;
 
     TLorentzVector MET;
@@ -161,6 +198,8 @@ private:
         {
             zHLT thisHLT = zHLT(HLTname->at(i), HLTprescale->at(i), HLTdecision->at(i));
             this->triggers.push_back(thisHLT);
+            cout << "Trigger " << HLTname->at(i) << " prescale " << HLTprescale->at(i) << " decision "
+                 << HLTdecision->at(i) << endl;
         }
     }
 
@@ -309,6 +348,33 @@ private:
         event.getByLabel(std::string("metFull:metFullPy"), MetPy);
 
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
+    }
+
+    void get_vertices(edm::EventBase const &event) {
+        edm::Handle<std::vector<float> > vtxZ;
+        event.getByLabel(std::string("vertexInfo:z"), vtxZ);
+        // Handle to the dof of vertex
+        edm::Handle<std::vector<int> > dof;
+        event.getByLabel(std::string("vertexInfo:ndof"), dof);
+        // Handle to the rho
+        edm::Handle<std::vector<float> > rhoo;
+        event.getByLabel(std::string("vertexInfo:rho"), rhoo);
+
+        for (size_t i = 0; i < vtxZ.size(); i++) {
+            zVertex this_vtx;
+            this_vtx.z = vtxZ->at(i);
+            this_vtx.dof = dof->at(i);
+            this_vtx.RHO = rhoo->at(i);
+
+            this->vertices.push_back(this_vtx);
+         }
+
+        this->nVtx = this->vertices.size();
+    }
+
+public:
+    const zVertex& get_vertex(size_t index) {
+        return this->vertices.at(index);
     }
 };
 
