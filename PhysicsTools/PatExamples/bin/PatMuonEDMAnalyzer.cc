@@ -152,6 +152,7 @@ int main(int argc, char *argv[])
         std::vector<zElectron> selectedElectrons;
         std::vector<zMuon> selectedMuons;
         std::vector<zJet> selectedJets;
+        std::vector<zJet> selectedBJets;
 
         std::copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
                      [](const zElectron &part) {
@@ -162,6 +163,13 @@ int main(int argc, char *argv[])
                      [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
 
 
+        std::copy_if(event->getJets().begin(), event->getJets().end(), selectedJets.begin(),
+                     [](const zJet &jet) {
+                         return jet.is_loose() && jet.is_clean() && jet.Pt() > 30 && jet.Eta() < 2.4;
+                     });
+
+        std::copy_if(selectedJets.begin(), selectedJets.end(), selectedBJets.begin(),
+                     [](const zJet &jet) { return jet.is_bjet(); });
     }
 
     /*

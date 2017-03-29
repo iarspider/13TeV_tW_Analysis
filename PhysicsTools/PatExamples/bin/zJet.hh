@@ -16,12 +16,13 @@ public:
         check_loose();
     }
 
-    bool is_loose()
+    bool is_loose() const
     {
         return this->loose_flag;
     }
 
-    bool is_bjet() {
+    bool is_bjet() const
+    {
         return this->btag > 0.8484;
     }
 
@@ -41,12 +42,7 @@ private:
     bool clean_flag;
 
 public:
-    bool get_isloose() const
-    {
-        return loose_flag;
-    }
-
-    bool get_isclean() const
+    bool is_clean() const
     {
         return clean_flag;
     }
