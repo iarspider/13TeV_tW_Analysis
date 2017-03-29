@@ -26,8 +26,64 @@ private:
     vector<zElectron> electrons;
     vector<zMuon> muons;
     vector<zJet> jets;
-    vector<zFlag> selection_pass_flags;
+
     vector<zVertex> vertices;
+    vector<zHLT> triggers;
+    TLorentzVector MET;
+    bool isMETok;
+
+    int puNtrueInteractons;
+    double weight;
+
+public:
+    const vector<zHLT> &getTriggers() const
+    {
+        return triggers;
+    }
+
+    const TLorentzVector &getMET() const
+    {
+        return MET;
+    }
+
+    bool isIsMETok() const
+    {
+        return isMETok;
+    }
+
+    int getPuNtrueInteractons() const
+    {
+        return puNtrueInteractons;
+    }
+
+    const vector<zElectron> &getElectrons() const
+    {
+        return electrons;
+    }
+
+    const vector<zMuon> &getMuons() const
+    {
+        return muons;
+    }
+
+    const vector<zJet> &getJets() const
+    {
+        return jets;
+    }
+
+    const vector<zVertex> &getVertices() const
+    {
+        return vertices;
+    }
+
+    double getWeight() const
+    {
+        return weight;
+    }
+
+
+private:
+    vector<zFlag> selection_pass_flags;
 
 public:
     void add_flag(zFlag flag)
@@ -50,30 +106,23 @@ public:
             return -1;
     }
 
-    vector<zHLT> triggers;
-
-    TLorentzVector MET;
-    bool isMETok;
-
-    int puNtrueInteractons;
-    double weight;
-public:
-    double getWeight() const
+    bool has_trigger(string name)
     {
-        return weight;
+        return std::find_if(this->triggers.cbegin(), this->triggers.cend(),
+                            [name](zHLT trig) {
+                                return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
+                            }) != this->triggers.cend();
     }
 
-private:
 
-    vector<bool> is_clean_jet;
-
-public:
     zEvent(edm::EventBase const &ev)
     {
         // Fill event information
+#ifndef TW_SYNC
         get_userdata(ev);
         get_triggers(ev);
         get_vertices(ev);
+#endif
         get_electrons(ev);
         get_muons(ev);
         get_jets(ev);
@@ -84,13 +133,6 @@ public:
         // check_cuts(ev); // fills selection_pass_flags
     }
 
-    bool has_trigger(string name)
-    {
-        return std::find_if(this->triggers.cbegin(), this->triggers.cend(),
-                            [name](zHLT trig) {
-                                return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
-                            }) != this->triggers.cend();
-    }
 
 private:
     void get_electrons(edm::EventBase const &event)
@@ -161,6 +203,8 @@ private:
 
             this->electrons.push_back(thisElectron);
         }
+
+        std::sort(this->electrons.begin(), this->electrons.end());
     }
 
     void get_userdata(edm::EventBase const &event)
@@ -230,13 +274,16 @@ private:
             zMuon thisMuon(v, muonCharge->at(i), muonIso04->at(i), muonTight->at(i) == 1);
             this->muons.push_back(thisMuon);
         }
+
+        std::sort(this->muons.begin(), this->muons.end());
+
     }
 
     void get_jets(edm::EventBase const &event)
     {
-        // Handle to the jet CSV
-        edm::Handle<std::vector<float> > jetCSV;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSCSVv2"), jetCSV);
+        // Handle to the jet b-tag
+        edm::Handle<std::vector<float> > jetBTag;
+        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSCSVv2"), jetBTag);
         // Handle to the jet charge
         edm::Handle<std::vector<float> > jetCharge;
         event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSCharge"), jetCharge);
@@ -283,26 +330,30 @@ private:
         // Handle to the Neutral particle multiplicity
         edm::Handle<std::vector<float> > jetneutralMultiplicity;
         event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSneutralMultiplicity"), jetneutralMultiplicity);
+        /////////////////Jet b-tag/////////////////////////////////////////////////////////////////////////////////
 
-        for (size_t i = 0; i < jetCSV->size(); i++)
+
+        for (size_t i = 0; i < jetBTag->size(); i++)
         {
             TLorentzVector v;
             v.SetPtEtaPhiE(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
 
-            zJet this_jet = zJet(v, (int) jetCharge->at(i), jetCSV->at(i), jetRapidity->at(i), jetArea->at(i),
+            zJet this_jet = zJet(v, (int) jetCharge->at(i), jetBTag->at(i), jetRapidity->at(i), jetArea->at(i),
                                  jetneutralHadronEnergyFrac->at(i), jetneutralEmEnergyFrac->at(i),
                                  jetchargedHadronEnergyFrac->at(i), jetchargedEmEnergyFrac->at(i),
                                  jetNumConstituents->at(i), jetchargedMultiplicity->at(i),
                                  jetneutralMultiplicity->at(i));
             this->jets.push_back(this_jet);
         }
+
+        std::sort(this->jets.begin(), this->jets.end());
     }
 
     void clean_jets()
     {
         for (size_t i = 0; i < this->jets.size(); i++)
         {
-            zJet this_jet = this->jets.at(i);
+            zJet &this_jet = this->jets.at(i);
             bool jet_flag = true;
 
             for (size_t j = 0; j < this->electrons.size(); j++)
@@ -316,8 +367,8 @@ private:
 
             if (!jet_flag)
             {
-                this->is_clean_jet.push_back(false);
-                break;
+                this_jet.set_isclean(false);
+                continue;
             }
 
             for (size_t j = 0; j < this->muons.size(); j++)
@@ -329,7 +380,7 @@ private:
                 }
             }
 
-            this->is_clean_jet.push_back(jet_flag);
+            this_jet.set_isclean(jet_flag);
         }
     }
 
@@ -344,7 +395,8 @@ private:
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
     }
 
-    void get_vertices(edm::EventBase const &event) {
+    void get_vertices(edm::EventBase const &event)
+    {
         edm::Handle<std::vector<float> > vtxZ;
         event.getByLabel(std::string("vertexInfo:z"), vtxZ);
         // Handle to the dof of vertex
@@ -354,22 +406,15 @@ private:
         edm::Handle<std::vector<float> > rhoo;
         event.getByLabel(std::string("vertexInfo:rho"), rhoo);
 
-        for (size_t i = 0; i < vtxZ->size(); i++) {
+        for (size_t i = 0; i < vtxZ->size(); i++)
+        {
             zVertex this_vtx;
             this_vtx.z = vtxZ->at(i);
             this_vtx.dof = dof->at(i);
             this_vtx.RHO = rhoo->at(i);
 
             this->vertices.push_back(this_vtx);
-         }
-    }
-
-public:
-    size_t NVtx() {
-        return this->vertices.size();
-    }
-    const zVertex& get_vertex(size_t index) {
-        return this->vertices.at(index);
+        }
     }
 };
 

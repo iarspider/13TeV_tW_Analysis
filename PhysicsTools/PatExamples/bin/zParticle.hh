@@ -32,6 +32,11 @@ public:
     {
         return (this->charge * other.get_charge() > 0);
     }
+
+    bool operator<(const zParticle &rhs) const
+    {
+        return this->Pt() > rhs.Pt();
+    }
 };
 
 #endif //INC_13TEV_TW_ANALYSIS_ZPARTICLE_HH

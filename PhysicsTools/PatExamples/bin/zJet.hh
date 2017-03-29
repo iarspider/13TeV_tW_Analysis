@@ -6,10 +6,10 @@
 class zJet : public zParticle
 {
 public:
-    zJet(const TLorentzVector &v, float charge, float csv, float rapidity, float area, float nhef, float neef,
+    zJet(const TLorentzVector &v, float charge, float btag, float rapidity, float area, float nhef, float neef,
          float chef,
          float ceef, float n_const, float cmult, float nmult)
-            : zParticle(v, charge), csv(csv),
+            : zParticle(v, charge), btag(btag),
               rapidity(rapidity), area(area),
               NHF(nhef), NEMF(neef), CHF(chef), CEMF(ceef), NumConst(n_const), cmult(cmult), NumNeutralParticle(nmult)
     {
@@ -21,8 +21,12 @@ public:
         return this->loose_flag;
     }
 
+    bool is_bjet() {
+        return this->btag > 0.8484;
+    }
+
 private:
-    float csv;
+    float btag;
     float rapidity;
     float area;
     float NHF;
@@ -34,6 +38,25 @@ private:
     float NumNeutralParticle;
 
     bool loose_flag;
+    bool clean_flag;
+
+public:
+    bool get_isloose() const
+    {
+        return loose_flag;
+    }
+
+    bool get_isclean() const
+    {
+        return clean_flag;
+    }
+
+    void set_isclean(bool clean_flag)
+    {
+        this->clean_flag = clean_flag;
+    }
+
+private:
 
     void check_loose_27()
     {
@@ -93,7 +116,6 @@ private:
         {
             check_loose_gt30();
         }
-
     }
 
 

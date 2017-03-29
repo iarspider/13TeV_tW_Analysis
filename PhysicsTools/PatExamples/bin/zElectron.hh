@@ -68,22 +68,29 @@ public:
               eta_sc(eta_sc),
               dxy(dxy), d0(d0),
               dz(dz), full5x5_sigmaIetaIeta(full5x5_sigmaIetaIeta),
-              dEtaIn(dEtaIn), dPhiIn(dPhiIn), HoverE(HoverE), invE_invP(invE_invP), rel_iso(rel_iso), missing_hits(missing_hits), is_veto(is_veto)
+              dEtaIn(dEtaIn), dPhiIn(dPhiIn), HoverE(HoverE), invE_invP(invE_invP), rel_iso(rel_iso),
+              missing_hits(missing_hits), is_veto(is_veto)
     {
         this->check_tight();
     }
 
     zElectron() = default;
 
-    bool get_is_tight()
+    bool get_istight() const
     {
         return this->is_tight;
     }
 
-    float get_etaSC()
+    float get_etaSC() const
     {
         return this->eta_sc;
     }
 
+    bool in_gap() const
+    {
+        return fabs(this->eta_sc) > 1.4442 && fabs(this->eta_sc) < 1.566;
+    }
+
 };
+
 #endif //INC_13TEV_TW_ANALYSIS_ZELECTRON_HH

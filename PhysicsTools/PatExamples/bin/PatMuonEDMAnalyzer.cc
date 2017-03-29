@@ -12,6 +12,8 @@
 
 using namespace std;
 
+#define TW_SYNC
+
 #include "zEvent.hh"
 
 int main(int argc, char *argv[])
@@ -39,6 +41,7 @@ int main(int argc, char *argv[])
     double cNetEvWt = 0;
     int cTHltEv = 0, cVertexEv = 0;
 
+#ifndef TW_SYNC
     // for(int i=s;i<=n;i++)
     for (int i = 1; i <= n; i++)
     {
@@ -67,84 +70,106 @@ int main(int argc, char *argv[])
         //char constName[]="root://eoscms//eos/cms/store/group/phys_top/Priyanka/tChnlTop/ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/crab_tChnlTop/170207_131459/0000/B2GEDMNtuple_";
         // char constName[]="root://eoscms//eos/cms/store/group/phys_top/Priyanka/tChnlAntiTop/ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1/crab_tChnlAntiTop/170208_055151/0000/B2GEDMNtuple_";
         // char constName[]="root://eoscms//eos/cms/store/group/phys_top/Priyanka/sChnl/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/crab_sChnl/170207_131653/0000/B2GEDMNtuple_";
+#endif
+    try
+    {
+#ifndef TW_SYNC
+        sprintf(fname, "%s%d.root", constName, i);
+#else
+        sprintf(fname,
+                "/store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/36CDAE89-B3BE-E611-B022-0025905B8604.root");
+#endif
+        cout << "File Name:" << fname << endl;
 
-        try
+        TFile *inFile = TFile::Open(fname);
+
+        if (!inFile)
         {
-            sprintf(fname, "%s%d.root", constName, i);
-            cout << "File Name:" << fname << endl;
-
-            TFile *inFile = TFile::Open(fname);
-
-            if (!inFile)
-            {
-                cout << "Input Root File not opened for processing " << endl;
-                return 1;
-            }
-
-            fwlite::Event ev(inFile);
-            int evtID = 0;
-
-            for (ev.toBegin(); !ev.atEnd(); ++ev, evtID++)
-            {
-                edm::EventBase const &event = ev;
-                events.push_back(zEvent(event));
-            }
-        }
-        catch (exception &e)
-        {
-            cout << "error:" << e.what() << endl;
-            cout << "File Name:" << fname << "is not valid!" << endl << endl << endl;
+            cout << "Input Root File not opened for processing " << endl;
+            return 1;
         }
 
-        for (auto event = events.begin(); event != events.end(); event++)
+        fwlite::Event ev(inFile);
+        int evtID = 0;
+
+        for (ev.toBegin(); !ev.atEnd(); ++ev, evtID++)
         {
-            cNetEvWt += event->getWeight();
-            if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
-            {
-                cTHltEv++;
-                event->add_flag(make_pair("trigger", true));
-            }
-            else
-            {
-                event->add_flag(make_pair("trigger", false));
-                continue;
-            }
-
-            double Vtx_Cut_z = 24.0;
-            int Vtx_Cut_ndof = 4;
-            double Vtx_Cut_rho = 2.0;
-            bool has_pv = false;
-
-            if (event->NVtx() > 0)
-            {
-                for (size_t iVtx = 0; iVtx < event->NVtx(); iVtx++)
-                {
-                    const zVertex vtx = event->get_vertex(iVtx);
-
-                    if ((fabs(vtx.z) < Vtx_Cut_z) && (vtx.dof > Vtx_Cut_ndof) && (vtx.RHO < Vtx_Cut_rho))
-                    {
-                        event->add_flag(make_pair("vertex", true));
-                        cVertexEv++;
-                        has_pv = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!has_pv)
-            {
-                event->add_flag(make_pair("vertex", false));
-                continue;
-            }
-
+            edm::EventBase const &event = ev;
+            events.push_back(zEvent(event));
         }
     }
+    catch (exception &e)
+    {
+        cout << "error:" << e.what() << endl;
+        cout << "File Name:" << fname << "is not valid!" << endl << endl << endl;
+    }
+#ifndef TW_SYNC
+    }
+#endif
 
+    for (auto event = events.begin(); event != events.end(); event++)
+    {
+#ifndef TW_SYNC
+        cNetEvWt += event->getWeight();
+        if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
+        {
+            cTHltEv++;
+            event->add_flag(make_pair("trigger", true));
+        }
+        else
+        {
+            event->add_flag(make_pair("trigger", false));
+            continue;
+        }
+
+        double Vtx_Cut_z = 24.0;
+        int Vtx_Cut_ndof = 4;
+        double Vtx_Cut_rho = 2.0;
+        bool has_pv = false;
+
+        if (event->NVtx() > 0)
+        {
+            for (size_t iVtx = 0; iVtx < event->NVtx(); iVtx++)
+            {
+                const zVertex vtx = event->get_vertex(iVtx);
+
+                if ((fabs(vtx.z) < Vtx_Cut_z) && (vtx.dof > Vtx_Cut_ndof) && (vtx.RHO < Vtx_Cut_rho))
+                {
+                    event->add_flag(make_pair("vertex", true));
+                    cVertexEv++;
+                    has_pv = true;
+                    break;
+                }
+            }
+        }
+
+        if (!has_pv)
+        {
+            event->add_flag(make_pair("vertex", false));
+            continue;
+        }
+#endif
+        std::vector<zElectron> selectedElectrons;
+        std::vector<zMuon> selectedMuons;
+        std::vector<zJet> selectedJets;
+
+        std::copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
+                     [](const zElectron &part) {
+                         return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
+                     });
+
+        std::copy_if(event->getMuons().begin(), event->getMuons().end(), selectedMuons.begin(),
+                     [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
+
+
+    }
+
+    /*
     cout << "Total number of events processed: " << events.size() << endl;
     cout << "Sum of events Weight : " << cNetEvWt << endl;
     cout << "Total number of events passed HLT cuts: " << cTHltEv << endl;
     cout << "Total number of events passed vertex cuts: " << cVertexEv << endl;
-    /*
+
     cout << "Total number of tight electrons: " << cTTE << endl;
     cout << "Total number of events having only one tight electron: " << cEW1e << endl;
     cout << "Total number of events having exactly two tight electrons: " << cEW2e << endl;
