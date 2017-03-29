@@ -360,7 +360,7 @@ private:
         edm::Handle<std::vector<float> > rhoo;
         event.getByLabel(std::string("vertexInfo:rho"), rhoo);
 
-        for (size_t i = 0; i < vtxZ.size(); i++) {
+        for (size_t i = 0; i < vtxZ->size(); i++) {
             zVertex this_vtx;
             this_vtx.z = vtxZ->at(i);
             this_vtx.dof = dof->at(i);
