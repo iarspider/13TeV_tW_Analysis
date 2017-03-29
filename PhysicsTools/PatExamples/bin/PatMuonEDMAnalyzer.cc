@@ -36,6 +36,8 @@ int main(int argc, char *argv[])
     char fname[160];
 
     std::vector<zEvent> events;
+    double cNetEvWt = 0;
+    int cTHltEv = 0;
 
     // for(int i=s;i<=n;i++)
     for (int i = 1; i <= n; i++)
@@ -93,12 +95,19 @@ int main(int argc, char *argv[])
             cout << "error:" << e.what() << endl;
             cout << "File Name:" << fname << "is not valid!" << endl << endl << endl;
         }
+
+        for (auto event = events.cbegin(); event != events.cend(); event++)
+        {
+            cNetEvWt += event->getWeight();
+            if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3"))
+                cTHltEv++;
+        }
     }
 
     cout << "Total number of events processed: " << events.size() << endl;
-    /*
-    cout << "Total number of events Weight : " << cNetEvWt << endl;
+    cout << "Sum of events Weight : " << cNetEvWt << endl;
     cout << "Total number of events passed HLT cuts: " << cTHltEv << endl;
+    /*
     cout << "Total number of events passed vertex cuts: " << cVertexEv << endl;
     cout << "Total number of tight electrons: " << cTTE << endl;
     cout << "Total number of events having only one tight electron: " << cEW1e << endl;

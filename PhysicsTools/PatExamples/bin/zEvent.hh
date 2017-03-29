@@ -27,6 +27,13 @@ private:
 
     int puNtrueInteractons;
     double weight;
+public:
+    double getWeight() const
+    {
+        return weight;
+    }
+
+private:
 
     vector<bool> is_clean_jet;
 
@@ -34,13 +41,13 @@ public:
     zEvent(edm::EventBase const &ev)
     {
         // Fill event information
-        get_weight(ev);
+        get_userdata(ev);
         get_triggers(ev);
         get_electrons(ev);
         get_muons(ev);
         get_jets(ev);
         clean_jets();
-        // get_MET(ev);
+        get_MET(ev);
 
         // Apply analysis filters
         // check_cuts(ev); // fills selection_pass_flags
@@ -48,8 +55,12 @@ public:
 
     bool has_trigger(string name)
     {
+
+
         return std::find_if(this->triggers.cbegin(), this->triggers.cend(),
-                            [name](zHLT trig) { return trig.HLTName == name; }) != this->triggers.cend();
+                                    [name](zHLT trig) {
+                                        return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
+                                    }) != this->triggers.cend();
     }
 
 private:
@@ -123,7 +134,7 @@ private:
         }
     }
 
-    void get_weight(edm::EventBase const &event)
+    void get_userdata(edm::EventBase const &event)
     {
         // Handle to the genEventWeight, which I added in eventUserData class
         edm::Handle<double> genEventWeight;
@@ -291,8 +302,15 @@ private:
         }
     }
 
-    void getMET(edm::EventBase const &event)
+    void get_MET(edm::EventBase const &event)
     {
+        edm::Handle<std::vector<float> > MetPx;
+        event.getByLabel(std::string("metFull:metFullPx"), MetPx);
+
+        edm::Handle<std::vector<float> > MetPy;
+        event.getByLabel(std::string("metFull:metFullPy"), MetPy);
+
+        this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
     }
 };
 
