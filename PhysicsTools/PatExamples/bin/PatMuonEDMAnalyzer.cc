@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        for (auto mumu = mumuPairs.begin(); mumum != mumuPairs.end(); mumu++) {
+        for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++) {
             auto mu1 = mumu->first;
             auto mu2 = mumu->second;
 
