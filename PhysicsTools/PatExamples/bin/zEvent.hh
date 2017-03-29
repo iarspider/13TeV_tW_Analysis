@@ -198,8 +198,8 @@ private:
         {
             zHLT thisHLT = zHLT(HLTname->at(i), HLTprescale->at(i), HLTdecision->at(i));
             this->triggers.push_back(thisHLT);
-            cout << "Trigger " << HLTname->at(i) << " prescale " << HLTprescale->at(i) << " decision "
-                 << HLTdecision->at(i) << endl;
+            // cout << "Trigger " << HLTname->at(i) << " prescale " << HLTprescale->at(i) << " decision "
+            //     << HLTdecision->at(i) << endl;
         }
     }
 
