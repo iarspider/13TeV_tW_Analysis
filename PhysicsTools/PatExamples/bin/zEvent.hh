@@ -55,12 +55,10 @@ public:
 
     bool has_trigger(string name)
     {
-
-
         return std::find_if(this->triggers.cbegin(), this->triggers.cend(),
-                                    [name](zHLT trig) {
-                                        return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
-                                    }) != this->triggers.cend();
+                            [name](zHLT trig) {
+                                return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
+                            }) != this->triggers.cend();
     }
 
 private:

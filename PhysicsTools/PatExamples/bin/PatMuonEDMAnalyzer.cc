@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
             cout << "File Name:" << fname << "is not valid!" << endl << endl << endl;
         }
 
-        for (auto event = events.cbegin(); event != events.cend(); event++)
+        for (auto event = events.begin(); event != events.end(); event++)
         {
             cNetEvWt += event->getWeight();
             if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v3"))
