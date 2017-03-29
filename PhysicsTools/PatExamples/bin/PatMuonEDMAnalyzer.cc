@@ -113,19 +113,30 @@ int main(int argc, char *argv[])
             double Vtx_Cut_z = 24.0;
             int Vtx_Cut_ndof = 4;
             double Vtx_Cut_rho = 2.0;
+            bool has_pv = false;
 
+            if (event->getNVtx() > 0)
+            {
+                for (size_t iVtx = 0; iVtx < event->getNVtx(); iVtx++)
+                {
+                    const zVertex vtx = event->get_vertex(iVtx);
 
-            for(size_t iVtx = 0; iVtx < event->getNVtx(); iVtx++) {
-                const zVertex vtx = event->get_vertex(iVtx);
-
-                if (fabs(vtx.z) < Vtx_Cut_z && vtx.dof > Vtx_Cut_ndof && vtx.RHO < Vtx_Cut_rho) {
-                    event->add_flag(make_pair("vertex", true));
-                    cVertexEv++;
+                    if ((fabs(vtx.z) < Vtx_Cut_z) && (vtx.dof > Vtx_Cut_ndof) && (vtx.RHO < Vtx_Cut_rho))
+                    {
+                        event->add_flag(make_pair("vertex", true));
+                        cVertexEv++;
+                        has_pv = true;
+                        break;
+                    }
                 }
-                else
-                    event->add_flag(make_pair("vertex", false));
             }
 
+            if (!has_pv)
+            {
+                event->add_flag(make_pair("vertex", false));
+                continue;
+            }
+            
         }
     }
 
