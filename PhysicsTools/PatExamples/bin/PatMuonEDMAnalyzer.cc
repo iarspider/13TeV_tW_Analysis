@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
                 event->add_flag(make_pair("vertex", false));
                 continue;
             }
-            
+
         }
     }
 
