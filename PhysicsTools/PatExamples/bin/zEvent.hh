@@ -30,7 +30,7 @@ private:
     vector<zVertex> vertices;
     vector<zHLT> triggers;
     TLorentzVector MET;
-    bool isMETok;
+    bool isMETok_;
 
     int puNtrueInteractons;
     double weight;
@@ -46,9 +46,9 @@ public:
         return MET;
     }
 
-    bool isIsMETok() const
+    bool isMETok() const
     {
-        return isMETok;
+        return isMETok_;
     }
 
     int getPuNtrueInteractons() const
@@ -392,7 +392,14 @@ private:
         edm::Handle<std::vector<float> > MetPy;
         event.getByLabel(std::string("metFull:metFullPy"), MetPy);
 
+        edm::Handle<bool> BadChargedCandidateFilter;
+        event.getByLabel(std::string("BadChargedCandidateFilter"), BadChargedCandidateFilter);
+
+        edm::Handle<bool> BadPFMuonFilter;
+        event.getByLabel(std::string("BadPFMuonFilter"), BadPFMuonFilter);
+
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
+        this->isMETok_ = (*BadChargedCandidateFilter) && (*BadPFMuonFilter);
     }
 
     void get_vertices(edm::EventBase const &event)
