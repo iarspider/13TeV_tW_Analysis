@@ -29,13 +29,6 @@ private:
     vector<zFlag> selection_pass_flags;
     vector<zVertex> vertices;
 
-    size_t nVtx;
-public:
-    size_t getNVtx() const
-    {
-        return nVtx;
-    }
-
 public:
     void add_flag(zFlag flag)
     {
@@ -80,6 +73,7 @@ public:
         // Fill event information
         get_userdata(ev);
         get_triggers(ev);
+        get_vertices(ev);
         get_electrons(ev);
         get_muons(ev);
         get_jets(ev);
@@ -368,11 +362,12 @@ private:
 
             this->vertices.push_back(this_vtx);
          }
-
-        this->nVtx = this->vertices.size();
     }
 
 public:
+    size_t NVtx() {
+        return this->vertices.size();
+    }
     const zVertex& get_vertex(size_t index) {
         return this->vertices.at(index);
     }

@@ -115,9 +115,9 @@ int main(int argc, char *argv[])
             double Vtx_Cut_rho = 2.0;
             bool has_pv = false;
 
-            if (event->getNVtx() > 0)
+            if (event->NVtx() > 0)
             {
-                for (size_t iVtx = 0; iVtx < event->getNVtx(); iVtx++)
+                for (size_t iVtx = 0; iVtx < event->NVtx(); iVtx++)
                 {
                     const zVertex vtx = event->get_vertex(iVtx);
 
