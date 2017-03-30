@@ -10,6 +10,7 @@ private:
 public:
     friend std::ostream &operator<<(std::ostream & o, const zParticle & z) {
         o << "Charge" << z.get_charge() << ", (Pt, Eta, Phi, E) = (" << z.Pt() << ", " << z.Eta() << ", " << z.Phi() << ", " << z.E() << ")";
+        return o;
     }
 
     zParticle(TLorentzVector v, float charge) : TLorentzVector(v)
