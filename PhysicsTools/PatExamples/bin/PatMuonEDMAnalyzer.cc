@@ -168,9 +168,6 @@ int main(int argc, char *argv[])
             continue;
         }
 #endif
-        if (!event->isMETok())
-            continue;
-
         if (event->getEvID() == 21902)
         {
             cout << "GOTCHA!" << endl;
@@ -345,6 +342,9 @@ int main(int argc, char *argv[])
 
         counter[2]++;
 
+        if (!event->isMETok())
+            continue;
+        
         if (mumuPairs.size() > 0 || eePairs.size() > 0)
         {
             if (event->getMET().Pt() <= 40)
