@@ -184,6 +184,10 @@ int main(int argc, char *argv[])
         selectedElectrons.clear();
         selectedJets.clear();
         selectedMuons.clear();
+
+        eePairs.clear();
+        emuPairs.clear();
+        mumuPairs.clear();
 /*
         cout << "=== New event " << iEvent << " ===" << endl;
         cout << "Raw electrons: " << event->getElectrons().size() << ", muons " << event->getMuons().size() << ", jets "
