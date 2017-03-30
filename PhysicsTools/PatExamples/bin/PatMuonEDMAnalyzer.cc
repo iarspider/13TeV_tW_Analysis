@@ -174,40 +174,22 @@ int main(int argc, char *argv[])
         selectedElectrons.clear();
         selectedJets.clear();
         selectedMuons.clear();
-/*
-        cout << "Event " << iEvent << " has :" << endl;
-        cout << "\t" << event->getElectrons().size() << " electron(s)" << endl;
-        cout << "\t" << event->getMuons().size() << " muon(s)" << endl;
-        cout << "\t" << event->getJets().size() << " jet(s)" << endl;
 
-        size_t iJet = 0;
-        for (auto jet = event->getJets().begin(); jet != event->getJets().end(); jet++, iJet++)
-        {
-            cout << "Jet " << iJet << endl;
-            // cout << "\t" << &(jet) << endl;
-            zJet tmpJet(*jet);
-            cout << "\t" << (tmpJet.is_loose() && tmpJet.is_clean() && tmpJet.Pt() > 30 && tmpJet.Eta() < 2.4)
-                 << endl;
 
-        }
-
-        return 0;
-*/
-        copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
+        copy_if(event->getElectrons().begin(), event->getElectrons().end(), back_inserter(selectedElectrons),
                 [](const zElectron &part) {
                     return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
                 });
 
-        copy_if(event->getMuons().begin(), event->getMuons().end(), selectedMuons.begin(),
+        copy_if(event->getMuons().begin(), event->getMuons().end(), back_inserter(selectedMuons),
                 [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
 
-
-        copy_if(event->getJets().begin(), event->getJets().end(), selectedJets.begin(),
+        copy_if(event->getJets().begin(), event->getJets().end(), back_inserter(selectedJets),
                 [](const zJet &jet) {
                     return jet.is_loose() && jet.is_clean() && jet.Pt() > 30 && jet.Eta() < 2.4;
                 });
 
-        copy_if(selectedJets.begin(), selectedJets.end(), selectedBJets.begin(),
+        copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
 
         // ee
