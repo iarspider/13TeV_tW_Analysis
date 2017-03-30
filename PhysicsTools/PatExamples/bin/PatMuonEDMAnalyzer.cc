@@ -459,8 +459,6 @@ int main(int argc, char *argv[])
 */
 
         counter[event_tag][2]++;
-        if (!event->isMETok())
-            continue;
 
         /*
     if (mumuPairs.size() > 0 || eePairs.size() > 0)
@@ -485,9 +483,13 @@ int main(int argc, char *argv[])
     }
          */
 
-        if (event_tag != EMu)
+        if (event_tag != EMu) {
             if (!event->isMETok())
                 continue;
+
+            if (event->getMET().Pt() <= 40)
+                continue;
+        }
 
         counter[event_tag][3]++;
     }
