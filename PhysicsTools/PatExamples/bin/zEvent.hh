@@ -35,9 +35,9 @@ private:
     int puNtrueInteractons;
     double weight;
 
-    ulong evID;
+    ULong64_t evID;
 public:
-    ulong getEvID() const
+    ULong64_t getEvID() const
     {
         return evID;
     }
@@ -129,7 +129,7 @@ public:
         get_triggers(ev);
         get_vertices(ev);
 #endif
-        edm::Handle<ulong> event_id;
+        edm::Handle<ULong64_t> event_id;
         ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
         this->evID = *event_id;
         get_electrons(ev);
