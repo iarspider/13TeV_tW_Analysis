@@ -251,7 +251,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (eePairs.size() > 0 || emuPairs.size() > 0 || mumuPairs.size() > 0)
+        if (eePairs.size() > 0 /*|| emuPairs.size() > 0 || mumuPairs.size() > 0*/)
             counter[1]++;
         else
             continue;
