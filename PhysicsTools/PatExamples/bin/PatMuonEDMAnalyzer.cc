@@ -193,14 +193,23 @@ int main(int argc, char *argv[])
                 [](const zJet &jet) { return jet.is_bjet(); });
 
         // ee
+        size_t ie1 = 0, ie2 = 0;
         if (selectedElectrons.size() > 0)
         {
-            for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++)
+            for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++)
             {
+                cout << "Electron candidate #1 (id=" << ie1 << "):  charge=" << e1->get_charge() << endl;
+                e1->Print();
                 if (e1->Pt() > 25)
                 {
-                    for (auto e2 = e1 + 1; e2 != selectedElectrons.end(); e2++)
+                    for (auto e2 = e1 + 1; e2 != selectedElectrons.end(); e2++, ie2++)
                     {
+                        cout << "Electron candidate #2 (id=" << ie2 << "): charge=" << e2->get_charge() << endl;
+                        e2->Print();
+                        cout << "Dileption object:" << endl;
+                        TLorentzVector ll = (*e1) + (*e2);
+                        ll.Print();
+
                         if (!e1->is_samesign(*e2) && TLorentzVector(*e1 + *e2).Mag() > 20)
                         {
                             eePairs.push_back(make_pair(e1, e2));
