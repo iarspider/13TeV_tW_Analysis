@@ -176,6 +176,8 @@ int main(int argc, char *argv[])
         selectedMuons.clear();
 
         cout << "=== New event " << iEvent << " ===" << endl;
+        cout << "Raw electrons: " << event->getElectrons().size() << ", muons " << event->getMuons().size() << ", jets "
+             << event->getJets().size() << endl;
 
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), back_inserter(selectedElectrons),
                 [](const zElectron &part) {
@@ -192,6 +194,9 @@ int main(int argc, char *argv[])
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
+
+        cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+             << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
 
         // ee
         size_t ie1 = 0, ie2 = 0;
@@ -210,7 +215,8 @@ int main(int argc, char *argv[])
                         cout << "\t" << *e2 << endl;
                         cout << "Dileption object:" << endl;
                         TLorentzVector ll = (*e1) + (*e2);
-                        cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", " << ll.E() << ")";
+                        cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
+                             << ll.E() << ")";
                         cout << " M = " << ll.Mag() << endl;
                         //ll.Print();
 
