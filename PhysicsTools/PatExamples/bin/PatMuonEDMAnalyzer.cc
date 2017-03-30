@@ -174,11 +174,11 @@ int main(int argc, char *argv[])
         selectedElectrons.clear();
         selectedJets.clear();
         selectedMuons.clear();
-
+/*
         cout << "=== New event " << iEvent << " ===" << endl;
         cout << "Raw electrons: " << event->getElectrons().size() << ", muons " << event->getMuons().size() << ", jets "
              << event->getJets().size() << endl;
-
+*/
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), back_inserter(selectedElectrons),
                 [](const zElectron &part) {
                     return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
@@ -194,9 +194,27 @@ int main(int argc, char *argv[])
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
-
+/*
         cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
              << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+*/
+        if (selectedElectrons.size() == 2) {
+            cout << "=== New ee event " << iEvent << " ===" << endl;
+            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+                 << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+        }
+
+        if (selectedMuons.size() == 2) {
+            cout << "=== New mumu event " << iEvent << " ===" << endl;
+            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+                 << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+        }
+
+        if (selectedElectrons.size() >= 1 && selectedMuons.size() >= 1) {
+            cout << "=== New emu event " << iEvent << " ===" << endl;
+            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+                 << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+        }
 
         // ee
         size_t ie1 = 0, ie2 = 0;
