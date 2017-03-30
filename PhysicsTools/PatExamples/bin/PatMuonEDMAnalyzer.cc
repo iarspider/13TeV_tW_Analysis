@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
     ulong counter[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     ulong globalEventID;
 
+    cout << boolalpha;
 
 #ifndef TW_SYNC
     // for(int i=s;i<=n;i++)

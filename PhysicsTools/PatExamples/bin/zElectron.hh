@@ -14,19 +14,19 @@ private:
     int missing_hits;
     bool is_veto;
 
-    void check_tight()
+    void check_tight(bool debug = false)
     {
         if (abs(this->eta_sc) <= 1.479)
         {
-            check_tight_eb();
+            check_tight_eb(debug);
         }
         else
         {
-            check_tight_ee();
+            check_tight_ee(debug);
         }
     }
 
-    void check_tight_eb()
+    void check_tight_eb(bool debug)
     {
         vector<bool> conditions;
         conditions.push_back(this->full5x5_sigmaIetaIeta < 0.00998);
@@ -40,10 +40,15 @@ private:
         conditions.push_back(fabs(this->d0) < 0.05);
         conditions.push_back(fabs(this->dz) < 0.10);
 
+        int i = 0;
+
+        for (auto it = conditions.begin(); it != conditions.end(); it++, i++)
+            cout << "Condition " << i << " is " << (*it) << endl;
+
         this->is_tight = std::all_of(conditions.cbegin(), conditions.cend(), [](bool b) { return b; });
     }
 
-    void check_tight_ee()
+    void check_tight_ee(bool debug)
     {
         vector<bool> conditions;
         conditions.push_back(this->full5x5_sigmaIetaIeta < 0.0292);
@@ -56,6 +61,11 @@ private:
         conditions.push_back(!this->is_veto);
         conditions.push_back(fabs(this->d0) < 0.10);
         conditions.push_back(fabs(this->dz) < 0.20);
+
+        int i = 0;
+
+        for (auto it = conditions.begin(); it != conditions.end(); it++, i++)
+            cout << "Condition " << i << " is " << (*it) << endl;
 
         this->is_tight = std::all_of(conditions.cbegin(), conditions.cend(), [](bool b) { return b; });
     }
@@ -92,12 +102,21 @@ public:
         return fabs(this->eta_sc) > 1.4442 && fabs(this->eta_sc) < 1.566;
     }
 
-    friend ostream &operator<<(ostream &os, const zElectron &electron)
+    void debug_tight()
     {
-        os << "Electron tight " << electron.get_istight() << " sc eta = " << electron.get_etaSC() << " in gap " << electron.in_gap() << "; " << static_cast<const zParticle &>(electron);
-        return os;
+        this->check_tight(true);
     }
 
+    friend ostream &operator<<(ostream &os, const zElectron &electron)
+    {
+        os << " is_tight: " << electron.is_tight << " eta_sc: "
+           << electron.eta_sc << " dxy: " << electron.dxy << " d0: " << electron.d0 << " dz: " << electron.dz
+           << " full5x5_sigmaIetaIeta: " << electron.full5x5_sigmaIetaIeta << " dEtaIn: " << electron.dEtaIn
+           << " dPhiIn: " << electron.dPhiIn << " HoverE: " << electron.HoverE << " invE_invP: " << electron.invE_invP
+           << " rel_iso: " << electron.rel_iso << " missing_hits: " << electron.missing_hits << " is_veto: "
+           << electron.is_veto << static_cast<const zParticle &>(electron);
+        return os;
+    }
 };
 
 #endif //INC_13TEV_TW_ANALYSIS_ZELECTRON_HH
