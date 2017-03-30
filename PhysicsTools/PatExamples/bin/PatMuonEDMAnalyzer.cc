@@ -184,8 +184,8 @@ int main(int argc, char *argv[])
         for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++, iJet++)
         {
             cout << "Jet " << iJet << endl;
-            cout << "\t" << (int) &(thisJet) << endl;
-            cout << "\t" << (int) &(*thisJet) << endl;
+            cout << "\t" << &(thisJet) << endl;
+            cout << "\t" << &(*thisJet) << endl;
         }
 
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
