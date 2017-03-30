@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
                             {
                                 emuPairs.push_back(make_pair(e1, mu1));
                                 cout << "Passed" << endl;
-                                if (event_tag != -1)
+                                if (event_tag != -1 && event_tag != EMu)
                                 {
                                     cout << "! Event " << event->getEvID() << " is already tagged with " << event_tag
                                          << endl;
@@ -344,7 +344,7 @@ int main(int argc, char *argv[])
                         {
                             mumuPairs.push_back(make_pair(mu1, mu2));
                             cout << "Passed" << endl;
-                            if (event_tag != -1)
+                            if (event_tag != -1 && event_tag != MuMu)
                             {
                                 cout << "! Event " << event->getEvID() << " is already tagged with " << event_tag
                                      << endl;
@@ -378,7 +378,7 @@ int main(int argc, char *argv[])
                                 emuPair_t pair = make_pair(e1, mu1);
                                 if (find(emuPairs.begin(), emuPairs.end(), pair) == emuPairs.end())
                                 {
-                                    if (event_tag != -1)
+                                    if (event_tag != -1 && event_tag != EMu)
                                     {
                                         cout << "! Event " << event->getEvID() << " is already tagged with "
                                              << event_tag << endl;
