@@ -62,7 +62,8 @@ public:
         }
         else
         {
-            os << "Muon is_tight: " << lepton.is_tight << "; " << static_cast<const zParticle &>(lepton);
+            os << "Muon is_tight: " << lepton.is_tight << ", iso: " << lepton.iso_ << ", is_iso: " << lepton.is_iso() << "; "
+               << static_cast<const zParticle &>(lepton);
         }
         return os;
     }
