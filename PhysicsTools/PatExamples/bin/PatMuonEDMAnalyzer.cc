@@ -20,10 +20,7 @@ using namespace std;
 
 #include "zEvent.hh"
 
-typedef pair<vector<zElectron>::iterator, vector<zElectron>::iterator> eePair_t;
-typedef pair<vector<zElectron>::iterator, vector<zMuon>::iterator> emuPair_t;
-typedef pair<vector<zMuon>::iterator, vector<zMuon>::iterator> mumuPair_t;
-
+typedef std::pair<std::vector<zLepton>::iterator, std::vector<zLepton>::iterator> llPair_t;
 
 int main(int argc, char *argv[])
 {
@@ -129,14 +126,11 @@ int main(int argc, char *argv[])
     counter[EE][0] = events.size();
     counter[EMu][0] = events.size();
     counter[MuMu][0] = events.size();
-    vector<zElectron> selectedElectrons;
-    vector<zMuon> selectedMuons;
+    vector<zLepton> selectedLeptons;
     vector<zJet> selectedJets;
     vector<zJet> selectedBJets;
 
-    vector<eePair_t> eePairs;
-    vector<mumuPair_t> mumuPairs;
-    vector<emuPair_t> emuPairs;
+    vector<llPair_t> llPairs;
 
     int iEvent = 0;
 
@@ -194,25 +188,20 @@ int main(int argc, char *argv[])
 */
 
         selectedBJets.clear();
-        selectedElectrons.clear();
+        selectedLeptons.clear();
         selectedJets.clear();
-        selectedMuons.clear();
 
-        eePairs.clear();
-        emuPairs.clear();
-        mumuPairs.clear();
+        llPairs.clear();
         bool event_tagged = false;
         int event_tag = -1;
 
         TLorentzVector ll;
 
-        copy_if(event->getElectrons().begin(), event->getElectrons().end(), back_inserter(selectedElectrons),
-                [](const zElectron &part) {
-                    return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
+        // in_gap will return false for muons
+        copy_if(event->getLeptons().begin(), event->getLeptons().end(), back_inserter(selectedLeptons),
+                [](const zLepton &part) {
+                    return part.get_istight() && part.Pt() > 20. && fabs(part.Eta()) < 2.4 && !part.in_gap();
                 });
-
-        copy_if(event->getMuons().begin(), event->getMuons().end(), back_inserter(selectedMuons),
-                [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
 
         copy_if(event->getJets().begin(), event->getJets().end(), back_inserter(selectedJets),
                 [](const zJet &jet) {
@@ -222,7 +211,7 @@ int main(int argc, char *argv[])
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
 
-
+/*
         if (selectedElectrons.size() >= 2)
         {
             cout << "=== New ee candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
@@ -396,7 +385,34 @@ int main(int argc, char *argv[])
                 }
             }
         }
+*/
 
+        if (selectedLeptons.size() >= 2)
+        {
+            cout << "=== New ll candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+
+            auto leading_l = selectedLeptons.at(0);
+            auto other_l = selectedLeptons.at(1);
+            ll = leading_l + other_l;
+
+            cout << "Leptons #1: " << endl;
+            cout << "Leading: " << leading_l << endl;
+            cout << "Second: " << other_l << endl;
+            cout << "Dileption: " << "(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
+                 << ll.E() << "), M = " << ll.Mag() << endl;
+
+            if (!leading_l.is_samesign(other_l) && leading_l.Pt() > 25 && ll.Mag() > 20)
+            {
+                cout << "+ Accept step 1" << endl;
+                if (leading_l.is_muon() && other_l.is_muon())
+                    event_tag = MuMu;
+                else if (!(leading_l.is_muon() || other_l.is_muon()))
+                    event_tag = EE;
+                else
+                    event_tag = EMu;
+            }
+
+        }
         counter[event_tag][1]++;
 
         if (event_tag == EE)
@@ -410,6 +426,9 @@ int main(int argc, char *argv[])
 
         bool massFlag = false;
 
+        if (event_tag != EMu)
+            massFlag = (ll.Mag() >= 76 && ll.Mag() <= 106);
+/*
         for (auto ee = eePairs.begin(); ee != eePairs.end(); ee++)
         {
             ll = (*(ee->first)) + (*(ee->second));
@@ -420,63 +439,57 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-
-        if (massFlag)
-        {
-            continue;
-        }
-
-        for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
-        {
-            ll = (*(mumu->first)) + (*(mumu->second));
-            if (ll.Mag() >= 76 && ll.Mag() <= 106)
-            {
-                massFlag = true;
-                break;
-            }
-        }
-
+*/
         if (massFlag)
             continue;
 
-        if (eePairs.size() > 0)
+        /*
+    for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
+    {
+        ll = (*(mumu->first)) + (*(mumu->second));
+        if (ll.Mag() >= 76 && ll.Mag() <= 106)
         {
-            counter[EE][2]++;
+            massFlag = true;
+            break;
         }
+    }
 
-        if (emuPairs.size() > 0)
-        {
-            counter[EMu][2]++;
-        }
+    if (massFlag)
+        continue;
+*/
 
-        if (mumuPairs.size() > 0)
-        {
-            counter[MuMu][2]++;
-        }
-
+        counter[event_tag][2]++;
         if (!event->isMETok())
             continue;
 
-        if (mumuPairs.size() > 0 || eePairs.size() > 0)
-        {
-            if (event->getMET().Pt() <= 40)
+        /*
+    if (mumuPairs.size() > 0 || eePairs.size() > 0)
+    {
+        if (event->getMET().Pt() <= 40)
+            continue;
+    }
+
+    if (eePairs.size() > 0)
+    {
+        counter[EE][3]++;
+    }
+
+    if (emuPairs.size() > 0)
+    {
+        counter[EMu][3]++;
+    }
+
+    if (mumuPairs.size() > 0)
+    {
+        counter[MuMu][3]++;
+    }
+         */
+
+        if (event_tag != EMu)
+            if (!event->isMETok())
                 continue;
-        }
 
-        if (eePairs.size() > 0)
-        {
-            counter[EE][3]++;
-        }
-
-        if (emuPairs.size() > 0)
-        {
-            counter[EMu][3]++;
-        }
-
-        if (mumuPairs.size() > 0)
-        {
-            counter[MuMu][3]++;
-        }
+        counter[event_tag][3]++;
     }
 
     ee_evid.close();

@@ -6,8 +6,11 @@
 
 #include <DataFormats/FWLite/interface/Event.h>
 
+/*
 #include "zElectron.hh"
 #include "zMuon.hh"
+ */
+#include "zLepton.hh"
 #include "zJet.hh"
 #include "zHLT.hh"
 
@@ -23,8 +26,7 @@ struct zVertex
 class zEvent
 {
 private:
-    vector<zElectron> electrons;
-    vector<zMuon> muons;
+    vector<zLepton> leptons;
     vector<zJet> jets;
 
     vector<zVertex> vertices;
@@ -62,14 +64,9 @@ public:
         return puNtrueInteractons;
     }
 
-    const vector<zElectron> &getElectrons() const
+    const vector<zLepton> &getLeptons() const
     {
-        return electrons;
-    }
-
-    const vector<zMuon> &getMuons() const
-    {
-        return muons;
+        return leptons;
     }
 
     const vector<zJet> &getJets() const
@@ -134,6 +131,7 @@ public:
         this->evID = *event_id;
         get_electrons(ev);
         get_muons(ev);
+        std::sort(this->leptons.begin(), this->leptons.end());
         get_jets(ev);
         clean_jets();
         get_MET(ev);
@@ -173,12 +171,11 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
 
-            zElectron thisElectron = zElectron(v, electronCharge->at(i), electronSCeta->at(i), elvidTight->at(i) != 0);
+            zLepton thisElectron = zLepton(v, electronCharge->at(i), electronSCeta->at(i), elvidTight->at(i) != 0,
+                                           false);
 
-            this->electrons.push_back(thisElectron);
+            this->leptons.push_back(thisElectron);
         }
-
-        std::sort(this->electrons.begin(), this->electrons.end());
     }
 
     void get_userdata(edm::EventBase const &event)
@@ -245,12 +242,9 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(muonPt->at(i), muonEta->at(i), muonPhi->at(i), muonEn->at(i));
 
-            zMuon thisMuon(v, muonCharge->at(i), muonIso04->at(i), muonTight->at(i) != 0);
-            this->muons.push_back(thisMuon);
+            zLepton thisMuon(v, muonCharge->at(i), 0, muonTight->at(i) != 0, true);
+            this->leptons.push_back(thisMuon);
         }
-
-        std::sort(this->muons.begin(), this->muons.end());
-
     }
 
     void get_jets(edm::EventBase const &event)
@@ -330,24 +324,9 @@ private:
             zJet &this_jet = this->jets.at(i);
             bool jet_flag = true;
 
-            for (size_t j = 0; j < this->electrons.size(); j++)
+            for (size_t j = 0; j < this->leptons.size(); j++)
             {
-                if (this_jet.deltaR(this->electrons.at(j)) <= 0.4)
-                {
-                    jet_flag = false;
-                    break;
-                }
-            }
-
-            if (!jet_flag)
-            {
-                this_jet.set_isclean(false);
-                continue;
-            }
-
-            for (size_t j = 0; j < this->muons.size(); j++)
-            {
-                if (this_jet.deltaR(this->muons.at(j)) <= 0.4)
+                if (this_jet.deltaR(this->leptons.at(j)) <= 0.4)
                 {
                     jet_flag = false;
                     break;
