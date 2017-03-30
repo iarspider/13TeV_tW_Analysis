@@ -158,57 +158,22 @@ private:
         edm::Handle<std::vector<float> > electronEn;
         event.getByLabel(std::string("electrons:elE"), electronEn);
 
-        // Handle to the electron impact parameter
-        edm::Handle<std::vector<float> > electronDxy;
-        event.getByLabel(std::string("electrons:elDxy"), electronDxy);
-        // Handle to the electron veto
-        edm::Handle<std::vector<float> > electronisVeto;
-        event.getByLabel(std::string("electrons:elvidVeto"), electronisVeto);
-        // Handle to the electron missing hits
-        edm::Handle<std::vector<float> > electronmissHits;
-        event.getByLabel(std::string("electrons:elmissHits"), electronmissHits);
-        // Handle to the electron isolation of cone of radius 0.03
-        edm::Handle<std::vector<float> > electronIso03;
-        event.getByLabel(std::string("electrons:elIso03"), electronIso03);
         // Handle to the electron charge
         edm::Handle<std::vector<float> > electronCharge;
         event.getByLabel(std::string("electrons:elCharge"), electronCharge);
-
         // Handle to the electron electronSCeta
         edm::Handle<std::vector<float> > electronSCeta;
         event.getByLabel(std::string("electrons:elSCEta"), electronSCeta);
-        // Handle to the electron electronfullSigmaEtaEta
-        edm::Handle<std::vector<float> > electronfullSigmaEtaEta;
-        event.getByLabel(std::string("electrons:elfull5x5siee"), electronfullSigmaEtaEta);
-        // Handle to the electron electrondEtaIn
-        edm::Handle<std::vector<float> > electrondEtaIn;
-        event.getByLabel(std::string("electrons:eldEtaIn"), electrondEtaIn);
-        // Handle to the electron electrondPhiIn
-        edm::Handle<std::vector<float> > electrondPhiIn;
-        event.getByLabel(std::string("electrons:eldPhiIn"), electrondPhiIn);
-        // Handle to the electron electronHOverE
-        edm::Handle<std::vector<float> > electronHOverE;
-        event.getByLabel(std::string("electrons:elHoE"), electronHOverE);
-        // Handle to the electron electronooEmooP
-        edm::Handle<std::vector<float> > electronooEmooP;
-        event.getByLabel(std::string("electrons:elooEmooP"), electronooEmooP);
-        // Handle to the electron electronD0
-        edm::Handle<std::vector<float> > electronD0;
-        event.getByLabel(std::string("electrons:elDxy"), electronD0);
-        // Handle to the electron electronDz
-        edm::Handle<std::vector<float> > electronDz;
-        event.getByLabel(std::string("electrons:elDz"), electronDz);
+
+        edm::Handle<std::vector<float> > elvidTight;
+        event.getByLabel(std::string("electrons:elvidTight"), elvidTight);
 
         for (size_t i = 0; i < electronPt->size(); i++)
         {
             TLorentzVector v;
             v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
 
-            zElectron thisElectron = zElectron(v, electronCharge->at(i), electronSCeta->at(i), electronDxy->at(i),
-                                               electronD0->at(i), electronDz->at(i), electronfullSigmaEtaEta->at(i),
-                                               electrondEtaIn->at(i), electrondPhiIn->at(i), electronHOverE->at(i),
-                                               electronooEmooP->at(i), electronIso03->at(i),
-                                               (int) electronmissHits->at(i), electronisVeto->at(i) == 1);
+            zElectron thisElectron = zElectron(v, electronCharge->at(i), electronSCeta->at(i), elvidTight->at(i) == 1);
 
             this->electrons.push_back(thisElectron);
         }

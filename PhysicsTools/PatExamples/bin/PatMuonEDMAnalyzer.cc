@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     catch (exception &e)
     {
         cout << "error:" << e.what() << endl;
-        cout << "File Name:" << fname << "is not valid!" << endl << endl << endl;
+        cout << "File Name:" << fname << " is not valid!" << endl << endl << endl;
     }
 #ifndef TW_SYNC
     }  // for i
