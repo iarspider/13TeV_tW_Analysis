@@ -20,6 +20,7 @@ typedef pair<vector<zElectron>::iterator, vector<zElectron>::iterator> eePair_t;
 typedef pair<vector<zElectron>::iterator, vector<zMuon>::iterator> emuPair_t;
 typedef pair<vector<zMuon>::iterator, vector<zMuon>::iterator> mumuPair_t;
 
+
 int main(int argc, char *argv[])
 {
     // ----------------------------------------------------------------------
@@ -188,6 +189,7 @@ int main(int argc, char *argv[])
         eePairs.clear();
         emuPairs.clear();
         mumuPairs.clear();
+        bool event_tagged = false;
 /*
         cout << "=== New event " << iEvent << " ===" << endl;
         cout << "Raw electrons: " << event->getElectrons().size() << ", muons " << event->getMuons().size() << ", jets "
@@ -212,20 +214,26 @@ int main(int argc, char *argv[])
         cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
              << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
 */
-        if (selectedElectrons.size() == 2)
+
+
+        if (selectedElectrons.size() >= 2)
         {
             cout << "=== New ee event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
             cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
                  << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+
+            event_tagged = true;
         }
 
-        if (selectedMuons.size() == 2)
+        if (selectedMuons.size() >= 2)
         {
             cout << "=== New mumu event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
             cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
                  << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+
+            event_tagged = true;
         }
 
         if (selectedElectrons.size() >= 1 && selectedMuons.size() >= 1)
@@ -234,8 +242,12 @@ int main(int argc, char *argv[])
             cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
                  << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
+            event_tagged = true;
         }
 
+        if (!event_tagged)
+            continue;
+        
         // ee
         size_t ie1 = 0, ie2 = 0;
         if (selectedElectrons.size() > 0)
