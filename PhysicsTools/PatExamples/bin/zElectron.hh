@@ -16,18 +16,21 @@ private:
 
     void check_tight(bool debug = false)
     {
+        if (debug)
+            cout << "Debug is_tight" << endl;
+
         if (abs(this->eta_sc) <= 1.479)
-        {
             check_tight_eb(debug);
-        }
         else
-        {
             check_tight_ee(debug);
-        }
+
+        if (debug)
+            cout << "end" << endl;
     }
 
     void check_tight_eb(bool debug)
     {
+        cout << "EB electron" << endl;
         vector<bool> conditions;
         conditions.push_back(this->full5x5_sigmaIetaIeta < 0.00998);
         conditions.push_back(fabs(this->dEtaIn) < 0.00308);
@@ -43,13 +46,15 @@ private:
         int i = 0;
 
         for (auto it = conditions.begin(); it != conditions.end(); it++, i++)
-            cout << "Condition " << i << " is " << (*it) << endl;
+            if (!(*it))
+                cout << "Condition " << i << " failed" << endl;
 
         this->is_tight = std::all_of(conditions.cbegin(), conditions.cend(), [](bool b) { return b; });
     }
 
     void check_tight_ee(bool debug)
     {
+        cout << "EE electron" << endl;
         vector<bool> conditions;
         conditions.push_back(this->full5x5_sigmaIetaIeta < 0.0292);
         conditions.push_back(fabs(this->dEtaIn) < 0.00605);
@@ -65,7 +70,8 @@ private:
         int i = 0;
 
         for (auto it = conditions.begin(); it != conditions.end(); it++, i++)
-            cout << "Condition " << i << " is " << (*it) << endl;
+            if (!(*it))
+                cout << "Condition " << i << " failed" << endl;
 
         this->is_tight = std::all_of(conditions.cbegin(), conditions.cend(), [](bool b) { return b; });
     }
