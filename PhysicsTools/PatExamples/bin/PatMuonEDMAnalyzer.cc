@@ -16,9 +16,9 @@ using namespace std;
 
 #include "zEvent.hh"
 
-typedef std::pair<std::vector<zElectron>::iterator, std::vector<zElectron>::iterator> eePair_t;
-typedef std::pair<std::vector<zElectron>::iterator, std::vector<zMuon>::iterator> emuPair_t;
-typedef std::pair<std::vector<zMuon>::iterator, std::vector<zMuon>::iterator> mumuPair_t;
+typedef pair<vector<zElectron>::iterator, vector<zElectron>::iterator> eePair_t;
+typedef pair<vector<zElectron>::iterator, vector<zMuon>::iterator> emuPair_t;
+typedef pair<vector<zMuon>::iterator, vector<zMuon>::iterator> mumuPair_t;
 
 int main(int argc, char *argv[])
 {
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
     char fname[160];
 
-    std::vector<zEvent> events;
+    vector<zEvent> events;
 //    double cNetEvWt = 0;
     ulong counter[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -114,8 +114,18 @@ int main(int argc, char *argv[])
 #endif
 
     counter[0] = events.size();
+    vector<zElectron> selectedElectrons;
+    vector<zMuon> selectedMuons;
+    vector<zJet> selectedJets;
+    vector<zJet> selectedBJets;
 
-    for (auto event = events.begin(); event != events.end(); event++)
+    vector<eePair_t> eePairs;
+    vector<mumuPair_t> mumuPairs;
+    vector<emuPair_t> emuPairs;
+
+    int iEvent = 0;
+
+    for (auto event = events.begin(); event != events.end(); event++, iEvent++)
     {
 #ifndef TW_SYNC
         cNetEvWt += event->getWeight();
@@ -160,30 +170,31 @@ int main(int argc, char *argv[])
         if (!event->isMETok())
             continue;
 
-        std::vector<zElectron> selectedElectrons;
-        std::vector<zMuon> selectedMuons;
-        std::vector<zJet> selectedJets;
-        std::vector<zJet> selectedBJets;
+        selectedBJets.clear();
+        selectedElectrons.clear();
+        selectedJets.clear();
+        selectedMuons.clear();
+        
+        cout << "Event " << iEvent << " has :" << endl;
+        cout << "\t" << event->getElectrons().size() << "electron(s)" << endl;
+        cout << "\t" << event->getMuons().size() << "muon(s)" << endl;
+        cout << "\t" << event->getJets().size() << "jet(s)" << endl;
 
-        std::vector<eePair_t> eePairs;
-        std::vector<mumuPair_t> mumuPairs;
-        std::vector<emuPair_t> emuPairs;
-
-        std::copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
+        copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
                      [](const zElectron &part) {
                          return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
                      });
 
-        std::copy_if(event->getMuons().begin(), event->getMuons().end(), selectedMuons.begin(),
+        copy_if(event->getMuons().begin(), event->getMuons().end(), selectedMuons.begin(),
                      [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
 
 
-        std::copy_if(event->getJets().begin(), event->getJets().end(), selectedJets.begin(),
+        copy_if(event->getJets().begin(), event->getJets().end(), selectedJets.begin(),
                      [](const zJet &jet) {
                          return jet.is_loose() && jet.is_clean() && jet.Pt() > 30 && jet.Eta() < 2.4;
                      });
 
-        std::copy_if(selectedJets.begin(), selectedJets.end(), selectedBJets.begin(),
+        copy_if(selectedJets.begin(), selectedJets.end(), selectedBJets.begin(),
                      [](const zJet &jet) { return jet.is_bjet(); });
 
         // ee
@@ -224,7 +235,7 @@ int main(int argc, char *argv[])
                     {
                         if (!mu1->is_samesign(*mu2) && TLorentzVector(*mu1 + *mu2).Mag() > 20)
                         {
-                            mumuPairs.push_back(std::make_pair(mu1, mu2));
+                            mumuPairs.push_back(make_pair(mu1, mu2));
                         }
                     }
 
@@ -235,8 +246,8 @@ int main(int argc, char *argv[])
                             if (!e1->is_samesign(*mu1) && TLorentzVector(*e1 + *mu1).Mag() > 20 && mu1->Pt() > e1->Pt())
                             {
                                 // emuPairs.push_back(make_pair(e1, mu1));
-                                emuPair_t pair = std::make_pair(e1, mu1);
-                                if (std::find(emuPairs.begin(), emuPairs.end(), pair) == emuPairs.end())
+                                emuPair_t pair = make_pair(e1, mu1);
+                                if (find(emuPairs.begin(), emuPairs.end(), pair) == emuPairs.end())
                                     emuPairs.push_back(pair);
                             }
                         }
