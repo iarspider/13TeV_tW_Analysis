@@ -8,6 +8,9 @@ class zParticle : public TLorentzVector
 private:
     float charge;
 public:
+    friend std::ostream &operator<<(std::ostream & o, const zParticle & z) {
+        o << "Charge" << z.get_charge() << ", (Pt, Eta, Phi, E) = (" << z.Pt() << ", " << z.Eta() << ", " << z.Phi() << ", " << z.E() << ")";
+    }
 
     zParticle(TLorentzVector v, float charge) : TLorentzVector(v)
     {
@@ -18,17 +21,17 @@ public:
     {
     }
 
-    float get_charge()
+    float get_charge() const
     {
         return this->charge;
     }
 
-    Double_t deltaR(zParticle &other)
+    Double_t deltaR(zParticle &other) const
     {
         return this->DeltaR(TLorentzVector(other));
     }
 
-    bool is_samesign(zParticle &other)
+    bool is_samesign(zParticle &other) const
     {
         return (this->charge * other.get_charge() > 0);
     }

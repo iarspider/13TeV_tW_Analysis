@@ -175,6 +175,7 @@ int main(int argc, char *argv[])
         selectedJets.clear();
         selectedMuons.clear();
 
+        cout << "=== New event " << iEvent << " ===" << endl;
 
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), back_inserter(selectedElectrons),
                 [](const zElectron &part) {
@@ -198,17 +199,20 @@ int main(int argc, char *argv[])
         {
             for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++)
             {
-                cout << "Electron candidate #1 (id=" << ie1 << "):  charge=" << e1->get_charge() << endl;
-                e1->Print();
+                cout << "Electron candidate #1 (id=" << ie1 << "):" << endl;
+                cout << "\t" << *e1 << endl;
+
                 if (e1->Pt() > 25)
                 {
                     for (auto e2 = e1 + 1; e2 != selectedElectrons.end(); e2++, ie2++)
                     {
-                        cout << "Electron candidate #2 (id=" << ie2 << "): charge=" << e2->get_charge() << endl;
-                        e2->Print();
+                        cout << "Electron candidate #2 (id=" << ie2 << "): " << endl;
+                        cout << "\t" << *e2 << endl;
                         cout << "Dileption object:" << endl;
                         TLorentzVector ll = (*e1) + (*e2);
-                        ll.Print();
+                        cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", " << ll.E() << ")";
+                        cout << " M = " << ll.Mag() << endl;
+                        //ll.Print();
 
                         if (!e1->is_samesign(*e2) && TLorentzVector(*e1 + *e2).Mag() > 20)
                         {

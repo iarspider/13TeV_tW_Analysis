@@ -1,6 +1,7 @@
 #ifndef INC_13TEV_TW_ANALYSIS_ZELECTRON_HH
 #define INC_13TEV_TW_ANALYSIS_ZELECTRON_HH
 
+#include <ostream>
 #include "zParticle.hh"
 
 class zElectron : public zParticle
@@ -89,6 +90,12 @@ public:
     bool in_gap() const
     {
         return fabs(this->eta_sc) > 1.4442 && fabs(this->eta_sc) < 1.566;
+    }
+
+    friend ostream &operator<<(ostream &os, const zElectron &electron)
+    {
+        os << "Electron tight " << electron.get_istight() << " sc eta = " << electron.get_etaSC() << " in gap " << electron.in_gap() << "; " << static_cast<const zParticle &>(electron);
+        return os;
     }
 
 };
