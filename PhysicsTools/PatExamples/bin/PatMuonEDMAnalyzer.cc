@@ -171,8 +171,11 @@ int main(int argc, char *argv[])
         if (event->getEvID() == 21902)
         {
             cout << "GOTCHA!" << endl;
-            continue;
+            for (auto el = event->getElectrons().begin(); el != event->getElectrons().end(); el++) {
+                cout << "\t" << *el << endl;
+            }
         }
+        continue;
 
 
         selectedBJets.clear();
@@ -344,7 +347,7 @@ int main(int argc, char *argv[])
 
         if (!event->isMETok())
             continue;
-        
+
         if (mumuPairs.size() > 0 || eePairs.size() > 0)
         {
             if (event->getMET().Pt() <= 40)
