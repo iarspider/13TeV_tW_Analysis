@@ -133,7 +133,7 @@ public:
         get_muons(ev);
         std::sort(this->leptons.begin(), this->leptons.end());
         get_jets(ev);
-        clean_jets();
+//        clean_jets();
         get_MET(ev);
 
         // Apply analysis filters
@@ -171,8 +171,8 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
 
-            zLepton thisElectron = zLepton(v, electronCharge->at(i), electronSCeta->at(i), elvidTight->at(i) != 0,
-                                           false);
+            zLepton thisElectron = zLepton(v, electronCharge->at(i), electronSCeta->at(i), 0,
+                                           elvidTight->at(i) != 0, false);
 
             this->leptons.push_back(thisElectron);
         }
@@ -242,7 +242,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(muonPt->at(i), muonEta->at(i), muonPhi->at(i), muonEn->at(i));
 
-            zLepton thisMuon(v, muonCharge->at(i), 0, muonTight->at(i) != 0, true);
+            zLepton thisMuon(v, muonCharge->at(i), 0, muonIso04->at(i), muonTight->at(i) != 0, true);
             this->leptons.push_back(thisMuon);
         }
     }
@@ -316,17 +316,17 @@ private:
 
         std::sort(this->jets.begin(), this->jets.end());
     }
-
-    void clean_jets()
+public:
+    void clean_jets(const std::vector<zLepton> &leptons_)
     {
         for (size_t i = 0; i < this->jets.size(); i++)
         {
             zJet &this_jet = this->jets.at(i);
             bool jet_flag = true;
 
-            for (size_t j = 0; j < this->leptons.size(); j++)
+            for (size_t j = 0; j < leptons_.size(); j++)
             {
-                if (this_jet.deltaR(this->leptons.at(j)) <= 0.4)
+                if (this_jet.deltaR(leptons_.at(j)) <= 0.4)
                 {
                     jet_flag = false;
                     break;

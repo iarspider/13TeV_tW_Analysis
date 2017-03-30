@@ -27,7 +27,7 @@ public:
         return this->charge;
     }
 
-    Double_t deltaR(zParticle &other) const
+    Double_t deltaR(const zParticle &other) const
     {
         return this->DeltaR(TLorentzVector(other));
     }

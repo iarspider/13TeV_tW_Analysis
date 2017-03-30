@@ -192,7 +192,6 @@ int main(int argc, char *argv[])
         selectedJets.clear();
 
         llPairs.clear();
-        bool event_tagged = false;
         int event_tag = -1;
 
         TLorentzVector ll;
@@ -202,6 +201,8 @@ int main(int argc, char *argv[])
                 [](const zLepton &part) {
                     return part.get_istight() && part.Pt() > 20. && fabs(part.Eta()) < 2.4 && !part.in_gap();
                 });
+
+        event->clean_jets(selectedLeptons);
 
         copy_if(event->getJets().begin(), event->getJets().end(), back_inserter(selectedJets),
                 [](const zJet &jet) {

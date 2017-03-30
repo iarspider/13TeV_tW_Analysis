@@ -12,6 +12,9 @@ class zLepton : public zParticle
 {
 private:
     float eta_sc;
+    float iso_;
+
+private:
     bool is_tight;
     bool is_muon_;
 public:
@@ -20,10 +23,15 @@ public:
         return is_muon_;
     }
 
+    float is_iso() const
+    {
+        return (!this->is_muon()) || (iso_ < 0.15);
+    }
+
 public:
-    zLepton(const TLorentzVector &v, float charge, float eta_sc, bool is_tight, bool is_muon)
+    zLepton(const TLorentzVector &v, float charge, float eta_sc, float iso, bool is_tight, bool is_muon)
             : zParticle(v, charge),
-              eta_sc(eta_sc),
+              eta_sc(eta_sc), iso_(iso),
               is_tight(is_tight), is_muon_(is_muon)
     {
     }
