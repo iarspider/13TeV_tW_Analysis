@@ -38,7 +38,7 @@ public:
     friend ostream &operator<<(ostream &os, const zElectron &electron)
     {
         os << " is_tight: " << electron.is_tight << " eta_sc: "
-           << electron.eta_sc << static_cast<const zParticle &>(electron);
+           << electron.eta_sc << "; " << static_cast<const zParticle &>(electron);
         return os;
     }
 };

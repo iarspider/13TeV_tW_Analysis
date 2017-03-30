@@ -169,6 +169,7 @@ int main(int argc, char *argv[])
             continue;
         }
 #endif
+/*
         if (event->getEvID() == 21902)
         {
             cout << "GOTCHA!" << endl;
@@ -177,7 +178,7 @@ int main(int argc, char *argv[])
             }
         }
         continue;
-
+*/
 
         selectedBJets.clear();
         selectedElectrons.clear();
