@@ -181,12 +181,14 @@ int main(int argc, char *argv[])
         cout << "\t" << event->getJets().size() << " jet(s)" << endl;
 
         size_t iJet = 0;
-        for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++, iJet++)
+        for (auto jet = event->getJets().begin(); jet != event->getJets().end(); jet++, iJet++)
         {
             cout << "Jet " << iJet << endl;
-            // cout << "\t" << &(thisJet) << endl;
-            cout << "\t" << *thisJet << endl;
+            // cout << "\t" << &(jet) << endl;
+            cout << "\t" << (jet->is_loose() && jet->is_clean() && jet->Pt() > 30 && jet->Eta() < 2.4) << endl;
         }
+
+        return 0;
 
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
                      [](const zElectron &part) {

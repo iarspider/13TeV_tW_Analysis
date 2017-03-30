@@ -26,6 +26,8 @@ public:
         return this->btag > 0.8484;
     }
 
+    zJet(zJet& other) = default;
+
 private:
     friend std::ostream &operator<<(std::ostream &, const zJet &);
 
