@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     vector<zEvent> events;
 //    double cNetEvWt = 0;
     ulong counter[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    ulong globalEventID;
 
 
 #ifndef TW_SYNC
@@ -170,6 +171,13 @@ int main(int argc, char *argv[])
         if (!event->isMETok())
             continue;
 
+        if (event->getEvID() == 21902)
+        {
+            cout << "GOTCHA!" << endl;
+            continue;
+        }
+
+
         selectedBJets.clear();
         selectedElectrons.clear();
         selectedJets.clear();
@@ -198,21 +206,27 @@ int main(int argc, char *argv[])
         cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
              << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
 */
-        if (selectedElectrons.size() == 2) {
-            cout << "=== New ee event " << iEvent << " ===" << endl;
-            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+        if (selectedElectrons.size() == 2)
+        {
+            cout << "=== New ee event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
+                 << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
         }
 
-        if (selectedMuons.size() == 2) {
-            cout << "=== New mumu event " << iEvent << " ===" << endl;
-            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+        if (selectedMuons.size() == 2)
+        {
+            cout << "=== New mumu event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
+                 << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
         }
 
-        if (selectedElectrons.size() >= 1 && selectedMuons.size() >= 1) {
-            cout << "=== New emu event " << iEvent << " ===" << endl;
-            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
+        if (selectedElectrons.size() >= 1 && selectedMuons.size() >= 1)
+        {
+            cout << "=== New emu event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
+                 << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
         }
 

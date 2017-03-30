@@ -35,7 +35,13 @@ private:
     int puNtrueInteractons;
     double weight;
 
+    ulong evID;
 public:
+    ulong getEvID() const
+    {
+        return evID;
+    }
+
     const vector<zHLT> &getTriggers() const
     {
         return triggers;
@@ -123,6 +129,9 @@ public:
         get_triggers(ev);
         get_vertices(ev);
 #endif
+        edm::Handle<ulong> event_id;
+        ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
+        this->evID = *event_id;
         get_electrons(ev);
         get_muons(ev);
         get_jets(ev);
