@@ -55,6 +55,10 @@ int main(int argc, char *argv[])
 
     cout << boolalpha;
 
+    fstream ee_evid("ee_list.txt", ee_evid.out | ee_evid.trunc);
+    fstream emu_evid("emu_list.txt", emu_evid.out | emu_evid.trunc);
+    fstream mumu_evid("mumu_list.txt", mumu_evid.out | mumu_evid.trunc);
+
 #ifndef TW_SYNC
     // for(int i=s;i<=n;i++)
     for (int i = 1; i <= n; i++)
@@ -410,18 +414,25 @@ int main(int argc, char *argv[])
         if (eePairs.size() > 0)
         {
             counter[EE][3]++;
+            ee_evid << event->getEvID() << endl;
         }
 
         if (emuPairs.size() > 0)
         {
             counter[EMu][3]++;
+            emu_evid << event->getEvID() << endl;
         }
 
         if (mumuPairs.size() > 0)
         {
             counter[MuMu][3]++;
+            mumu_evid << event->getEvID() << endl;
         }
     }
+
+    ee_evid.close();
+    emu_evid.close();
+    mumu_evid.close();
 
     for (int i = 0; i < 4; i++)
     {
