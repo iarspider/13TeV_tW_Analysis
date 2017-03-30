@@ -492,6 +492,21 @@ int main(int argc, char *argv[])
         }
 
         counter[event_tag][3]++;
+
+        if (selectedJets.size() >= 2) {
+            counter[event_tag][4]++;
+            if (selectedBJets.size() >= 1) {
+             counter[event_tag][5]++;
+            }
+        }
+
+        if (selectedJets.size() == 1) {
+            counter[event_tag][6]++;
+            if (selectedBJets.size() == 1) {
+                counter[event_tag][7]++;
+            }
+        }
+
     }
 
     ee_evid.close();
