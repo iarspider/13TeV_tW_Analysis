@@ -44,8 +44,10 @@ int main(int argc, char *argv[])
 
     vector<zEvent> events;
 //    double cNetEvWt = 0;
-    ulong counter[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    ulong globalEventID;
+    ulong counter[4][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0}};
 
     cout << boolalpha;
 
@@ -116,7 +118,9 @@ int main(int argc, char *argv[])
     }  // for i
 #endif
 
-    counter[0] = events.size();
+    counter[00b][0] = events.size();
+    counter[01b][0] = events.size();
+    counter[11b][0] = events.size();
     vector<zElectron> selectedElectrons;
     vector<zMuon> selectedMuons;
     vector<zJet> selectedJets;
@@ -190,11 +194,9 @@ int main(int argc, char *argv[])
         emuPairs.clear();
         mumuPairs.clear();
         bool event_tagged = false;
-/*
-        cout << "=== New event " << iEvent << " ===" << endl;
-        cout << "Raw electrons: " << event->getElectrons().size() << ", muons " << event->getMuons().size() << ", jets "
-             << event->getJets().size() << endl;
-*/
+
+        TLorentzVector ll;
+
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), back_inserter(selectedElectrons),
                 [](const zElectron &part) {
                     return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
@@ -210,10 +212,6 @@ int main(int argc, char *argv[])
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
-/*
-        cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size() << ", jets "
-             << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
-*/
 
 
         if (selectedElectrons.size() >= 2)
@@ -247,30 +245,30 @@ int main(int argc, char *argv[])
 
         if (!event_tagged)
             continue;
-        
+
         // ee
         size_t ie1 = 0, ie2 = 0;
         if (selectedElectrons.size() > 0)
         {
-            for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++)
+            for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++, ie2 = ie1 + 1)
             {
                 cout << "Electron candidate #1 (id=" << ie1 << "):" << endl;
                 cout << "\t" << *e1 << endl;
 
-                if (e1->Pt() > 25)
+                if (e1->Pt() > 25.)
                 {
                     for (auto e2 = e1 + 1; e2 != selectedElectrons.end(); e2++, ie2++)
                     {
                         cout << "Electron candidate #2 (id=" << ie2 << "): " << endl;
                         cout << "\t" << *e2 << endl;
                         cout << "Dileption object:" << endl;
-                        TLorentzVector ll = (*e1) + (*e2);
+                        ll = (*e1) + (*e2);
                         cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
                              << ll.E() << ")";
                         cout << " M = " << ll.Mag() << endl;
                         //ll.Print();
 
-                        if (!e1->is_samesign(*e2) && TLorentzVector(*e1 + *e2).Mag() > 20)
+                        if (!e1->is_samesign(*e2) && ll.Mag() > 20.)
                         {
                             eePairs.push_back(make_pair(e1, e2));
                         }
@@ -279,7 +277,9 @@ int main(int argc, char *argv[])
                     {
                         for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++)
                         {
-                            if (!e1->is_samesign(*mu1) && TLorentzVector(*e1 + *mu1).Mag() > 20 && mu1->Pt() < e1->Pt())
+                            ll = (*e1) + (*mu1);
+
+                            if (!e1->is_samesign(*mu1) && ll.Mag() > 20. && mu1->Pt() < e1->Pt())
                             {
                                 emuPairs.push_back(make_pair(e1, mu1));
                             }
@@ -293,11 +293,13 @@ int main(int argc, char *argv[])
         {
             for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++)
             {
-                if (mu1->Pt() > 25)
+                if (mu1->Pt() > 25.)
                 {
                     for (auto mu2 = mu1 + 1; mu2 != selectedMuons.end(); mu2++)
                     {
-                        if (!mu1->is_samesign(*mu2) && TLorentzVector(*mu1 + *mu2).Mag() > 20)
+                        ll = (*mu1) + (*mu2);
+
+                        if (!mu1->is_samesign(*mu2) && ll.Mag() > 20.)
                         {
                             mumuPairs.push_back(make_pair(mu1, mu2));
                         }
@@ -307,7 +309,9 @@ int main(int argc, char *argv[])
                     {
                         for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++)
                         {
-                            if (!e1->is_samesign(*mu1) && TLorentzVector(*e1 + *mu1).Mag() > 20 && mu1->Pt() > e1->Pt())
+                            ll = (*e1) + (*mu1);
+
+                            if (!e1->is_samesign(*mu1) && ll.Mag() > 20. && mu1->Pt() > e1->Pt())
                             {
                                 // emuPairs.push_back(make_pair(e1, mu1));
                                 emuPair_t pair = make_pair(e1, mu1);
@@ -320,19 +324,37 @@ int main(int argc, char *argv[])
             }
         }
 
-        if (eePairs.size() > 0 /*|| emuPairs.size() > 0 || mumuPairs.size() > 0*/)
-            counter[1]++;
-        else
+        event_tagged = false;
+
+        if (eePairs.size() > 0)
+        {
+            counter[00b][1]++;
+            event_tagged = true;
+        }
+
+        if (emuPairs.size() > 0)
+        {
+            counter[01b][1]++;
+            event_tagged = true;
+        }
+
+        if (mumuPairs.size() > 0)
+        {
+            counter[11b][1]++;
+            event_tagged = true;
+        }
+
+        if (!event_tagged)
             continue;
 
         bool massFlag = false;
 
         for (auto ee = eePairs.begin(); ee != eePairs.end(); ee++)
         {
-            auto e1 = ee->first;
-            auto e2 = ee->second;
 
-            if (TLorentzVector(*e1 + *e2).Mag() >= 76 && TLorentzVector(*e1 + *e2).Mag() <= 106)
+            ll = (*(ee->first)) + (*(ee->second));
+
+            if (ll.Mag() >= 76 && ll.Mag() <= 106)
             {
                 massFlag = true;
                 break;
@@ -346,10 +368,8 @@ int main(int argc, char *argv[])
 
         for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
         {
-            auto mu1 = mumu->first;
-            auto mu2 = mumu->second;
-
-            if (TLorentzVector(*mu1 + *mu2).Mag() >= 76 && TLorentzVector(*mu1 + *mu2).Mag() <= 106)
+            ll = (*(mumu->first)) + (*(mumu->second));
+            if (ll.Mag() >= 76 && ll.Mag() <= 106)
             {
                 massFlag = true;
                 break;
@@ -357,11 +377,22 @@ int main(int argc, char *argv[])
         }
 
         if (massFlag)
-        {
             continue;
+
+        if (eePairs.size() > 0)
+        {
+            counter[00b][2]++;
         }
 
-        counter[2]++;
+        if (emuPairs.size() > 0)
+        {
+            counter[01b][2]++;
+        }
+
+        if (mumuPairs.size() > 0)
+        {
+            counter[11b][2]++;
+        }
 
         if (!event->isMETok())
             continue;
@@ -372,12 +403,43 @@ int main(int argc, char *argv[])
                 continue;
         }
 
-        counter[3]++;
+        if (eePairs.size() > 0)
+        {
+            counter[00b][3]++;
+        }
+
+        if (emuPairs.size() > 0)
+        {
+            counter[01b][3]++;
+        }
+
+        if (mumuPairs.size() > 0)
+        {
+            counter[11b][3]++;
+        }
     }
 
-    for (int i = 0; i < 8; i++)
-        cout << "Step " << i << " events " << counter[i] << endl;
+    for (int i = 0; i < 3; i++)
+    {
 
+        cout << "=== ";
+        switch(i) {
+            case 0:
+                cout << "EE";
+                break;
+            case 1:
+                cout << "EMu";
+                break;
+            case 3:
+                cout << "MuMu";
+                break;
+            default:
+                cout << "None";
+        }
+        cout << " channel ===" << endl;
+        for (int j = 0; j < 8; j++)
+            cout << "Step " << j << " events " << counter[i][j] << endl;
+    }
     /*
     cout << "Total number of events processed: " << events.size() << endl;
     cout << "Sum of events Weight : " << cNetEvWt << endl;
