@@ -196,10 +196,11 @@ int main(int argc, char *argv[])
 
         TLorentzVector ll;
 
-        // in_gap will return false for muons
+        // in_gap will return false for muons; is_iso will return true for electrons
         copy_if(event->getLeptons().begin(), event->getLeptons().end(), back_inserter(selectedLeptons),
                 [](const zLepton &part) {
-                    return part.get_istight() && part.Pt() > 20. && fabs(part.Eta()) < 2.4 && !part.in_gap();
+                    return part.get_istight() && part.is_iso() && !part.in_gap() && part.Pt() > 20. &&
+                           fabs(part.Eta()) < 2.4;
                 });
 
         event->clean_jets(selectedLeptons);
@@ -484,7 +485,8 @@ int main(int argc, char *argv[])
     }
          */
 
-        if (event_tag != EMu) {
+        if (event_tag != EMu)
+        {
             if (!event->isMETok())
                 continue;
 
@@ -494,16 +496,20 @@ int main(int argc, char *argv[])
 
         counter[event_tag][3]++;
 
-        if (selectedJets.size() >= 2) {
+        if (selectedJets.size() >= 2)
+        {
             counter[event_tag][4]++;
-            if (selectedBJets.size() >= 1) {
-             counter[event_tag][5]++;
+            if (selectedBJets.size() >= 1)
+            {
+                counter[event_tag][5]++;
             }
         }
 
-        if (selectedJets.size() == 1) {
+        if (selectedJets.size() == 1)
+        {
             counter[event_tag][6]++;
-            if (selectedBJets.size() == 1) {
+            if (selectedBJets.size() == 1)
+            {
                 counter[event_tag][7]++;
             }
         }
