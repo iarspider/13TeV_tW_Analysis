@@ -202,6 +202,7 @@ int main(int argc, char *argv[])
         emuPairs.clear();
         mumuPairs.clear();
         bool event_tagged = false;
+        int event_tag = -1;
 
         TLorentzVector ll;
 
@@ -224,7 +225,7 @@ int main(int argc, char *argv[])
 
         if (selectedElectrons.size() >= 2)
         {
-            cout << "=== New ee event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "=== New ee candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
             cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
                  << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
@@ -234,7 +235,7 @@ int main(int argc, char *argv[])
 
         if (selectedMuons.size() >= 2)
         {
-            cout << "=== New mumu event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "=== New mumu candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
             cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
                  << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
@@ -244,7 +245,7 @@ int main(int argc, char *argv[])
 
         if (selectedElectrons.size() >= 1 && selectedMuons.size() >= 1)
         {
-            cout << "=== New emu event " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "=== New emu candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
             cout << "Selected electrons: " << selectedElectrons.size() << ", muons " << selectedMuons.size()
                  << ", jets "
                  << selectedJets.size() << ", bjets " << selectedBJets.size() << endl;
@@ -255,44 +256,61 @@ int main(int argc, char *argv[])
             continue;
 
         // ee
-        size_t ie1 = 0, ie2 = 0;
+        size_t ie1 = 0, ie2 = 0, imu1 = 0, imu2 = 0;
         if (selectedElectrons.size() > 0)
         {
-            for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++, ie2 = ie1 + 1)
+            for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++)
             {
-                cout << "Electron candidate #1 (id=" << ie1 << "):" << endl;
+                cout << "Lepton candidate #1 (electron #" << ie1 << "/" << selectedElectrons.size() << "):" << endl;
                 cout << "\t" << *e1 << endl;
 
                 if (e1->Pt() > 25.)
                 {
+                    ie2 = ie1 + 1;
                     for (auto e2 = e1 + 1; e2 != selectedElectrons.end(); e2++, ie2++)
                     {
-                        cout << "Electron candidate #2 (id=" << ie2 << "): " << endl;
+                        cout << "Lepton candidate #2 (electron #" << ie2 << "/" << selectedElectrons.size() << "):"
+                             << endl;
                         cout << "\t" << *e2 << endl;
                         cout << "Dileption object:" << endl;
                         ll = (*e1) + (*e2);
                         cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
-                             << ll.E() << ")";
-                        cout << " M = " << ll.Mag() << endl;
-                        //ll.Print();
+                             << ll.E() << "), M = " << ll.Mag() << endl;
+
 
                         if (!e1->is_samesign(*e2) && ll.Mag() > 20.)
                         {
-
-                            cout << "ACCEPT 1" << endl;
+                            cout << "Passed" << endl;
                             eePairs.push_back(make_pair(e1, e2));
+                            event_tag = EE;
                         }
                     }
                     if (selectedMuons.size() > 0)
                     {
-                        for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++)
+                        for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++, imu1++)
                         {
+                            cout << "Lepton candidate #2 (moun #" << imu1 << "/" << selectedMuons.size() << "):"
+                                 << endl;
+                            cout << "\t" << *mu1 << endl;
+                            cout << "Dileption object:" << endl;
                             ll = (*e1) + (*mu1);
+                            cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
+                                 << ll.E() << "), M = " << ll.Mag() << endl;
+
 
                             if (!e1->is_samesign(*mu1) && ll.Mag() > 20. && mu1->Pt() < e1->Pt())
                             {
-                                cout << "ACCEPT 1" << endl;
                                 emuPairs.push_back(make_pair(e1, mu1));
+                                cout << "Passed" << endl;
+                                if (event_tag != -1)
+                                {
+                                    cout << "! Event " << event->getEvID() << " is already tagged with " << event_tag
+                                         << endl;
+                                }
+                                else
+                                {
+                                    event_tag = EMu;
+                                }
                             }
                         }
                     }
@@ -302,34 +320,74 @@ int main(int argc, char *argv[])
 
         if (selectedMuons.size() > 0)
         {
-            for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++)
+            imu1 = 0;
+
+            for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++, imu1++)
             {
+                cout << "Lepton candidate #1 (muon #" << ie1 << "/" << selectedMuons.size() << "):" << endl;
+                cout << "\t" << *mu1 << endl;
+
                 if (mu1->Pt() > 25.)
                 {
+                    imu2 = imu1 + 1;
                     for (auto mu2 = mu1 + 1; mu2 != selectedMuons.end(); mu2++)
                     {
+                        cout << "Lepton candidate #2 (moun #" << imu2 << "/" << selectedMuons.size() << "):" << endl;
+                        cout << "\t" << *mu2 << endl;
+                        cout << "Dileption object:" << endl;
                         ll = (*mu1) + (*mu2);
+                        cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
+                             << ll.E() << "), M = " << ll.Mag() << endl;
+
 
                         if (!mu1->is_samesign(*mu2) && ll.Mag() > 20.)
                         {
-                            cout << "ACCEPT 1" << endl;
                             mumuPairs.push_back(make_pair(mu1, mu2));
+                            cout << "Passed" << endl;
+                            if (event_tag != -1)
+                            {
+                                cout << "! Event " << event->getEvID() << " is already tagged with " << event_tag
+                                     << endl;
+                            }
+                            else
+                            {
+                                event_tag = MuMu;
+                            }
+
                         }
                     }
 
+                    ie1 = 0;
                     if (selectedElectrons.size() > 0)
                     {
-                        for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++)
+                        for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++, ie1++)
                         {
+                            cout << "Lepton candidate #2 (electron #" << ie1 << "/" << selectedElectrons.size() << "):"
+                                 << endl;
+                            cout << "\t" << *e1 << endl;
+                            cout << "Dileption object:" << endl;
                             ll = (*e1) + (*mu1);
+                            cout << "\t(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
+                                 << ll.E() << "), M = " << ll.Mag() << endl;
+
 
                             if (!e1->is_samesign(*mu1) && ll.Mag() > 20. && mu1->Pt() > e1->Pt())
                             {
-                                // emuPairs.push_back(make_pair(e1, mu1));
+                                cout << "Passed" << endl;
+
                                 emuPair_t pair = make_pair(e1, mu1);
                                 if (find(emuPairs.begin(), emuPairs.end(), pair) == emuPairs.end())
                                 {
-                                    cout << "ACCEPT 1" << endl;
+                                    if (event_tag != -1)
+                                    {
+                                        cout << "! Event " << event->getEvID() << " is already tagged with "
+                                             << event_tag << endl;
+                                    }
+                                    else
+                                    {
+                                        event_tag = EMu;
+                                    }
+
                                     emuPairs.push_back(pair);
                                 }
                             }
@@ -339,37 +397,21 @@ int main(int argc, char *argv[])
             }
         }
 
-        event_tagged = false;
+        counter[event_tag][1]++;
 
-        if (eePairs.size() > 0)
-        {
-            counter[EE][1]++;
-            event_tagged = true;
+        if (event_tag == EE)
             ee_evid << event->getEvID() << endl;
-        }
-
-        if (emuPairs.size() > 0)
-        {
-            counter[EMu][1]++;
-            event_tagged = true;
+        else if (event_tag == EMu)
             emu_evid << event->getEvID() << endl;
-        }
-
-        if (mumuPairs.size() > 0)
-        {
-            counter[MuMu][1]++;
-            event_tagged = true;
+        else if (event_tag == MuMu)
             mumu_evid << event->getEvID() << endl;
-        }
-
-        if (!event_tagged)
+        else
             continue;
 
         bool massFlag = false;
 
         for (auto ee = eePairs.begin(); ee != eePairs.end(); ee++)
         {
-
             ll = (*(ee->first)) + (*(ee->second));
 
             if (ll.Mag() >= 76 && ll.Mag() <= 106)
@@ -443,6 +485,8 @@ int main(int argc, char *argv[])
 
     for (int i = 0; i < 4; i++)
     {
+        if (i == 2)
+            continue;
 
         cout << "=== ";
         switch (i)
