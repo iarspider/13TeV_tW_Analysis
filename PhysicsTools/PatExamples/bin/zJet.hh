@@ -27,6 +27,8 @@ public:
     }
 
 private:
+    friend std::ostream &operator<<(std::ostream &, const zJet &);
+
     float btag;
     float rapidity;
     float area;
@@ -116,5 +118,12 @@ private:
 
 
 };
+
+std::ostream &operator<<(std::ostream &strm, const zJet &j)
+{
+    // return strm << "A(" << a.j << ")";
+    return strm << "Jet(" << j.Pt() << ", " << j.Eta() << ", " << j.Phi() << ", " << j.Energy() << ") clean= "
+                << j.is_clean() << ", loose = " << j.is_loose() << ", tag =" << j.is_bjet();
+}
 
 #endif //INC_13TEV_TW_ANALYSIS_ZJET_HH
