@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
                     {
                         for (auto mu1 = selectedMuons.begin(); mu1 != selectedMuons.end(); mu1++, imu1++)
                         {
-                            cout << "Lepton candidate #2 (moun #" << imu1 << "/" << selectedMuons.size() << "):"
+                            cout << "Lepton candidate #2 (muon #" << imu1 << "/" << selectedMuons.size() << "):"
                                  << endl;
                             cout << "\t" << *mu1 << endl;
                             cout << "Dileption object:" << endl;
@@ -332,7 +332,7 @@ int main(int argc, char *argv[])
                     imu2 = imu1 + 1;
                     for (auto mu2 = mu1 + 1; mu2 != selectedMuons.end(); mu2++)
                     {
-                        cout << "Lepton candidate #2 (moun #" << imu2 << "/" << selectedMuons.size() << "):" << endl;
+                        cout << "Lepton candidate #2 (muon #" << imu2 << "/" << selectedMuons.size() << "):" << endl;
                         cout << "\t" << *mu2 << endl;
                         cout << "Dileption object:" << endl;
                         ll = (*mu1) + (*mu2);
