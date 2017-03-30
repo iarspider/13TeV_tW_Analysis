@@ -278,6 +278,8 @@ int main(int argc, char *argv[])
 
                         if (!e1->is_samesign(*e2) && ll.Mag() > 20.)
                         {
+
+                            cout << "ACCEPT 1" << endl;
                             eePairs.push_back(make_pair(e1, e2));
                         }
                     }
@@ -289,6 +291,7 @@ int main(int argc, char *argv[])
 
                             if (!e1->is_samesign(*mu1) && ll.Mag() > 20. && mu1->Pt() < e1->Pt())
                             {
+                                cout << "ACCEPT 1" << endl;
                                 emuPairs.push_back(make_pair(e1, mu1));
                             }
                         }
@@ -309,6 +312,7 @@ int main(int argc, char *argv[])
 
                         if (!mu1->is_samesign(*mu2) && ll.Mag() > 20.)
                         {
+                            cout << "ACCEPT 1" << endl;
                             mumuPairs.push_back(make_pair(mu1, mu2));
                         }
                     }
@@ -324,7 +328,10 @@ int main(int argc, char *argv[])
                                 // emuPairs.push_back(make_pair(e1, mu1));
                                 emuPair_t pair = make_pair(e1, mu1);
                                 if (find(emuPairs.begin(), emuPairs.end(), pair) == emuPairs.end())
+                                {
+                                    cout << "ACCEPT 1" << endl;
                                     emuPairs.push_back(pair);
+                                }
                             }
                         }
                     }
@@ -338,18 +345,21 @@ int main(int argc, char *argv[])
         {
             counter[EE][1]++;
             event_tagged = true;
+            ee_evid << event->getEvID() << endl;
         }
 
         if (emuPairs.size() > 0)
         {
             counter[EMu][1]++;
             event_tagged = true;
+            emu_evid << event->getEvID() << endl;
         }
 
         if (mumuPairs.size() > 0)
         {
             counter[MuMu][1]++;
             event_tagged = true;
+            mumu_evid << event->getEvID() << endl;
         }
 
         if (!event_tagged)
@@ -414,19 +424,16 @@ int main(int argc, char *argv[])
         if (eePairs.size() > 0)
         {
             counter[EE][3]++;
-            ee_evid << event->getEvID() << endl;
         }
 
         if (emuPairs.size() > 0)
         {
             counter[EMu][3]++;
-            emu_evid << event->getEvID() << endl;
         }
 
         if (mumuPairs.size() > 0)
         {
             counter[MuMu][3]++;
-            mumu_evid << event->getEvID() << endl;
         }
     }
 
@@ -438,7 +445,8 @@ int main(int argc, char *argv[])
     {
 
         cout << "=== ";
-        switch(i) {
+        switch (i)
+        {
             case EE:
                 cout << "EE";
                 break;
