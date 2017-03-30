@@ -14,6 +14,10 @@ using namespace std;
 
 #define TW_SYNC
 
+#define EE 0
+#define EMu 1
+#define MuMu 3
+
 #include "zEvent.hh"
 
 typedef pair<vector<zElectron>::iterator, vector<zElectron>::iterator> eePair_t;
@@ -118,9 +122,9 @@ int main(int argc, char *argv[])
     }  // for i
 #endif
 
-    counter[00b][0] = events.size();
-    counter[01b][0] = events.size();
-    counter[11b][0] = events.size();
+    counter[EE][0] = events.size();
+    counter[EMu][0] = events.size();
+    counter[MuMu][0] = events.size();
     vector<zElectron> selectedElectrons;
     vector<zMuon> selectedMuons;
     vector<zJet> selectedJets;
@@ -328,19 +332,19 @@ int main(int argc, char *argv[])
 
         if (eePairs.size() > 0)
         {
-            counter[00b][1]++;
+            counter[EE][1]++;
             event_tagged = true;
         }
 
         if (emuPairs.size() > 0)
         {
-            counter[01b][1]++;
+            counter[EMu][1]++;
             event_tagged = true;
         }
 
         if (mumuPairs.size() > 0)
         {
-            counter[11b][1]++;
+            counter[MuMu][1]++;
             event_tagged = true;
         }
 
@@ -381,17 +385,17 @@ int main(int argc, char *argv[])
 
         if (eePairs.size() > 0)
         {
-            counter[00b][2]++;
+            counter[EE][2]++;
         }
 
         if (emuPairs.size() > 0)
         {
-            counter[01b][2]++;
+            counter[EMu][2]++;
         }
 
         if (mumuPairs.size() > 0)
         {
-            counter[11b][2]++;
+            counter[MuMu][2]++;
         }
 
         if (!event->isMETok())
@@ -405,17 +409,17 @@ int main(int argc, char *argv[])
 
         if (eePairs.size() > 0)
         {
-            counter[00b][3]++;
+            counter[EE][3]++;
         }
 
         if (emuPairs.size() > 0)
         {
-            counter[01b][3]++;
+            counter[EMu][3]++;
         }
 
         if (mumuPairs.size() > 0)
         {
-            counter[11b][3]++;
+            counter[MuMu][3]++;
         }
     }
 
@@ -424,13 +428,13 @@ int main(int argc, char *argv[])
 
         cout << "=== ";
         switch(i) {
-            case 0:
+            case EE:
                 cout << "EE";
                 break;
-            case 1:
+            case EMu:
                 cout << "EMu";
                 break;
-            case 3:
+            case MuMu:
                 cout << "MuMu";
                 break;
             default:
