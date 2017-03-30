@@ -7,9 +7,8 @@
 class zElectron : public zParticle
 {
 private:
-    bool is_tight;
     float eta_sc;
-
+    bool is_tight;
 
 public:
     zElectron(const TLorentzVector &v, float charge, float eta_sc, bool is_tight)
