@@ -173,7 +173,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
 
-            zElectron thisElectron = zElectron(v, electronCharge->at(i), electronSCeta->at(i), elvidTight->at(i) == 1);
+            zElectron thisElectron = zElectron(v, electronCharge->at(i), electronSCeta->at(i), elvidTight->at(i) != 0);
 
             this->electrons.push_back(thisElectron);
         }
@@ -245,7 +245,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(muonPt->at(i), muonEta->at(i), muonPhi->at(i), muonEn->at(i));
 
-            zMuon thisMuon(v, muonCharge->at(i), muonIso04->at(i), muonTight->at(i) == 1);
+            zMuon thisMuon(v, muonCharge->at(i), muonIso04->at(i), muonTight->at(i) != 0);
             this->muons.push_back(thisMuon);
         }
 
