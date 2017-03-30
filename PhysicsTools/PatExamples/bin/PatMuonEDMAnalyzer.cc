@@ -15,9 +15,10 @@ using namespace std;
 #define TW_SYNC
 
 #include "zEvent.hh"
-typedef std::pair<std::vector<zElectron>::iterator,std::vector<zElectron>::iterator> eePair_t;
-typedef std::pair<std::vector<zElectron>::iterator,std::vector<zMuon>::iterator> emuPair_t;
-typedef std::pair<std::vector<zMuon>::iterator,std::vector<zMuon>::iterator> mumuPair_t;
+
+typedef std::pair<std::vector<zElectron>::iterator, std::vector<zElectron>::iterator> eePair_t;
+typedef std::pair<std::vector<zElectron>::iterator, std::vector<zMuon>::iterator> emuPair_t;
+typedef std::pair<std::vector<zMuon>::iterator, std::vector<zMuon>::iterator> mumuPair_t;
 
 int main(int argc, char *argv[])
 {
@@ -42,7 +43,8 @@ int main(int argc, char *argv[])
 
     std::vector<zEvent> events;
 //    double cNetEvWt = 0;
-    ulong counter[8];
+    ulong counter[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
 
 #ifndef TW_SYNC
     // for(int i=s;i<=n;i++)
@@ -81,7 +83,7 @@ int main(int argc, char *argv[])
     {
 
         sprintf(fname,
-                "root://eoscms//eos/cms//store/mc/RunIISummer16MiniAODv2/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/MINIAODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/50000/36CDAE89-B3BE-E611-B022-0025905B8604.root");
+                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
 #endif
         cout << "File Name:" << fname << endl;
 
@@ -220,18 +222,21 @@ int main(int argc, char *argv[])
                 {
                     for (auto mu2 = mu1 + 1; mu2 != selectedMuons.end(); mu2++)
                     {
-                        if (!mu1->is_samesign(*mu2) && TLorentzVector(*mu1 + *mu2).Mag() > 20) {
+                        if (!mu1->is_samesign(*mu2) && TLorentzVector(*mu1 + *mu2).Mag() > 20)
+                        {
                             mumuPairs.push_back(std::make_pair(mu1, mu2));
                         }
                     }
 
-                    if (selectedElectrons.size() > 0) {
+                    if (selectedElectrons.size() > 0)
+                    {
                         for (auto e1 = selectedElectrons.begin(); e1 != selectedElectrons.end(); e1++)
                         {
-                            if (!e1->is_samesign(*mu1) && TLorentzVector(*e1 + *mu1).Mag() > 20 && mu1->Pt() > e1->Pt()) {
+                            if (!e1->is_samesign(*mu1) && TLorentzVector(*e1 + *mu1).Mag() > 20 && mu1->Pt() > e1->Pt())
+                            {
                                 // emuPairs.push_back(make_pair(e1, mu1));
                                 emuPair_t pair = std::make_pair(e1, mu1);
-                                if (std::find(emuPairs.begin(),emuPairs.end(), pair) == emuPairs.end())
+                                if (std::find(emuPairs.begin(), emuPairs.end(), pair) == emuPairs.end())
                                     emuPairs.push_back(pair);
                             }
                         }
@@ -247,37 +252,44 @@ int main(int argc, char *argv[])
 
         bool massFlag = false;
 
-        for (auto ee = eePairs.begin(); ee != eePairs.end(); ee++) {
+        for (auto ee = eePairs.begin(); ee != eePairs.end(); ee++)
+        {
             auto e1 = ee->first;
             auto e2 = ee->second;
 
-            if (TLorentzVector(*e1 + *e2).Mag() >= 76 && TLorentzVector(*e1 + *e2).Mag() <= 106){
+            if (TLorentzVector(*e1 + *e2).Mag() >= 76 && TLorentzVector(*e1 + *e2).Mag() <= 106)
+            {
                 massFlag = true;
                 break;
             }
         }
 
-        if (massFlag) {
+        if (massFlag)
+        {
             continue;
         }
 
-        for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++) {
+        for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
+        {
             auto mu1 = mumu->first;
             auto mu2 = mumu->second;
 
-            if (TLorentzVector(*mu1 + *mu2).Mag() >= 76 && TLorentzVector(*mu1 + *mu2).Mag() <= 106){
+            if (TLorentzVector(*mu1 + *mu2).Mag() >= 76 && TLorentzVector(*mu1 + *mu2).Mag() <= 106)
+            {
                 massFlag = true;
                 break;
             }
         }
 
-        if (massFlag) {
+        if (massFlag)
+        {
             continue;
         }
 
         counter[2]++;
 
-        if (mumuPairs.size() > 0 || eePairs.size() > 0) {
+        if (mumuPairs.size() > 0 || eePairs.size() > 0)
+        {
             if (event->getMET().Pt() <= 40)
                 continue;
         }
