@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
         selectedElectrons.clear();
         selectedJets.clear();
         selectedMuons.clear();
-        
+
         cout << "Event " << iEvent << " has :" << endl;
         cout << "\t" << event->getElectrons().size() << " electron(s)" << endl;
         cout << "\t" << event->getMuons().size() << " muon(s)" << endl;
@@ -185,27 +185,30 @@ int main(int argc, char *argv[])
         {
             cout << "Jet " << iJet << endl;
             // cout << "\t" << &(jet) << endl;
-            cout << "\t" << (jet->is_loose() && jet->is_clean() && jet->Pt() > 30 && jet->Eta() < 2.4) << endl;
+            zJet tmpJet(*jet);
+            cout << "\t" << (tmpJet.is_loose() && tmpJet.is_clean() && tmpJet.Pt() > 30 && tmpJet.Eta() < 2.4)
+                 << endl;
+
         }
 
         return 0;
 
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
-                     [](const zElectron &part) {
-                         return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
-                     });
+                [](const zElectron &part) {
+                    return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4 && !part.in_gap();
+                });
 
         copy_if(event->getMuons().begin(), event->getMuons().end(), selectedMuons.begin(),
-                     [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
+                [](const zMuon &part) { return part.get_istight() && part.Pt() > 20 && fabs(part.Eta()) < 2.4; });
 
 
         copy_if(event->getJets().begin(), event->getJets().end(), selectedJets.begin(),
-                     [](const zJet &jet) {
-                         return jet.is_loose() && jet.is_clean() && jet.Pt() > 30 && jet.Eta() < 2.4;
-                     });
+                [](const zJet &jet) {
+                    return jet.is_loose() && jet.is_clean() && jet.Pt() > 30 && jet.Eta() < 2.4;
+                });
 
         copy_if(selectedJets.begin(), selectedJets.end(), selectedBJets.begin(),
-                     [](const zJet &jet) { return jet.is_bjet(); });
+                [](const zJet &jet) { return jet.is_bjet(); });
 
         // ee
         if (selectedElectrons.size() > 0)
