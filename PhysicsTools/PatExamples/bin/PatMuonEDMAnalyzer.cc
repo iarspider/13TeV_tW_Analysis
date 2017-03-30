@@ -176,9 +176,17 @@ int main(int argc, char *argv[])
         selectedMuons.clear();
         
         cout << "Event " << iEvent << " has :" << endl;
-        cout << "\t" << event->getElectrons().size() << "electron(s)" << endl;
-        cout << "\t" << event->getMuons().size() << "muon(s)" << endl;
-        cout << "\t" << event->getJets().size() << "jet(s)" << endl;
+        cout << "\t" << event->getElectrons().size() << " electron(s)" << endl;
+        cout << "\t" << event->getMuons().size() << " muon(s)" << endl;
+        cout << "\t" << event->getJets().size() << " jet(s)" << endl;
+
+        size_t iJet = 0;
+        for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++, iJet++)
+        {
+            cout << "Jet " << iJet << endl;
+            cout << "\t" << (int) &(thisJet) << endl;
+            cout << "\t" << (int) &(*thisJet) << endl;
+        }
 
         copy_if(event->getElectrons().begin(), event->getElectrons().end(), selectedElectrons.begin(),
                      [](const zElectron &part) {
