@@ -205,6 +205,11 @@ int main(int argc, char *argv[])
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
 
+        cout << "=== BEGIN EVENT " << iEvent << " (" << event->getEvID() << ")" << endl;
+        cout << "Raw: # leptons = " << event->getLeptons().size() << ", # jets = " << event->getJets().size() << endl;
+        cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
+        cout << ", # bjets = " << selectedBJets.size() << endl;
+
         /* EMu events */
         if (event->getEvID() == 38579947 ||
             event->getEvID() == 46996462 ||
@@ -416,7 +421,7 @@ int main(int argc, char *argv[])
 
         if (selectedLeptons.size() >= 2)
         {
-            cout << "=== New ll candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            cout << "== New ll candidate ==" << endl;
 
             auto leading_l = selectedLeptons.at(0);
             auto other_l = selectedLeptons.at(1);
@@ -430,26 +435,41 @@ int main(int argc, char *argv[])
 
             if (!leading_l.is_samesign(other_l) && leading_l.Pt() > 25 && ll.Mag() > 20)
             {
-                cout << "+ Accept step 1" << endl;
+                cout << "+ Accept step 1 as";
                 if (leading_l.is_muon() && other_l.is_muon())
+                {
                     event_tag = MuMu;
+                    cout << "MuMu" << endl;
+                }
                 else if (!(leading_l.is_muon() || other_l.is_muon()))
+                {
                     event_tag = EE;
+                    cout << "EE" << endl;
+                }
                 else
+                {
                     event_tag = EMu;
+                    cout << "EMu" << endl;
+                }
             }
 
         }
-        counter[event_tag][1]++;
 
         if (event_tag == EE)
+        {
             ee_evid << event->getEvID() << endl;
+        }
         else if (event_tag == EMu)
             emu_evid << event->getEvID() << endl;
         else if (event_tag == MuMu)
             mumu_evid << event->getEvID() << endl;
         else
+        {
+            cout << "- Reject step 1" << endl;
             continue;
+        }
+
+        counter[event_tag][1]++;
 
         bool massFlag = false;
 
@@ -468,8 +488,11 @@ int main(int argc, char *argv[])
         }
 */
         if (massFlag)
+        {
+            cout << "- Reject step 2" << endl;
             continue;
-
+        }
+        cout << "+ Accept step 2" << endl;
         /*
     for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
     {
@@ -513,30 +536,54 @@ int main(int argc, char *argv[])
         if (event_tag != EMu)
         {
             if (!event->isMETok())
+            {
+                cout << "- Reject step 3.1" << endl;
                 continue;
+
+            }
 
             if (event->getMET().Pt() <= 40)
+            {
+                cout << "- Reject step 3.2" << endl;
                 continue;
+            }
+
         }
 
+        cout << "+ Accept step 3" << endl;
         counter[event_tag][3]++;
 
         if (selectedJets.size() >= 2)
         {
             counter[event_tag][4]++;
+            cout << "+ Accept step 4.1.1" << endl;
             if (selectedBJets.size() >= 1)
             {
                 counter[event_tag][5]++;
+                cout << "+ Accept step 4.1.2" << endl;
+            }
+            else
+            {
+                cout << "- Reject step 4.1.2" << endl;
             }
         }
-
-        if (selectedJets.size() == 1)
+        else if (selectedJets.size() == 1)
         {
             counter[event_tag][6]++;
+            cout << "+ Accept step 4.2.1" << endl;
             if (selectedBJets.size() == 1)
             {
                 counter[event_tag][7]++;
+                cout << "+ Accept step 4.2.2" << endl;
             }
+            else
+            {
+                cout << "- Reject step 4.2.2" << endl;
+            }
+        }
+        else
+        {
+            cout << "- Reject step 4" << endl;
         }
 
     }

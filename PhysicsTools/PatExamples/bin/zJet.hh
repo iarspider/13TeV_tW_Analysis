@@ -125,7 +125,7 @@ std::ostream &operator<<(std::ostream &strm, const zJet &j)
 {
     // return strm << "A(" << a.j << ")";
     return strm << "Jet is_clean = "
-                << j.is_clean() << ", is_loose = " << j.is_loose() << ", tag =" << j.is_bjet()
+                << j.is_clean() << ", is_loose = " << j.is_loose() << ", tag =" << j.is_bjet() << "; "
                 << static_cast<const zParticle & >(j);
 }
 
