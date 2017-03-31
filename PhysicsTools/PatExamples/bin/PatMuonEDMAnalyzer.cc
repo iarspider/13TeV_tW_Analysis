@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
                            {0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0}};
 
+    ulong count_extralep = 0, count_extratight = 0;
+
     cout << boolalpha;
 
     fstream ee_list("ee_list.txt", ee_list.out | ee_list.trunc);
@@ -210,7 +212,13 @@ int main(int argc, char *argv[])
         cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
         cout << ", # bjets = " << selectedBJets.size() << endl;
 
+        if (selectedLeptons.size() != event->getLeptons().size() && selectedLeptons.size() >= 2)
+            count_extralep++;
+
+        if (selectedLeptons.size() > 2)
+            count_extratight++;
         /* EMu events */
+/*
         if (event->getEvID() == 38579947 ||
             event->getEvID() == 46996462 ||
             event->getEvID() == 22285489 ||
@@ -242,6 +250,7 @@ int main(int argc, char *argv[])
             debug << "is_ok = " << event->isMETok() << ", ";
             debug << "METx = " << event->getMET().Px() << ", METy = " << event->getMET().Py() << endl;
         }
+*/
 
 /*
         if (selectedElectrons.size() >= 2)
@@ -435,7 +444,7 @@ int main(int argc, char *argv[])
 
             if (!leading_l.is_samesign(other_l) && leading_l.Pt() > 25 && ll.Mag() > 20)
             {
-                cout << "+ Accept step 1 as";
+                cout << "+ Accept step 1 as ";
                 if (leading_l.is_muon() && other_l.is_muon())
                 {
                     event_tag = MuMu;
@@ -620,6 +629,9 @@ int main(int argc, char *argv[])
         for (int j = 0; j < 8; j++)
             cout << "Step " << j << " events " << counter[i][j] << endl;
     }
+
+    cout << "Events with 2+ tight leptons and extra non-tight leptons:" << count_extralep <<  endl;
+    cout << "Events with 3+ tight leptons" << count_extratight << endl;
     /*
     cout << "Total number of events processed: " << events.size() << endl;
     cout << "Sum of events Weight : " << cNetEvWt << endl;
