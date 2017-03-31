@@ -37,7 +37,7 @@ public:
 
     friend ostream &operator<<(ostream &os, const zElectron &electron)
     {
-        os << " is_tight: " << electron.is_tight << ", is_gap " << electron.in_gap() << ", eta_sc: "
+        os << " is_tight_: " << electron.is_tight << ", is_gap " << electron.in_gap() << ", eta_sc: "
            << electron.eta_sc << "; " << static_cast<const zParticle &>(electron);
         return os;
     }

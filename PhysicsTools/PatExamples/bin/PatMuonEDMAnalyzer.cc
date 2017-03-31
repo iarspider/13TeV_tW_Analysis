@@ -190,8 +190,7 @@ int main(int argc, char *argv[])
         // in_gap will return false for muons; is_iso will return true for electrons
         copy_if(event->getLeptons().begin(), event->getLeptons().end(), back_inserter(selectedLeptons),
                 [](const zLepton &part) {
-                    return part.get_istight() && part.is_iso() && !part.in_gap() && part.Pt() > 20. &&
-                           fabs(part.Eta()) < 2.4;
+                    return part.is_selected();
                 });
 
         event->clean_jets(selectedLeptons);
@@ -204,6 +203,46 @@ int main(int argc, char *argv[])
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
 
+        cout << "=== BEGIN EVENT " << iEvent << " (" << event->getEvID() << ")" << endl;
+        cout << "Raw: # leptons = " << event->getLeptons().size() << ", # jets = " << event->getJets().size() << endl;
+        cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
+        cout << ", # bjets = " << selectedBJets.size() << endl;
+
+        /* EMu events */
+/*
+        if (event->getEvID() == 38579947 ||
+            event->getEvID() == 46996462 ||
+            event->getEvID() == 22285489 ||
+            event->getEvID() == 22285992 ||
+            event->getEvID() == 27600372 ||
+            event->getEvID() == 27600524 ||
+            event->getEvID() == 33356456 ||
+            event->getEvID() == 56250401 ||
+            event->getEvID() == 61999384)
+        {
+            debug << "== BEGIN EVENT DUMP " << event->getEvID() << "==" << endl;
+            debug << "= LEPTONS =" << endl;
+            for (auto part = event->getLeptons().begin(); part != event->getLeptons().end(); part++)
+            {
+                debug << *part;
+                debug << "; is_selected = "
+                      << (part->is_tight() && part->is_iso() && !part->in_gap() && part->Pt() > 20. &&
+                          fabs(part->Eta()) < 2.4) << endl;
+            }
+            debug << "= JETS =" << endl;
+            for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++)
+            {
+                debug << *thisJet;
+                debug << "; is_selected = "
+                      << (thisJet->is_loose() && thisJet->is_clean() && thisJet->Pt() > 30 && thisJet->Eta() < 2.4)
+                      << endl;
+            }
+            debug << "= MET =" << endl;
+            debug << "is_ok = " << event->isMETok() << ", ";
+            debug << "METx = " << event->getMET().Px() << ", METy = " << event->getMET().Py() << endl;
+        }
+*/
+        
 /*
         if (selectedElectrons.size() >= 2)
         {

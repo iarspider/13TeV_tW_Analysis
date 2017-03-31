@@ -1,6 +1,7 @@
 #ifndef INC_13TEV_TW_ANALYSIS_ZJET_HH
 #define INC_13TEV_TW_ANALYSIS_ZJET_HH
 
+#include <ostream>
 #include "zParticle.hh"
 
 class zJet : public zParticle
@@ -13,6 +14,9 @@ public:
               rapidity(rapidity), area(area),
               NHF(nhef), NEMF(neef), CHF(chef), CEMF(ceef), NumConst(n_const), cmult(cmult), NumNeutralParticle(nmult)
     {
+        this->setPt_cut_(30);
+        this->setEta_cut_(2.4);
+        this->setBtag_cut_(0.8484);
         check_loose();
     }
 
@@ -23,13 +27,11 @@ public:
 
     bool is_bjet() const
     {
-        return this->btag > 0.8484;
+        return this->btag > this->btag_cut_;
     }
 
-    zJet(const zJet& other) = default;
-
 private:
-    friend std::ostream &operator<<(std::ostream &, const zJet &);
+    //friend std::ostream &operator<<(std::ostream &, const zJet &);
 
     float btag;
     float rapidity;
@@ -41,6 +43,8 @@ private:
     float NumConst;
     float cmult;
     float NumNeutralParticle;
+
+    float pt_cut_, eta_cut_, btag_cut_;
 
     bool loose_flag;
     bool clean_flag;
@@ -54,6 +58,28 @@ public:
     void set_isclean(bool clean_flag)
     {
         this->clean_flag = clean_flag;
+    }
+
+    friend ostream &operator<<(ostream &os, const zJet &jet)
+    {
+        return os << "Jet is_clean = "
+                  << jet.is_clean() << ", is_loose = " << jet.is_loose() << ", tag =" << jet.is_bjet() << "; "
+                  << static_cast<const zParticle & >(jet);
+    }
+
+    void setPt_cut_(float pt_cut_)
+    {
+        this->pt_cut_ = pt_cut_;
+    }
+
+    void setEta_cut_(float eta_cut_)
+    {
+        this->eta_cut_ = eta_cut_;
+    }
+
+    void setBtag_cut_(float btag_cut_)
+    {
+        this->btag_cut_ = btag_cut_;
     }
 
 private:
@@ -120,12 +146,12 @@ private:
 
 
 };
-
+/*
 std::ostream &operator<<(std::ostream &strm, const zJet &j)
 {
     // return strm << "A(" << a.j << ")";
     return strm << "Jet(" << j.Pt() << ", " << j.Eta() << ", " << j.Phi() << ", " << j.Energy() << ") clean= "
                 << j.is_clean() << ", loose = " << j.is_loose() << ", tag =" << j.is_bjet();
 }
-
+*/
 #endif //INC_13TEV_TW_ANALYSIS_ZJET_HH
