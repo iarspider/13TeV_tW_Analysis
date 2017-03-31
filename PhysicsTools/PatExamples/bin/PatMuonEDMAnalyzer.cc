@@ -47,9 +47,9 @@ int main(int argc, char *argv[])
 
     cout << boolalpha;
 
-    fstream ee_evid("ee_list.txt", ee_evid.out | ee_evid.trunc);
-    fstream emu_evid("emu_list.txt", emu_evid.out | emu_evid.trunc);
-    fstream mumu_evid("mumu_list.txt", mumu_evid.out | mumu_evid.trunc);
+    fstream ee_list("ee_list.txt", ee_list.out | ee_list.trunc);
+    fstream emu_list("emu_list.txt", emu_list.out | emu_list.trunc);
+    fstream mumu_list("mumu_list.txt", mumu_list.out | mumu_list.trunc);
 
     fstream debug("debug.log", debug.out | debug.trunc);
     debug << boolalpha;
@@ -455,19 +455,23 @@ int main(int argc, char *argv[])
 
         }
 
-        if (event_tag == EE)
+        switch (event_tag)
         {
-            ee_evid << event->getEvID() << endl;
+            case EE:
+                ee_list << event->getEvID() << endl;
+                break;
+            case EMu:
+                emu_list << event->getEvID() << endl;
+                break;
+            case MuMu:
+                mumu_list << event->getEvID() << endl;
+                break;
+            default:
+                cout << "- Reject step 1" << endl;
         }
-        else if (event_tag == EMu)
-            emu_evid << event->getEvID() << endl;
-        else if (event_tag == MuMu)
-            mumu_evid << event->getEvID() << endl;
-        else
-        {
-            cout << "- Reject step 1" << endl;
+
+        if (event_tag == -1)
             continue;
-        }
 
         counter[event_tag][1]++;
 
@@ -588,9 +592,9 @@ int main(int argc, char *argv[])
 
     }
 
-    ee_evid.close();
-    emu_evid.close();
-    mumu_evid.close();
+    ee_list.close();
+    emu_list.close();
+    mumu_list.close();
 
     for (int i = 0; i < 4; i++)
     {
