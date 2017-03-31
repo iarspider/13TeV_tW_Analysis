@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     fstream mumu_evid("mumu_list.txt", mumu_evid.out | mumu_evid.trunc);
 
     fstream debug("debug.log", debug.out | debug.trunc);
+    debug << boolalpha;
 
 #ifndef TW_SYNC
     int n = 2;
@@ -203,6 +204,39 @@ int main(int argc, char *argv[])
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
+
+        /* EMu events */
+        if (event->getEvID() == 38579947 ||
+            event->getEvID() == 46996462 ||
+            event->getEvID() == 22285489 ||
+            event->getEvID() == 22285992 ||
+            event->getEvID() == 27600372 ||
+            event->getEvID() == 27600524 ||
+            event->getEvID() == 33356456 ||
+            event->getEvID() == 56250401 ||
+            event->getEvID() == 61999384)
+        {
+            debug << "== BEGIN EVENT DUMP " << event->getEvID() << "==" << endl;
+            debug << "= LEPTONS =" << endl;
+            for (auto part = event->getLeptons().begin(); part != event->getLeptons().end(); part++)
+            {
+                debug << *part;
+                debug << "; is_selected = "
+                      << (part->get_istight() && part->is_iso() && !part->in_gap() && part->Pt() > 20. &&
+                          fabs(part->Eta()) < 2.4);
+            }
+            debug << "= JETS =" << endl;
+            for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++)
+            {
+                debug << *thisJet;
+                debug << "; is_selected = "
+                      << (thisJet->is_loose() && thisJet->is_clean() && thisJet->Pt() > 30 && thisJet->Eta() < 2.4)
+                      << endl;
+            }
+            debug << "= MET =" << endl;
+            debug << "is_ok = " << event->isMETok() << ", ";
+            debug << "METx = " << event->getMET().Px() << ", METy = " << event->getMET().Py() << endl;
+        }
 
 /*
         if (selectedElectrons.size() >= 2)
@@ -595,6 +629,6 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-                        
+
 
 

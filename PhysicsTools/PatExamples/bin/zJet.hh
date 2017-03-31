@@ -26,7 +26,7 @@ public:
         return this->btag > 0.8484;
     }
 
-    zJet(const zJet& other) = default;
+    zJet(const zJet &other) = default;
 
 private:
     friend std::ostream &operator<<(std::ostream &, const zJet &);
@@ -124,8 +124,9 @@ private:
 std::ostream &operator<<(std::ostream &strm, const zJet &j)
 {
     // return strm << "A(" << a.j << ")";
-    return strm << "Jet(" << j.Pt() << ", " << j.Eta() << ", " << j.Phi() << ", " << j.Energy() << ") clean= "
-                << j.is_clean() << ", loose = " << j.is_loose() << ", tag =" << j.is_bjet();
+    return strm << "Jet is_clean = "
+                << j.is_clean() << ", is_loose = " << j.is_loose() << ", tag =" << j.is_bjet()
+                << static_cast<const zParticle & >(j);
 }
 
 #endif //INC_13TEV_TW_ANALYSIS_ZJET_HH
