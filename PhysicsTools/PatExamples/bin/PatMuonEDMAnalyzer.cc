@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
                 debug << *part;
                 debug << "; is_selected = "
                       << (part->get_istight() && part->is_iso() && !part->in_gap() && part->Pt() > 20. &&
-                          fabs(part->Eta()) < 2.4);
+                          fabs(part->Eta()) < 2.4) << endl;
             }
             debug << "= JETS =" << endl;
             for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++)
