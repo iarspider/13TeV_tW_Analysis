@@ -9,14 +9,12 @@
 #include <TFile.h>
 #include <TSystem.h>
 #include <FWCore/FWLite/interface/FWLiteEnabler.h>
+#include <PhysicsTools/FWLite/interface/TFileService.h>
 
 using namespace std;
 
 #define TW_SYNC
 
-#define EE 0
-#define EMu 1
-#define MuMu 3
 
 #include "zEvent.hh"
 
@@ -52,6 +50,8 @@ int main(int argc, char *argv[])
     fstream mumu_evid("mumu_list.txt", mumu_evid.out | mumu_evid.trunc);
 
     fstream debug("debug.log", debug.out | debug.trunc);
+
+    fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
 
 #ifndef TW_SYNC
     int n = 2;
@@ -182,6 +182,8 @@ int main(int argc, char *argv[])
         selectedLeptons.clear();
         selectedJets.clear();
 
+        // event.write(fs);
+
         llPairs.clear();
         int event_tag = -1;
 
@@ -189,16 +191,10 @@ int main(int argc, char *argv[])
 
         // in_gap will return false for muons; is_iso will return true for electrons
         copy_if(event->getLeptons().begin(), event->getLeptons().end(), back_inserter(selectedLeptons),
-                [](const zLepton &part) {
-                    return part.is_selected();
-                });
-
-        event->clean_jets(selectedLeptons);
+                [](const zLepton &part) { return part.is_selected(); });
 
         copy_if(event->getJets().begin(), event->getJets().end(), back_inserter(selectedJets),
-                [](const zJet &jet) {
-                    return jet.is_loose() && jet.is_clean() && jet.Pt() > 30 && jet.Eta() < 2.4;
-                });
+                [](const zJet &jet) { return jet.is_selected(); });
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
@@ -242,7 +238,7 @@ int main(int argc, char *argv[])
             debug << "METx = " << event->getMET().Px() << ", METy = " << event->getMET().Py() << endl;
         }
 */
-        
+
 /*
         if (selectedElectrons.size() >= 2)
         {

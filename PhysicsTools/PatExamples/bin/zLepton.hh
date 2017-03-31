@@ -40,7 +40,7 @@ public:
         return this->is_tight_ && is_iso();
     }
 
-    float is_iso() const
+    bool is_iso() const
     {
         return (!this->is_muon()) || (iso_ < 0.15);
     }

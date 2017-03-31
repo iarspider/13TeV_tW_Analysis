@@ -6,13 +6,13 @@
 
 #include <DataFormats/FWLite/interface/Event.h>
 
-/*
-#include "zElectron.hh"
-#include "zMuon.hh"
- */
 #include "zLepton.hh"
 #include "zJet.hh"
 #include "zHLT.hh"
+
+#define EE 0
+#define EMu 1
+#define MuMu 3
 
 using namespace std;
 
@@ -117,7 +117,6 @@ public:
                             }) != this->triggers.cend();
     }
 
-
     zEvent(edm::EventBase const &ev)
     {
         // Fill event information
@@ -133,11 +132,8 @@ public:
         get_muons(ev);
         std::sort(this->leptons.begin(), this->leptons.end());
         get_jets(ev);
-//        clean_jets();
+        clean_jets();
         get_MET(ev);
-
-        // Apply analysis filters
-        // check_cuts(ev); // fills selection_pass_flags
     }
 
 
@@ -316,24 +312,18 @@ private:
 
         std::sort(this->jets.begin(), this->jets.end());
     }
+
 public:
-    void clean_jets(const std::vector<zLepton> &leptons_)
+    void clean_jets()
     {
-        for (size_t i = 0; i < this->jets.size(); i++)
+        for (auto thisJet = this->jets.begin(); thisJet != this->jets.end(); thisJet++)
         {
-            zJet &this_jet = this->jets.at(i);
-            bool jet_flag = true;
+            bool jet_flag = std::all_of(this->leptons.begin(), this->leptons.end(),
+                                        [thisJet](const zLepton &thisLepton) {
+                                            return !(thisLepton.is_selected() && thisJet->deltaR(thisLepton) <= 0.4);
+                                        });
 
-            for (size_t j = 0; j < leptons_.size(); j++)
-            {
-                if (this_jet.deltaR(leptons_.at(j)) <= 0.4)
-                {
-                    jet_flag = false;
-                    break;
-                }
-            }
-
-            this_jet.set_isclean(jet_flag);
+            thisJet->set_clean_flag(jet_flag);
         }
     }
 
@@ -374,6 +364,32 @@ public:
             this_vtx.RHO = rhoo->at(i);
 
             this->vertices.push_back(this_vtx);
+        }
+    }
+
+    void fill_tree(TTree* tree)
+    {
+        std::vector<TLorentzVector> JetV, LepV;
+        std::vector<float> JetCh, LepCh;
+        std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepGap, LepIso, LepTight, LepMuon;
+
+        for(auto thisLepton = leptons.begin(); thisLepton != leptons.end(); thisLepton++) {
+            LepV.push_back(static_cast<TLorentzVector>(*thisLepton));
+            LepCh.push_back(thisLepton->get_charge());
+            LepSel.push_back(thisLepton->is_selected());
+            LepGap.push_back(thisLepton->in_gap());
+            LepIso.push_back(thisLepton->is_iso());
+            LepTight.push_back(thisLepton->is_tight());
+            LepMuon.push_back(thisLepton->is_muon());
+        }
+
+        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++){
+            JetV.push_back(static_cast<TLorentzVector>(*thisJet));
+            JetCh.push_back(thisJet->get_charge());
+            JetSel.push_back(thisJet->is_selected());
+            JetClean.push_back(thisJet->is_clean());
+            JetB.push_back(thisJet->is_bjet());
+            JetLoose.push_back(thisJet->is_loose());
         }
     }
 };

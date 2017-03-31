@@ -30,6 +30,11 @@ public:
         return this->btag > this->btag_cut_;
     }
 
+    bool is_selected() const
+    {
+        return this->is_loose() && this->is_clean() && this->Pt() > this->pt_cut_ && this->Eta() < this->eta_cut_;
+    }
+
 private:
     //friend std::ostream &operator<<(std::ostream &, const zJet &);
 
@@ -55,7 +60,7 @@ public:
         return clean_flag;
     }
 
-    void set_isclean(bool clean_flag)
+    void set_clean_flag(bool clean_flag)
     {
         this->clean_flag = clean_flag;
     }
