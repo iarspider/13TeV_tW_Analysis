@@ -423,7 +423,8 @@ int main(int argc, char *argv[])
         }
 */
 
-        if (selectedLeptons.size() >= 2)
+        // FIXME: revert to >= 2
+        if (selectedLeptons.size() == 2)
         {
             cout << "== New ll candidate ==" << endl;
 
