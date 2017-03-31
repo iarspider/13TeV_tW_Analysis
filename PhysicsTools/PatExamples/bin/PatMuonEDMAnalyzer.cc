@@ -36,11 +36,6 @@ int main(int argc, char *argv[])
     gSystem->Load("libFWCoreFWLite");
     FWLiteEnabler::enable();
 
-    int n = 2;
-    //int s=atoi(argv[2]);
-    //int n=atoi(argv[3]);
-    //int jobid=atoi(argv[1]);
-
     char fname[160];
 
     vector<zEvent> events;
@@ -56,7 +51,14 @@ int main(int argc, char *argv[])
     fstream emu_evid("emu_list.txt", emu_evid.out | emu_evid.trunc);
     fstream mumu_evid("mumu_list.txt", mumu_evid.out | mumu_evid.trunc);
 
+    fstream debug("debug.log", debug.out | debug.trunc);
+
 #ifndef TW_SYNC
+    int n = 2;
+    //int s=atoi(argv[2]);
+    //int n=atoi(argv[3]);
+    //int jobid=atoi(argv[1]);
+
     // for(int i=s;i<=n;i++)
     for (int i = 1; i <= n; i++)
     {
@@ -176,17 +178,6 @@ int main(int argc, char *argv[])
             continue;
         }
 #endif
-/*
-        if (event->getEvID() == 21902)
-        {
-            cout << "GOTCHA!" << endl;
-            for (auto el = event->getElectrons().begin(); el != event->getElectrons().end(); el++) {
-                cout << "\t" << *el << endl;
-            }
-        }
-        continue;
-*/
-
         selectedBJets.clear();
         selectedLeptons.clear();
         selectedJets.clear();
@@ -397,7 +388,7 @@ int main(int argc, char *argv[])
             auto other_l = selectedLeptons.at(1);
             ll = leading_l + other_l;
 
-            cout << "Leptons #1: " << endl;
+            cout << "Leptons: " << selectedLeptons.size() << endl;
             cout << "Leading: " << leading_l << endl;
             cout << "Second: " << other_l << endl;
             cout << "Dileption: " << "(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi() << ", "
