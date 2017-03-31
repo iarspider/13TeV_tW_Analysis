@@ -45,8 +45,6 @@ int main(int argc, char *argv[])
                            {0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0}};
 
-    ulong count_extralep[4] = {0, 0, 0, 0}, count_extratight[4] = {0, 0, 0, 0}, count_exacttight[4] = {0, 0, 0, 0};
-
     cout << boolalpha;
 
     fstream ee_list("ee_list.txt", ee_list.out | ee_list.trunc);
@@ -423,8 +421,7 @@ int main(int argc, char *argv[])
         }
 */
 
-        // FIXME: revert to >= 2
-        if (selectedLeptons.size() == 2 && event->getLeptons().size() == 2)
+        if (selectedLeptons.size() >= 2)
         {
             cout << "== New ll candidate ==" << endl;
 
@@ -518,17 +515,6 @@ int main(int argc, char *argv[])
 */
 
         counter[event_tag][2]++;
-//ulong count_extralep[4] = {0, 0, 0, 0}, count_extratight[4] = {0, 0, 0, 0}, count_exacttight[4] = {0, 0, 0, 0};
-        if (selectedLeptons.size() == 2)
-        {
-            count_exacttight[event_tag]++;
-
-            if (selectedLeptons.size() < event->getLeptons().size())
-                count_extralep[event_tag]++;
-        }
-
-        if (selectedLeptons.size() > 2)
-            count_extratight[event_tag]++;
 
         /*
     if (mumuPairs.size() > 0 || eePairs.size() > 0)
@@ -635,36 +621,6 @@ int main(int argc, char *argv[])
         cout << " channel ===" << endl;
         for (int j = 0; j < 8; j++)
             cout << "Step " << j << " events " << counter[i][j] << endl;
-    }
-
-    cout << "========================================================" << endl;
-
-    cout << "Number of events with 3+ leptons and 2+ tight leptons: ";
-    for (int i = 0; i < 4; i++)
-    {
-        if (i == 2)
-            continue;
-
-        cout << "=== ";
-        switch (i)
-        {
-            case EE:
-                cout << "EE";
-                break;
-            case EMu:
-                cout << "EMu";
-                break;
-            case MuMu:
-                cout << "MuMu";
-                break;
-            default:
-                cout << "None";
-        }
-        cout << " channel ===" << endl;
-
-        cout << "Number of events with 3+ leptons and =2 tight leptons: " << count_extralep[i] << endl;
-        cout << "Number of events with =2 tight leptons: " << count_exacttight[i] << endl;
-        cout << "Number of events with 3+ tight leptons: " <<  count_extratight[i] << endl;
     }
 
     /*
