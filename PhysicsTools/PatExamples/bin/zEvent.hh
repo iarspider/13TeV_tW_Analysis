@@ -439,7 +439,9 @@ public:
         tree->SetBranchAddress("JetIsLoose", &JetLoose);
 
         bool isMetOk = isMETok();
-        tree->SetBranchAddress("MetVec", &MET);
+        TLorentzVector* pMet = &MET;
+
+        tree->SetBranchAddress("MetVec", &pMet);
         tree->SetBranchAddress("MetOK", &isMetOk);
 
         tree->SetBranchAddress("Flags", &flags);
