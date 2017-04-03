@@ -163,8 +163,6 @@ int main(int argc, char *argv[])
             edm::EventBase const &event = ev;
             events.push_back(zEvent(event));
         }
-
-        return 0;
     }
     catch (exception &e)
     {
