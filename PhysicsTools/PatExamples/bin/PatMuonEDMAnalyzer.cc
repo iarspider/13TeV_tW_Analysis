@@ -451,12 +451,12 @@ int main(int argc, char *argv[])
                 else
                     event_tag = EMu;
             }
-
         }
         else
         {
-            event->add_flag("is_ll", false);
+            event->add_flag("no_ll", true);
             event->fill_tree(tree);
+            continue;
         }
 
         counter[event_tag][1]++;
@@ -478,7 +478,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            event->add_flag("fail_dilepton", true);
+            event->add_flag("not_dilepton", true);
             event->fill_tree(tree);
             continue;
         }
@@ -548,11 +548,19 @@ int main(int argc, char *argv[])
     }
          */
 
+        if (!event->isMETok())
+        {
+            event->fill_tree(tree);
+            continue;
+        }
+        else
+            event->add_flag("pass_met_filters", true);
+
         if (event_tag != EMu)
         {
-            if (!event->isMETok() || event->getMET().Pt() <= 40)
+            if (event->getMET().Pt() <= 40)
             {
-                event->add_flag("pass_met", false);
+                event->add_flag("pass_met_cut", false);
                 event->fill_tree(tree);
                 continue;
             }

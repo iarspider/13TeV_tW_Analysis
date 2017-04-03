@@ -32,7 +32,7 @@ public:
 
     bool is_selected() const
     {
-        return this->is_loose() && this->is_clean() && this->Pt() > this->pt_cut_ && this->Eta() < this->eta_cut_;
+        return this->is_loose() && this->is_clean() && (this->Pt() > this->pt_cut_) && (fabs(this->Eta()) < this->eta_cut_);
     }
 
 private:
