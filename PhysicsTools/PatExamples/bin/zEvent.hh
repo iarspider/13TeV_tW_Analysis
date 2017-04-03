@@ -341,7 +341,7 @@ public:
         event.getByLabel(std::string("metFull:metFullPy"), MetPy);
 
         edm::Handle<bool> BadChargedCandidateFilter;
-        event.getByLabel(std::string("BadChargedC +andidateFilter"), BadChargedCandidateFilter);
+        event.getByLabel(std::string("BadChargedCandidateFilter"), BadChargedCandidateFilter);
 
         edm::Handle<bool> BadPFMuonFilter;
         event.getByLabel(std::string("BadPFMuonFilter"), BadPFMuonFilter);
