@@ -10,6 +10,7 @@
 #include <TSystem.h>
 #include <FWCore/FWLite/interface/FWLiteEnabler.h>
 #include <PhysicsTools/FWLite/interface/TFileService.h>
+#include <TROOT.h>
 
 using namespace std;
 
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
 
     // load framework libraries
     gSystem->Load("libFWCoreFWLite");
+//    gROOT->ProcessLine("#include <vector>");
     FWLiteEnabler::enable();
 
     char fname[160];

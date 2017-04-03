@@ -372,35 +372,55 @@ public:
         }
     }
 
-    void fill_tree(TTree* tree)
+    void fill_tree(TTree *tree)
     {
-        std::vector<TLorentzVector> JetV, LepV;
-        std::vector<float> JetCh, LepCh;
-        std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepGap, LepIso, LepTight, LepMuon;
-        std::vector<string> flags;
+        std::vector<TLorentzVector> *JetV, *LepV;
+        std::vector<float> *JetCh, *LepCh;
+        std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepGap, *LepIso, *LepTight, *LepMuon;
+        std::vector<string> *flags;
 
-        for(auto thisLepton = leptons.begin(); thisLepton != leptons.end(); thisLepton++) {
-            LepV.push_back(static_cast<TLorentzVector>(*thisLepton));
-            LepCh.push_back(thisLepton->get_charge());
-            LepSel.push_back(thisLepton->is_selected());
-            LepGap.push_back(thisLepton->in_gap());
-            LepIso.push_back(thisLepton->is_iso());
-            LepTight.push_back(thisLepton->is_tight());
-            LepMuon.push_back(thisLepton->is_muon());
+        JetV = new std::vector<TLorentzVector>();
+        LepV = new std::vector<TLorentzVector>();
+        JetCh = new std::vector<float>();
+        LepCh = new std::vector<float>();
+
+        JetB = new std::vector<bool>();
+        JetClean = new std::vector<bool>();
+        JetSel = new std::vector<bool>();
+        JetLoose = new std::vector<bool>();
+        LepSel = new std::vector<bool>();
+        LepGap = new std::vector<bool>();
+        LepIso = new std::vector<bool>();
+        LepTight = new std::vector<bool>();
+        LepMuon = new std::vector<bool>();
+
+        flags = new std::vector<string>();
+
+        for (auto thisLepton = leptons.begin(); thisLepton != leptons.end(); thisLepton++)
+        {
+            LepV->push_back(static_cast<TLorentzVector>(*thisLepton));
+            LepCh->push_back(thisLepton->get_charge());
+            LepSel->push_back(thisLepton->is_selected());
+            LepGap->push_back(thisLepton->in_gap());
+            LepIso->push_back(thisLepton->is_iso());
+            LepTight->push_back(thisLepton->is_tight());
+            LepMuon->push_back(thisLepton->is_muon());
         }
 
-        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++){
-            JetV.push_back(static_cast<TLorentzVector>(*thisJet));
-            JetCh.push_back(thisJet->get_charge());
-            JetSel.push_back(thisJet->is_selected());
-            JetClean.push_back(thisJet->is_clean());
-            JetB.push_back(thisJet->is_bjet());
-            JetLoose.push_back(thisJet->is_loose());
+        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
+        {
+            JetV->push_back(static_cast<TLorentzVector>(*thisJet));
+            JetCh->push_back(thisJet->get_charge());
+            JetSel->push_back(thisJet->is_selected());
+            JetClean->push_back(thisJet->is_clean());
+            JetB->push_back(thisJet->is_bjet());
+            JetLoose->push_back(thisJet->is_loose());
         }
 
-        for (auto thisFlag = event_flags.begin(); thisFlag != event_flags.end(); thisFlag++) {
+        for (auto thisFlag = event_flags.begin(); thisFlag != event_flags.end(); thisFlag++)
+        {
             if (thisFlag->second)
-                flags.push_back(thisFlag->first);
+                flags->push_back(thisFlag->first);
         }
 
         tree->SetBranchAddress("LeptonVec", &LepV);
