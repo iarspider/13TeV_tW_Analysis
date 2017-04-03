@@ -44,9 +44,11 @@ void MakeBranches(TTree *tree)
     tree->Branch("JetIsBJet", &JetB);
     tree->Branch("JetIsLoose", &JetLoose);
 
-    bool isMetOk;
+    bool isMetOk, BadCCF, BadPFM;
     tree->Branch("MetVec", &MET);
     tree->Branch("MetOK", &isMetOk);
+    tree->Branch("MetBadCCF", &BadCCF);
+    tree->Branch("MetBadPFM", &BadPFM);
 
     ULong64_t * evid = NULL;
     tree->Branch("Flags", &flags);

@@ -33,6 +33,8 @@ private:
     vector<zHLT> triggers;
     TLorentzVector MET;
     bool isMETok_;
+    bool BadChargedCandidateFilter_;
+    bool BadPFMuonFilter_;
 
     int puNtrueInteractons;
     double weight;
@@ -342,9 +344,11 @@ public:
 
         edm::Handle<bool> BadChargedCandidateFilter;
         event.getByLabel(std::string("BadChargedCandidateFilter"), BadChargedCandidateFilter);
+        BadChargedCandidateFilter_ = *BadChargedCandidateFilter;
 
         edm::Handle<bool> BadPFMuonFilter;
         event.getByLabel(std::string("BadPFMuonFilter"), BadPFMuonFilter);
+        BadPFMuonFilter_ = *BadPFMuonFilter;
 
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
         this->isMETok_ = !((*BadChargedCandidateFilter) && (*BadPFMuonFilter));
@@ -443,6 +447,8 @@ public:
 
         tree->SetBranchAddress("MetVec", &pMet);
         tree->SetBranchAddress("MetOK", &isMetOk);
+        tree->SetBranchAddress("MetBadCCF", &BadChargedCandidateFilter_);
+        tree->SetBranchAddress("MetBadPFM", &BadPFMuonFilter_);
 
         tree->SetBranchAddress("Flags", &flags);
         tree->SetBranchAddress("eventID", &evID);
