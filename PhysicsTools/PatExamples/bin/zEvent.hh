@@ -347,7 +347,7 @@ public:
         event.getByLabel(std::string("BadPFMuonFilter"), BadPFMuonFilter);
 
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
-        this->isMETok_ = (*BadChargedCandidateFilter) && (*BadPFMuonFilter);
+        this->isMETok_ = !((*BadChargedCandidateFilter) && (*BadPFMuonFilter));
     }
 
     void get_vertices(edm::EventBase const &event)
