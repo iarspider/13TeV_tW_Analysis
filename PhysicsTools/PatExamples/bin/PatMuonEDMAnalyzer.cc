@@ -156,11 +156,18 @@ int main(int argc, char *argv[])
         fwlite::Event ev(inFile);
         int evtID = 0;
 
+        edm::Handle<std::vector<string>> METTriggerNameTree;
+
         for (ev.toBegin(); !ev.atEnd(); ++ev, evtID++)
         {
             edm::EventBase const &event = ev;
-            events.push_back(zEvent(event));
+            // events.push_back(zEvent(event));
+            event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerNameTree);
+            for (auto it = METTriggerNameTree->begin(); it != METTriggerNameTree->end(); it++)
+                debug << *it << endl;
         }
+
+        return 0;
     }
     catch (exception &e)
     {

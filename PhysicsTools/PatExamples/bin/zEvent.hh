@@ -350,6 +350,14 @@ public:
         event.getByLabel(std::string("BadPFMuonFilter"), BadPFMuonFilter);
         BadPFMuonFilter_ = *BadPFMuonFilter;
 
+        edm::Handle<std::vector<string>> METTriggerNameTree;
+        event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerNameTree);
+
+        edm::Handle<std::vector<float>> METTriggerBitTree;
+        event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerBitTree);
+
+
+
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
         this->isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter));
     }
