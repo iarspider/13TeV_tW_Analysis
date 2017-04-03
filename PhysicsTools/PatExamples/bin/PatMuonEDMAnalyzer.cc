@@ -161,10 +161,7 @@ int main(int argc, char *argv[])
         for (ev.toBegin(); !ev.atEnd(); ++ev, evtID++)
         {
             edm::EventBase const &event = ev;
-            // events.push_back(zEvent(event));
-            event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerNameTree);
-            for (auto it = METTriggerNameTree->begin(); it != METTriggerNameTree->end(); it++)
-                debug << *it << endl;
+            events.push_back(zEvent(event));
         }
 
         return 0;

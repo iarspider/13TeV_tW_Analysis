@@ -356,10 +356,22 @@ public:
         edm::Handle<std::vector<float>> METTriggerBitTree;
         event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerBitTree);
 
+        float otherMetFilters = 1;
 
+        for (size_t i = 0; i < METTriggerNameTree->size(); i++)
+        {
+            if (METTriggerNameTree->at(i) == "Flag_HBHENoiseFilter" ||
+                METTriggerNameTree->at(i) == "Flag_HBHENoiseIsoFilter" ||
+                METTriggerNameTree->at(i) == "Flag_globalTightHalo2016Filter" ||
+                METTriggerNameTree->at(i) == "Flag_goodVertices" ||
+                METTriggerNameTree->at(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter")
+            {
+                otherMetFilters *= METTriggerBitTree->at(i);
+            }
+        }
 
         this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
-        this->isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter));
+        this->isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter) && (otherMetFilters == 1));
     }
 
     void get_vertices(edm::EventBase const &event)
@@ -451,7 +463,7 @@ public:
         tree->SetBranchAddress("JetIsLoose", &JetLoose);
 
         bool isMetOk = isMETok();
-        TLorentzVector* pMet = &MET;
+        TLorentzVector *pMet = &MET;
 
         tree->SetBranchAddress("MetVec", &pMet);
         tree->SetBranchAddress("MetOK", &isMetOk);
