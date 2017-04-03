@@ -77,9 +77,17 @@ int main(int argc, char *argv[])
 
     cout << boolalpha;
 
-    fstream ee_evid("ee_list.txt", ee_evid.out | ee_evid.trunc);
-    fstream emu_evid("emu_list.txt", emu_evid.out | emu_evid.trunc);
-    fstream mumu_evid("mumu_list.txt", mumu_evid.out | mumu_evid.trunc);
+    fstream ee_lep_evid("ee_ihepru_ttbar_lepsel.txt", ee_lep_evid.out | ee_lep_evid.trunc);
+    fstream emu_lep_evid("emu_ihepru_ttbar_lepsel.txt", emu_lep_evid.out | emu_lep_evid.trunc);
+    fstream mumu_lep_evid("mumu_ihepru_ttbar_lepsel.txt", mumu_lep_evid.out | mumu_lep_evid.trunc);
+
+    fstream ee_jet1_evid("ee_ihepru_ttbar_jetsel1.txt", ee_lep_evid.out | ee_lep_evid.trunc);
+    fstream emu_jet1_evid("emu_ihepru_ttbar_jetsel1.txt", emu_lep_evid.out | emu_lep_evid.trunc);
+    fstream mumu_jet1_evid("mumu_ihepru_ttbar_jetsel1.txt", mumu_lep_evid.out | mumu_lep_evid.trunc);
+
+    fstream ee_jet2_evid("ee_ihepru_ttbar_jetsel2.txt", ee_lep_evid.out | ee_lep_evid.trunc);
+    fstream emu_jet2_evid("emu_ihepru_ttbar_jetsel2.txt", emu_lep_evid.out | emu_lep_evid.trunc);
+    fstream mumu_jet2_evid("mumu_ihepru_ttbar_jetsel2.txt", mumu_lep_evid.out | mumu_lep_evid.trunc);
 
     fstream debug("debug.log", debug.out | debug.trunc);
 
@@ -451,17 +459,17 @@ int main(int argc, char *argv[])
 
         if (event_tag == EE)
         {
-            ee_evid << event->getEvID() << endl;
+            ee_lep_evid << event->getEvID() << endl;
             event->add_flag("EE", true);
         }
         else if (event_tag == EMu)
         {
-            emu_evid << event->getEvID() << endl;
+            emu_lep_evid << event->getEvID() << endl;
             event->add_flag("EMu", true);
         }
         else if (event_tag == MuMu)
         {
-            mumu_evid << event->getEvID() << endl;
+            mumu_lep_evid << event->getEvID() << endl;
             event->add_flag("MuMu", true);
         }
         else
@@ -557,6 +565,20 @@ int main(int argc, char *argv[])
                 counter[event_tag][5]++;
                 event->add_flag("2+j1+t", true);
             }
+
+
+            if (event_tag == EE)
+            {
+                ee_jet2_evid << event->getEvID() << endl;
+            }
+            else if (event_tag == EMu)
+            {
+                emu_jet2_evid << event->getEvID() << endl;
+            }
+            else
+            {
+                mumu_jet2_evid << event->getEvID() << endl;
+            }
         }
 
         if (selectedJets.size() == 1)
@@ -567,14 +589,35 @@ int main(int argc, char *argv[])
                 counter[event_tag][7]++;
                 event->add_flag("1j1t", true);
             }
+
+            if (event_tag == EE)
+            {
+                ee_jet1_evid << event->getEvID() << endl;
+            }
+            else if (event_tag == EMu)
+            {
+                emu_jet1_evid << event->getEvID() << endl;
+            }
+            else
+            {
+                mumu_jet1_evid << event->getEvID() << endl;
+            }
         }
 
         event->fill_tree(tree);
     }
 
-    ee_evid.close();
-    emu_evid.close();
-    mumu_evid.close();
+    ee_lep_evid.close();
+    emu_lep_evid.close();
+    mumu_lep_evid.close();
+
+    ee_jet1_evid.close();
+    emu_jet1_evid.close();
+    mumu_jet1_evid.close();
+
+    ee_jet2_evid.close();
+    emu_jet2_evid.close();
+    mumu_jet2_evid.close();
 
     for (int i = 0; i < 4; i++)
     {
