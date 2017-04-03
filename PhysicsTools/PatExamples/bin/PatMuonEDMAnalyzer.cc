@@ -20,6 +20,36 @@ using namespace std;
 
 typedef std::pair<std::vector<zLepton>::iterator, std::vector<zLepton>::iterator> llPair_t;
 
+void MakeBranches(TTree *tree)
+{
+    std::vector<TLorentzVector> JetV, LepV;
+    std::vector<float> JetCh, LepCh;
+    std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepGap, LepIso, LepTight, LepMuon;
+    std::vector<string> flags;
+    TLorentzVector MET;
+
+    tree->Branch("LeptonVec", &LepV);
+    tree->Branch("LeptonCharge", &LepCh);
+    tree->Branch("LeptonSelected", &LepSel);
+    tree->Branch("LeptonInGap", &LepGap);
+    tree->Branch("LeptonIsIso", &LepIso);
+    tree->Branch("LeptonIsTight", &LepTight);
+    tree->Branch("LeptonIsMuon", &LepMuon);
+
+    tree->Branch("JetVec", &JetV);
+    tree->Branch("JetCharge", &JetCh);
+    tree->Branch("JetSelected", &JetSel);
+    tree->Branch("JetIsClean", &JetClean);
+    tree->Branch("JetIsBJet", &JetB);
+    tree->Branch("JetIsLoose", &JetLoose);
+
+    bool isMetOk;
+    tree->Branch("MetVec", &MET);
+    tree->Branch("MetOK", &isMetOk);
+
+    tree->Branch("Flags", &flags);
+}
+
 int main(int argc, char *argv[])
 {
     // ----------------------------------------------------------------------
@@ -52,6 +82,8 @@ int main(int argc, char *argv[])
     fstream debug("debug.log", debug.out | debug.trunc);
 
     fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
+    TTree *tree = fs.make<TTree>("tW");
+    MakeBranches(tree);
 
 #ifndef TW_SYNC
     int n = 2;
@@ -203,41 +235,6 @@ int main(int argc, char *argv[])
         cout << "Raw: # leptons = " << event->getLeptons().size() << ", # jets = " << event->getJets().size() << endl;
         cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
         cout << ", # bjets = " << selectedBJets.size() << endl;
-
-        /* EMu events */
-/*
-        if (event->getEvID() == 38579947 ||
-            event->getEvID() == 46996462 ||
-            event->getEvID() == 22285489 ||
-            event->getEvID() == 22285992 ||
-            event->getEvID() == 27600372 ||
-            event->getEvID() == 27600524 ||
-            event->getEvID() == 33356456 ||
-            event->getEvID() == 56250401 ||
-            event->getEvID() == 61999384)
-        {
-            debug << "== BEGIN EVENT DUMP " << event->getEvID() << "==" << endl;
-            debug << "= LEPTONS =" << endl;
-            for (auto part = event->getLeptons().begin(); part != event->getLeptons().end(); part++)
-            {
-                debug << *part;
-                debug << "; is_selected = "
-                      << (part->is_tight() && part->is_iso() && !part->in_gap() && part->Pt() > 20. &&
-                          fabs(part->Eta()) < 2.4) << endl;
-            }
-            debug << "= JETS =" << endl;
-            for (auto thisJet = event->getJets().begin(); thisJet != event->getJets().end(); thisJet++)
-            {
-                debug << *thisJet;
-                debug << "; is_selected = "
-                      << (thisJet->is_loose() && thisJet->is_clean() && thisJet->Pt() > 30 && thisJet->Eta() < 2.4)
-                      << endl;
-            }
-            debug << "= MET =" << endl;
-            debug << "is_ok = " << event->isMETok() << ", ";
-            debug << "METx = " << event->getMET().Px() << ", METy = " << event->getMET().Py() << endl;
-        }
-*/
 
 /*
         if (selectedElectrons.size() >= 2)
@@ -418,6 +415,7 @@ int main(int argc, char *argv[])
         if (selectedLeptons.size() >= 2)
         {
             cout << "=== New ll candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+            event->add_flag("is_ll", true)
 
             auto leading_l = selectedLeptons.at(0);
             auto other_l = selectedLeptons.at(1);
@@ -441,16 +439,35 @@ int main(int argc, char *argv[])
             }
 
         }
+        else
+        {
+            event->add_flag("is_ll", false);
+            event->fill_tree(tree);
+        }
+
         counter[event_tag][1]++;
 
         if (event_tag == EE)
+        {
             ee_evid << event->getEvID() << endl;
+            event->add_flag("EE", true);
+        }
         else if (event_tag == EMu)
+        {
             emu_evid << event->getEvID() << endl;
+            event->add_flag("EMu", true);
+        }
         else if (event_tag == MuMu)
+        {
             mumu_evid << event->getEvID() << endl;
+            event->add_flag("MuMu", true);
+        }
         else
+        {
+            event->add_flag("fail_dilepton", true);
+            event->fill_tree(tree);
             continue;
+        }
 
         bool massFlag = false;
 
@@ -469,7 +486,13 @@ int main(int argc, char *argv[])
         }
 */
         if (massFlag)
+        {
+            event->add_flag("pass_dilepton_mass", false);
+            event->fill_tree(tree);
             continue;
+        }
+        else
+            event->add_flag("pass_dilepton_mass", true);
 
         /*
     for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
@@ -513,12 +536,14 @@ int main(int argc, char *argv[])
 
         if (event_tag != EMu)
         {
-            if (!event->isMETok())
+            if (!event->isMETok() || event->getMET().Pt() <= 40)
+            {
+                event->add_flag("pass_met", false);
+                event->fill_tree(tree);
                 continue;
-
-            if (event->getMET().Pt() <= 40)
-                continue;
+            }
         }
+        event->add_flag("pass_met", true);
 
         counter[event_tag][3]++;
 
@@ -528,6 +553,7 @@ int main(int argc, char *argv[])
             if (selectedBJets.size() >= 1)
             {
                 counter[event_tag][5]++;
+                event->add_flag("2+j1+t", true);
             }
         }
 
@@ -537,9 +563,11 @@ int main(int argc, char *argv[])
             if (selectedBJets.size() == 1)
             {
                 counter[event_tag][7]++;
+                event->add_flag("1j1t", true);
             }
         }
 
+        event->fill_tree(tree);
     }
 
     ee_evid.close();

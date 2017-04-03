@@ -86,24 +86,29 @@ public:
 
 
 private:
-    vector<zFlag> selection_pass_flags;
+    vector<zFlag> event_flags;
 
 public:
     void add_flag(zFlag flag)
     {
-        auto it = std::find_if(this->selection_pass_flags.begin(), this->selection_pass_flags.end(),
+        auto it = std::find_if(this->event_flags.begin(), this->event_flags.end(),
                                [flag](zFlag item) { return flag.first == item.first; });
-        if (it != this->selection_pass_flags.end())
-            selection_pass_flags.erase(it);
+        if (it != this->event_flags.end())
+            event_flags.erase(it);
 
-        this->selection_pass_flags.push_back(flag);
+        this->event_flags.push_back(flag);
+    }
+
+    void add_flag(string name, bool value)
+    {
+        add_flag(make_pair(name, value));
     }
 
     int get_flag(string flag_name)
     {
-        auto it = std::find_if(this->selection_pass_flags.begin(), this->selection_pass_flags.end(),
+        auto it = std::find_if(this->event_flags.begin(), this->event_flags.end(),
                                [flag_name](zFlag item) { return flag_name == item.first; });
-        if (it != this->selection_pass_flags.end())
+        if (it != this->event_flags.end())
             return it->second ? 0 : 1;
         else
             return -1;
@@ -372,6 +377,7 @@ public:
         std::vector<TLorentzVector> JetV, LepV;
         std::vector<float> JetCh, LepCh;
         std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepGap, LepIso, LepTight, LepMuon;
+        std::vector<string> flags;
 
         for(auto thisLepton = leptons.begin(); thisLepton != leptons.end(); thisLepton++) {
             LepV.push_back(static_cast<TLorentzVector>(*thisLepton));
@@ -391,6 +397,34 @@ public:
             JetB.push_back(thisJet->is_bjet());
             JetLoose.push_back(thisJet->is_loose());
         }
+
+        for (auto thisFlag = event_flags.begin(); thisFlag != event_flags.end(); thisFlag++) {
+            if (thisFlag->second)
+                flags.push_back(thisFlag->first);
+        }
+
+        tree->SetBranchAddress("LeptonVec", &LepV);
+        tree->SetBranchAddress("LeptonCharge", &LepCh);
+        tree->SetBranchAddress("LeptonSelected", &LepSel);
+        tree->SetBranchAddress("LeptonInGap", &LepGap);
+        tree->SetBranchAddress("LeptonIsIso", &LepIso);
+        tree->SetBranchAddress("LeptonIsTight", &LepTight);
+        tree->SetBranchAddress("LeptonIsMuon", &LepMuon);
+
+        tree->SetBranchAddress("JetVec", &JetV);
+        tree->SetBranchAddress("JetCharge", &JetCh);
+        tree->SetBranchAddress("JetSelected", &JetSel);
+        tree->SetBranchAddress("JetIsClean", &JetClean);
+        tree->SetBranchAddress("JetIsBJet", &JetB);
+        tree->SetBranchAddress("JetIsLoose", &JetLoose);
+
+        bool isMetOk = isMETok();
+        tree->SetBranchAddress("MetVec", &MET);
+        tree->SetBranchAddress("MetOK", &isMetOk);
+
+        tree->SetBranchAddress("Flags", &flags);
+
+        tree->Fill();
     }
 };
 
