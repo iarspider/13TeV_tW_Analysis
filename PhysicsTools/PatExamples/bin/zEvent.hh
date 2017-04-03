@@ -445,6 +445,7 @@ public:
         tree->SetBranchAddress("MetOK", &isMetOk);
 
         tree->SetBranchAddress("Flags", &flags);
+        tree->SetBranchAddress("eventID", &evID);
 
         tree->Fill();
     }

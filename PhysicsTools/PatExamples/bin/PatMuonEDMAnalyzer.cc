@@ -48,7 +48,9 @@ void MakeBranches(TTree *tree)
     tree->Branch("MetVec", &MET);
     tree->Branch("MetOK", &isMetOk);
 
+    ULong64_t * evid = NULL;
     tree->Branch("Flags", &flags);
+    tree->Branch("eventID", evid);
 }
 
 int main(int argc, char *argv[])
