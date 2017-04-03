@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     fstream debug("debug.log", debug.out | debug.trunc);
 
     fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
-    TTree *tree = fs.make<TTree>("tW");
+    TTree *tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tree);
 
 #ifndef TW_SYNC
@@ -415,7 +415,7 @@ int main(int argc, char *argv[])
         if (selectedLeptons.size() >= 2)
         {
             cout << "=== New ll candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
-            event->add_flag("is_ll", true)
+            event->add_flag("is_ll", true);
 
             auto leading_l = selectedLeptons.at(0);
             auto other_l = selectedLeptons.at(1);
