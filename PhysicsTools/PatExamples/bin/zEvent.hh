@@ -354,7 +354,7 @@ public:
         event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerNameTree);
 
         edm::Handle<std::vector<float>> METTriggerBitTree;
-        event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerBitTree);
+        event.getByLabel(std::string("METUserData:triggerBitTree"), METTriggerBitTree);
 
         float otherMetFilters = 1;
 
