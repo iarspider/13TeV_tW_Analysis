@@ -169,13 +169,20 @@ private:
         edm::Handle<std::vector<float> > elvidTight;
         event.getByLabel(std::string("electrons:elvidTight"), elvidTight);
 
+        // Handle to the electron electronD0
+        edm::Handle<std::vector<float> > electronD0;
+        event.getByLabel(std::string("electrons:elDxy"), electronD0);
+        // Handle to the electron electronDz
+        edm::Handle<std::vector<float> > electronDz;
+        event.getByLabel(std::string("electrons:elDz"), electronDz);
+
         for (size_t i = 0; i < electronPt->size(); i++)
         {
             TLorentzVector v;
             v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
 
             zLepton thisElectron = zLepton(v, electronCharge->at(i), electronSCeta->at(i), 0,
-                                           elvidTight->at(i) != 0, false);
+                                           elvidTight->at(i) != 0, false, electronD0->at(i), electronDz->at(i));
 
             this->leptons.push_back(thisElectron);
         }
@@ -245,7 +252,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(muonPt->at(i), muonEta->at(i), muonPhi->at(i), muonEn->at(i));
 
-            zLepton thisMuon(v, muonCharge->at(i), 0, muonIso04->at(i), muonTight->at(i) != 0, true);
+            zLepton thisMuon(v, muonCharge->at(i), 0, muonIso04->at(i), muonTight->at(i) != 0, true, 0, 0);
             this->leptons.push_back(thisMuon);
         }
     }
@@ -399,7 +406,7 @@ public:
     void fill_tree(TTree *tree)
     {
         std::vector<TLorentzVector> *JetV, *LepV;
-        std::vector<float> *JetCh, *LepCh;
+        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz;
         std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepGap, *LepIso, *LepTight, *LepMuon;
         std::vector<string> *flags;
 
@@ -417,6 +424,8 @@ public:
         LepIso = new std::vector<bool>();
         LepTight = new std::vector<bool>();
         LepMuon = new std::vector<bool>();
+        LepDxy = new std::vector<float>();
+        LepDz = new std::vector<float>();
 
         flags = new std::vector<string>();
 
@@ -429,6 +438,8 @@ public:
             LepIso->push_back(thisLepton->is_iso());
             LepTight->push_back(thisLepton->is_tight());
             LepMuon->push_back(thisLepton->is_muon());
+            LepDxy->push_back(thisLepton->get_d0());
+            LepDz->push_back(thisLepton->get_dz());
         }
 
         for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
@@ -454,6 +465,8 @@ public:
         tree->SetBranchAddress("LeptonIsIso", &LepIso);
         tree->SetBranchAddress("LeptonIsTight", &LepTight);
         tree->SetBranchAddress("LeptonIsMuon", &LepMuon);
+        tree->SetBranchAddress("LeptonDxy", &LepDxy);
+        tree->SetBranchAddress("LeptonDz", &LepDz);
 
         tree->SetBranchAddress("JetVec", &JetV);
         tree->SetBranchAddress("JetCharge", &JetCh);
