@@ -461,6 +461,7 @@ int main(int argc, char *argv[])
         {
             event->add_flag("no_ll", true);
             event->fill_tree(tree);
+            cout << "- Reject step 1" << endl;
             continue;
         }
 
@@ -506,12 +507,15 @@ int main(int argc, char *argv[])
 */
         if (massFlag)
         {
+			cout << "- Reject step 2" << endl;
             event->add_flag("pass_dilepton_mass", false);
             event->fill_tree(tree);
             continue;
         }
-        else
+        else {
             event->add_flag("pass_dilepton_mass", true);
+            cout << "+ Accept step 2" << endl;
+        }
 
         /*
     for (auto mumu = mumuPairs.begin(); mumu != mumuPairs.end(); mumu++)
@@ -556,6 +560,7 @@ int main(int argc, char *argv[])
         if (!event->isMETok())
         {
             event->fill_tree(tree);
+            cout << "- Reject step 3.0" << endl;
             continue;
         }
         else
@@ -567,19 +572,24 @@ int main(int argc, char *argv[])
             {
                 event->add_flag("pass_met_cut", false);
                 event->fill_tree(tree);
+                cout << "- Reject step 3" << endl;
                 continue;
             }
         }
         event->add_flag("pass_met", true);
+        cout << "+ Accept step 3" << endl;
 
         counter[event_tag][3]++;
 
         if (selectedJets.size() >= 2)
         {
             counter[event_tag][4]++;
+            cout << "+ Accept step 4.1.1" << endl;
+            event->add_flag("2+j", true);
             if (selectedBJets.size() >= 1)
             {
                 counter[event_tag][5]++;
+                cout << "+ Accept step 4.1.2" << endl;
                 event->add_flag("2+j1+t", true);
             }
 
@@ -601,10 +611,13 @@ int main(int argc, char *argv[])
         if (selectedJets.size() == 1)
         {
             counter[event_tag][6]++;
+            event->add_flag("1j", true);
+            cout << "+ Accept step 4.2.1" << endl;
             if (selectedBJets.size() == 1)
             {
                 counter[event_tag][7]++;
                 event->add_flag("1j1t", true);
+                cout << "+ Accept step 4.2.2" << endl;
             }
 
             if (event_tag == EE)
