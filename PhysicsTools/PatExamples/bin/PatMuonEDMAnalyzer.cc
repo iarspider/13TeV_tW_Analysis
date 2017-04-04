@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 
     fstream debug("debug.log", debug.out | debug.trunc);
 
-    fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
+    fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
     TTree *tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tree);
 
@@ -142,9 +142,10 @@ int main(int argc, char *argv[])
 #else
     try
     {
-
+//        sprintf(fname,
+//                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
         sprintf(fname,
-                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
+                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/sync/CRAB_UserFiles/crab_sync/170404_071616/0000/B2GEDMNtuple_1.root");
 #endif
         cout << "File Name:" << fname << endl;
 
