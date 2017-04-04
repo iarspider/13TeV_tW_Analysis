@@ -255,6 +255,16 @@ int main(int argc, char *argv[])
         cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
         cout << ", # bjets = " << selectedBJets.size() << endl;
 
+
+        if (!event->isMETok())
+        {
+            event->fill_tree(tree);
+            cout << "- Reject step 0.1" << endl;
+            continue;
+        }
+        else
+            event->add_flag("pass_met_filters", true);
+
 /*
         if (selectedElectrons.size() >= 2)
         {
@@ -556,15 +566,6 @@ int main(int argc, char *argv[])
         counter[MuMu][3]++;
     }
          */
-
-        if (!event->isMETok())
-        {
-            event->fill_tree(tree);
-            cout << "- Reject step 3.0" << endl;
-            continue;
-        }
-        else
-            event->add_flag("pass_met_filters", true);
 
         if (event_tag != EMu)
         {
