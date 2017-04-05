@@ -53,7 +53,7 @@ void MakeBranches(TTree *tree)
     tree->Branch("MetBadCCF", &BadCCF);
     tree->Branch("MetBadPFM", &BadPFM);
 
-    ULong64_t * evid = NULL;
+    ULong64_t *evid = NULL;
     tree->Branch("Flags", &flags);
     tree->Branch("eventID", evid);
 }
@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 
     fstream debug("debug.log", debug.out | debug.trunc);
 
+#ifdef SYNC_EX
 #ifdef SYNC_TT
     fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
     TTree *tree = fs.make<TTree>("tW", "tW");
@@ -107,6 +108,12 @@ int main(int argc, char *argv[])
     TTree *tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tree);
 #endif
+#else
+    fwlite::TFileService fs = fwlite::TFileService("tW_main.root");
+    TTree *tree = fs.make<TTree>("tW", "tW");
+    MakeBranches(tree);
+#endif
+
 
 #ifndef SYNC_EX
     int n = 2;
@@ -526,12 +533,13 @@ int main(int argc, char *argv[])
 */
         if (massFlag)
         {
-			cout << "- Reject step 2" << endl;
+            cout << "- Reject step 2" << endl;
             event->add_flag("pass_dilepton_mass", false);
             event->fill_tree(tree);
             continue;
         }
-        else {
+        else
+        {
             event->add_flag("pass_dilepton_mass", true);
             cout << "+ Accept step 2" << endl;
         }
