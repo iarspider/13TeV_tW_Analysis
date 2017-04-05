@@ -135,17 +135,17 @@ public:
         edm::Handle<ULong64_t> event_id;
         ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
         this->evID = *event_id;
-        get_electrons(ev);
-        get_muons(ev);
+        read_electrons(ev);
+        read_muons(ev);
         std::sort(this->leptons.begin(), this->leptons.end());
-        get_jets(ev);
+        read_jets(ev);
         clean_jets();
-        get_MET(ev);
+        read_MET(ev);
     }
 
 
 private:
-    void get_electrons(edm::EventBase const &event)
+    void read_electrons(edm::EventBase const &event)
     {
         edm::Handle<std::vector<float> > electronPt;
         event.getByLabel(std::string("electrons:elPt"), electronPt);
@@ -188,7 +188,7 @@ private:
         }
     }
 
-    void get_userdata(edm::EventBase const &event)
+    void read_userdata(edm::EventBase const &event)
     {
         // Handle to the genEventWeight, which I added in eventUserData class
         edm::Handle<double> genEventWeight;
@@ -201,7 +201,7 @@ private:
         this->puNtrueInteractons = *puNtrueIntMC;
     }
 
-    void get_triggers(edm::EventBase const &event)
+    void read_triggers(edm::EventBase const &event)
     {
         // Handle to the pass decision of hlt
         edm::Handle<std::vector<float> > HLTdecision;
@@ -222,7 +222,7 @@ private:
         }
     }
 
-    void get_muons(edm::EventBase const &event)
+    void read_muons(edm::EventBase const &event)
     {
         // Handle to the muon muonPt
         edm::Handle<std::vector<float> > muonPt;
@@ -257,7 +257,7 @@ private:
         }
     }
 
-    void get_jets(edm::EventBase const &event)
+    void read_jets(edm::EventBase const &event)
     {
         // Handle to the jet b-tag
         edm::Handle<std::vector<float> > jetBTag;
@@ -341,7 +341,7 @@ public:
         }
     }
 
-    void get_MET(edm::EventBase const &event)
+    void read_MET(edm::EventBase const &event)
     {
         edm::Handle<std::vector<float> > MetPx;
         event.getByLabel(std::string("metFull:metFullPx"), MetPx);
@@ -381,7 +381,7 @@ public:
         this->isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter) && (otherMetFilters == 1));
     }
 
-    void get_vertices(edm::EventBase const &event)
+    void read_vertices(edm::EventBase const &event)
     {
         edm::Handle<std::vector<float> > vtxZ;
         event.getByLabel(std::string("vertexInfo:z"), vtxZ);
@@ -407,7 +407,8 @@ public:
     {
         std::vector<TLorentzVector> *JetV, *LepV;
         std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz;
-        std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepGap, *LepIso, *LepTight, *LepMuon;
+        std::vector<int> *LepWhere;
+        std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepIso, *LepTight, *LepMuon;
         std::vector<string> *flags;
 
         JetV = new std::vector<TLorentzVector>();
@@ -420,7 +421,7 @@ public:
         JetSel = new std::vector<bool>();
         JetLoose = new std::vector<bool>();
         LepSel = new std::vector<bool>();
-        LepGap = new std::vector<bool>();
+        LepWhere = new std::vector<int>();
         LepIso = new std::vector<bool>();
         LepTight = new std::vector<bool>();
         LepMuon = new std::vector<bool>();
@@ -434,7 +435,7 @@ public:
             LepV->push_back(static_cast<TLorentzVector>(*thisLepton));
             LepCh->push_back(thisLepton->get_charge());
             LepSel->push_back(thisLepton->is_selected());
-            LepGap->push_back(thisLepton->in_gap());
+            LepWhere->push_back(thisLepton->where());
             LepIso->push_back(thisLepton->is_iso());
             LepTight->push_back(thisLepton->is_tight());
             LepMuon->push_back(thisLepton->is_muon());
@@ -461,7 +462,7 @@ public:
         tree->SetBranchAddress("LeptonVec", &LepV);
         tree->SetBranchAddress("LeptonCharge", &LepCh);
         tree->SetBranchAddress("LeptonSelected", &LepSel);
-        tree->SetBranchAddress("LeptonInGap", &LepGap);
+        tree->SetBranchAddress("LeptonWhere", &LepWhere);
         tree->SetBranchAddress("LeptonIsIso", &LepIso);
         tree->SetBranchAddress("LeptonIsTight", &LepTight);
         tree->SetBranchAddress("LeptonIsMuon", &LepMuon);

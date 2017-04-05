@@ -25,14 +25,15 @@ void MakeBranches(TTree *tree)
 {
     std::vector<TLorentzVector> JetV, LepV;
     std::vector<float> JetCh, LepCh, LepDxy, LepDz;
-    std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepGap, LepIso, LepTight, LepMuon;
+    std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepIso, LepTight, LepMuon;
+    std::vector<int> LepWhere;
     std::vector<string> flags;
     TLorentzVector MET;
 
     tree->Branch("LeptonVec", &LepV);
     tree->Branch("LeptonCharge", &LepCh);
     tree->Branch("LeptonSelected", &LepSel);
-    tree->Branch("LeptonInGap", &LepGap);
+    tree->Branch("LeptonWhere", &LepWhere);
     tree->Branch("LeptonIsIso", &LepIso);
     tree->Branch("LeptonIsTight", &LepTight);
     tree->Branch("LeptonIsMuon", &LepMuon);

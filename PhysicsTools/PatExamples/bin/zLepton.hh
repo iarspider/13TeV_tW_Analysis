@@ -51,7 +51,7 @@ public:
         return (!this->is_muon()) || (iso_ < 0.15);
     }
 
-    inline bool is_endbarrel() const
+    inline bool is_barrel() const
     {
         return fabs(this->eta_sc) >= 1.566;
     }
@@ -61,7 +61,7 @@ public:
         if (this->in_gap())
             return false;
 
-        return fabs(this->d0_) < (this->is_endbarrel()?this->d0_cut_eb:this->d0_cut_ee);
+        return fabs(this->d0_) < (this->is_barrel()?this->d0_cut_eb:this->d0_cut_ee);
     }
 
     bool pass_dz_cut() const
@@ -69,12 +69,22 @@ public:
         if (this->in_gap())
             return false;
 
-        return fabs(this->dz_) < (this->is_endbarrel()?this->dz_cut_eb:this->dz_cut_ee);
+        return fabs(this->dz_) < (this->is_barrel()?this->dz_cut_eb:this->dz_cut_ee);
     }
 
     bool in_gap() const
     {
         return (!this->is_muon_) && (fabs(this->eta_sc) > 1.4442 && fabs(this->eta_sc) < 1.566);
+    }
+
+    int where() const {
+        if (this->is_barrel())
+            return 0;
+        else if (this->in_gap())
+            return 1;
+        else
+            return 2;
+
     }
 
     bool is_selected() const
