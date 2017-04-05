@@ -15,7 +15,7 @@
 using namespace std;
 
 #define SYNC_EX
-#define SYNC_TT
+#define SYNC_TW
 
 #include "zEvent.hh"
 
