@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
     fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
     TTree *tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tree);
-#elif definded(SYNC_TW)
+#elif defined(SYNC_TW)
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
     TTree *tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tree);
