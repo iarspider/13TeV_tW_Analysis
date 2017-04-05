@@ -14,8 +14,8 @@
 
 using namespace std;
 
-#define TW_SYNC
-
+#define SYNC_EX
+#define SYNC_TT
 
 #include "zEvent.hh"
 
@@ -98,11 +98,17 @@ int main(int argc, char *argv[])
 
     fstream debug("debug.log", debug.out | debug.trunc);
 
+#ifdef SYNC_TT
+    fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
+    TTree *tree = fs.make<TTree>("tW", "tW");
+    MakeBranches(tree);
+#elif definded(SYNC_TW)
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
     TTree *tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tree);
+#endif
 
-#ifndef TW_SYNC
+#ifndef SYNC_EX
     int n = 2;
     //int s=atoi(argv[2]);
     //int n=atoi(argv[3]);
@@ -142,8 +148,10 @@ int main(int argc, char *argv[])
 #else
     try
     {
-//        sprintf(fname,
-//                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
+#ifdef SYNC_TT
+        sprintf(fname,
+                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
+#elif defined(SYNC_TW)
         sprintf(fname,
                 "root://eoscms//eos/cms//store/group/phys_top/Priyanka/sync/CRAB_UserFiles/crab_sync/170404_071616/0000/B2GEDMNtuple_1.root");
 #endif
@@ -173,7 +181,7 @@ int main(int argc, char *argv[])
         cout << "error:" << e.what() << endl;
         cout << "File Name:" << fname << " is not valid!" << endl << endl << endl;
     }
-#ifndef TW_SYNC
+#ifndef SYNC_EX
     }  // for i
 #endif
 
@@ -190,7 +198,7 @@ int main(int argc, char *argv[])
 
     for (auto event = events.begin(); event != events.end(); event++, iEvent++)
     {
-#ifndef TW_SYNC
+#ifndef SYNC_EX
         cNetEvWt += event->getWeight();
         if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
         {

@@ -127,7 +127,7 @@ public:
     zEvent(edm::EventBase const &ev)
     {
         // Fill event information
-#ifndef TW_SYNC
+#ifndef SYNC_EX
         get_userdata(ev);
         get_triggers(ev);
         get_vertices(ev);

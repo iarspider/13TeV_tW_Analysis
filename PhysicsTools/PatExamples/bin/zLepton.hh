@@ -16,10 +16,11 @@ private:
     bool is_tight_;
     bool is_muon_;
     float d0_, dz_;
-    float pt_cut_, eta_cut_, pt_lead_cut_;
+    float pt_cut_, eta_cut_, pt_lead_cut_, d0_cut_eb, dz_cut_eb, d0_cut_ee, dz_cut_ee;
 
 public:
-    zLepton(const TLorentzVector &v, float charge, float eta_sc, float iso, bool is_tight, bool is_muon, float d0, float dz)
+    zLepton(const TLorentzVector &v, float charge, float eta_sc, float iso, bool is_tight, bool is_muon, float d0,
+            float dz)
             : zParticle(v, charge),
               eta_sc(eta_sc), iso_(iso),
               is_tight_(is_tight), is_muon_(is_muon), d0_(d0), dz_(dz)
@@ -27,6 +28,10 @@ public:
         this->eta_cut_ = 2.4;
         this->pt_cut_ = 20;
         this->pt_lead_cut_ = 25;
+        this->d0_cut_ee = 0.10;
+        this->dz_cut_ee = 0.20;
+        this->d0_cut_eb = 0.05;
+        this->dz_cut_eb = 0.10;
     }
 
 
@@ -38,12 +43,39 @@ public:
 
     bool is_tight() const
     {
-        return this->is_tight_ && is_iso();
+        return this->is_tight_ && is_iso() && pass_d0_cut() && pass_dz_cut();
     }
 
     bool is_iso() const
     {
         return (!this->is_muon()) || (iso_ < 0.15);
+    }
+
+    inline bool is_endbarrel() const
+    {
+        return fabs(this->eta_sc) >= 1.566;
+    }
+
+    bool pass_d0_cut() const
+    {
+        if (this->in_gap())
+            return false;
+
+        if (this->is_endbarrel())
+            return this->d0_ < this->d0_cut_eb;
+        else
+            return this->d0_ < this->d0_cut_ee;
+    }
+
+    bool pass_dz_cut() const
+    {
+        if (this->in_gap())
+            return false;
+
+        if (this->is_endbarrel())
+            return this->dz_ < this->dz_cut_eb;
+        else
+            return this->dz_ < this->dz_cut_ee;
     }
 
     bool in_gap() const
@@ -99,16 +131,13 @@ public:
     friend ostream &operator<<(ostream &os, const zLepton &lepton)
     {
         if (!lepton.is_muon())
-        {
             os << "Electron is_tight_: " << lepton.is_tight_ << ", is_gap " << lepton.in_gap() << ", eta_sc: "
                << lepton.eta_sc << "; " << static_cast<const zParticle &>(lepton);
-        }
         else
-        {
             os << "Muon is_tight_: " << lepton.is_tight_ << ", iso: " << lepton.iso_ << ", is_iso: " << lepton.is_iso()
                << "; "
                << static_cast<const zParticle &>(lepton);
-        }
+
         return os;
     }
 
@@ -120,6 +149,18 @@ public:
     float get_dz() const
     {
         return dz_;
+    }
+
+    void set_d0_cut(float d0_cut_ee, float d0_cut_eb)
+    {
+        this->d0_cut_ee = d0_cut_ee;
+        this->d0_cut_eb = d0_cut_eb;
+    }
+
+    void set_dz_cut(float dz_cut_ee, float dz_cut_eb)
+    {
+        this->dz_cut_ee = dz_cut_ee;
+        this->dz_cut_eb = dz_cut_eb;
     }
 
 };
