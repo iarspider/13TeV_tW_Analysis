@@ -151,10 +151,12 @@ int main(int argc, char *argv[])
         // char constName[]="root://eoscms//eos/cms/store/group/phys_top/Priyanka/sChnl/ST_s-channel_4f_leptonDecays_13TeV-amcatnlo-pythia8_TuneCUETP8M1/crab_sChnl/170207_131653/0000/B2GEDMNtuple_";
         try
         {
-        sprintf(fname, "%s%d.root", constName, i);
+            sprintf(fname, "%s%d.root", constName, i);
 #else
     try
     {
+#endif
+
 #ifdef SYNC_TT
         sprintf(fname,
                 "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
