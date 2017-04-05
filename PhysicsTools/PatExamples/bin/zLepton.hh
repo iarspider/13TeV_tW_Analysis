@@ -61,10 +61,7 @@ public:
         if (this->in_gap())
             return false;
 
-        if (this->is_endbarrel())
-            return this->d0_ < this->d0_cut_eb;
-        else
-            return this->d0_ < this->d0_cut_ee;
+        return fabs(this->d0_) < (this->is_endbarrel()?this->d0_cut_eb:this->d0_cut_ee);
     }
 
     bool pass_dz_cut() const
@@ -72,10 +69,7 @@ public:
         if (this->in_gap())
             return false;
 
-        if (this->is_endbarrel())
-            return this->dz_ < this->dz_cut_eb;
-        else
-            return this->dz_ < this->dz_cut_ee;
+        return fabs(this->dz_) < (this->is_endbarrel()?this->dz_cut_eb:this->dz_cut_ee);
     }
 
     bool in_gap() const
