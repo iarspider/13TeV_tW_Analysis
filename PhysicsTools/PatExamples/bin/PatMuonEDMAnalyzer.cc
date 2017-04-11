@@ -24,7 +24,7 @@ typedef std::pair<std::vector<zLepton>::iterator, std::vector<zLepton>::iterator
 void MakeBranches(TTree *tree)
 {
     std::vector<TLorentzVector> JetV, LepV;
-    std::vector<float> JetCh, LepCh, LepDxy, LepDz;
+    std::vector<float> JetCh, LepCh, LepDxy, LepDz, LepEtaSC;
     std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepIso, LepTight, LepMuon;
     std::vector<int> LepWhere;
     std::vector<string> flags;
@@ -39,6 +39,7 @@ void MakeBranches(TTree *tree)
     tree->Branch("LeptonIsMuon", &LepMuon);
     tree->Branch("LeptonDxy", &LepDxy);
     tree->Branch("LeptonDz", &LepDxy);
+    tree->Branch("LeptonEtaSC", &LepEtaSC)
 
 
     tree->Branch("JetVec", &JetV);

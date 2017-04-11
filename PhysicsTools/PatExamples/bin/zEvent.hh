@@ -406,7 +406,7 @@ public:
     void fill_tree(TTree *tree)
     {
         std::vector<TLorentzVector> *JetV, *LepV;
-        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz;
+        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC;
         std::vector<int> *LepWhere;
         std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepIso, *LepTight, *LepMuon;
         std::vector<string> *flags;
@@ -427,6 +427,7 @@ public:
         LepMuon = new std::vector<bool>();
         LepDxy = new std::vector<float>();
         LepDz = new std::vector<float>();
+        LepEtaSC = new std::vector<float>();
 
         flags = new std::vector<string>();
 
@@ -441,6 +442,7 @@ public:
             LepMuon->push_back(thisLepton->is_muon());
             LepDxy->push_back(thisLepton->get_d0());
             LepDz->push_back(thisLepton->get_dz());
+            LepEtaSC->push_back(thisLepton->get_etaSC());
         }
 
         for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
@@ -468,6 +470,7 @@ public:
         tree->SetBranchAddress("LeptonIsMuon", &LepMuon);
         tree->SetBranchAddress("LeptonDxy", &LepDxy);
         tree->SetBranchAddress("LeptonDz", &LepDz);
+        tree->SetBranchAddress("LeptonEtaSC", &LepEtaSC);
 
         tree->SetBranchAddress("JetVec", &JetV);
         tree->SetBranchAddress("JetCharge", &JetCh);

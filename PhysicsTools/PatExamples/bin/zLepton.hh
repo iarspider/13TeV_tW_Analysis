@@ -56,6 +56,11 @@ public:
         return fabs(this->eta_sc) <= 1.4442;
     }
 
+    bool in_gap() const
+    {
+        return (!this->is_muon_) && (fabs(this->eta_sc) > 1.4442 && fabs(this->eta_sc) < 1.566);
+    }
+
     bool pass_d0_cut() const
     {
         if (this->in_gap())
@@ -70,11 +75,6 @@ public:
             return false;
 
         return fabs(this->dz_) < (this->is_barrel() ? this->dz_cut_eb : this->dz_cut_ee);
-    }
-
-    bool in_gap() const
-    {
-        return (!this->is_muon_) && (fabs(this->eta_sc) > 1.4442 && fabs(this->eta_sc) < 1.566);
     }
 
     int where() const
