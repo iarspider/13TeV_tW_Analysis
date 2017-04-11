@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <string>
+#include <math.h>
 
 #include <DataFormats/FWLite/interface/Event.h>
 
 #include "zLepton.hh"
 #include "zJet.hh"
 #include "zHLT.hh"
+
 
 #define EE 0
 #define EMu 1
@@ -22,6 +24,31 @@ struct zVertex
 {
     float z, dof, RHO;
 };
+
+Double_t HTsum(vector<TLorentzVector *> v)
+{
+    Double_t result = 0;
+
+    for (auto it = v.begin(); it != v.end(); it++)
+        result += (*it)->Pt();
+
+    return result;
+}
+
+Double_t PTsum(vector<TLorentzVector *> v)
+{
+    TLorentzVector result;
+
+    for (auto it = v.begin(); it != v.end(); it++)
+        result += *(*it);
+
+    return result.Pt();
+}
+
+Double_t Et(TLorentzVector v)
+{
+    return sqrt(v.Mag2() + pow(v.Pt(), 2));
+}
 
 class zEvent
 {
@@ -489,6 +516,120 @@ public:
 
         tree->SetBranchAddress("Flags", &flags);
         tree->SetBranchAddress("eventID", &evID);
+
+        tree->Fill();
+    }
+
+    void fill_tree_2(TTree *tree)
+    {
+        vector<TLorentzVector> selectedLeptons, selectedJets, selectedBJets;
+        copy_if(this->getLeptons().begin(), this->getLeptons().end(), back_inserter(selectedLeptons),
+                [](const zLepton &part) { return part.is_selected(); });
+
+        copy_if(this->getJets().begin(), this->getJets().end(), back_inserter(selectedJets),
+                [](const zJet &jet) { return jet.is_selected(); });
+
+        copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
+                [](const zJet &jet) { return jet.is_bjet(); });
+
+        TLorentzVector lep1(selectedLeptons.at(0));
+        TLorentzVector lep2(selectedLeptons.at(0));
+        TLorentzVector bjet1(selectedBJets.at(0));
+        TLorentzVector jet1(selectedJets.at(0));
+        TLorentzVector jet2(0, 0, 0, 0);
+        TLorentzVector met(this->getMET());
+        if (selectedJets.size() > 1)
+        {
+            jet2 = selectedJets.at(1);
+        }
+
+        Double_t ptllmetj = (lep1 + lep2 + jet1 + met).Pt();
+        tree->SetBranchAddress("ptsys", &ptllmetj);
+
+        Double_t dptll_metj = (lep1 + lep2).Pt() - (met + jet1).Pt();
+        tree->SetBranchAddress("dpt_ll_metj", &dptll_metj);
+
+        Double_t met_pt = this->getMET().Pt();
+        tree->SetBranchAddress("MET", &met_pt);
+
+        Double_t dptll_met = (lep1 + lep2).Pt() - met_pt;
+        tree->SetBranchAddress("dpt_ll_met", &dptll_met);
+
+        Double_t ptlmetj = (lep1 + jet1 + met).Pt();
+        tree->SetBranchAddress("pt_lMETj", &ptllmetj);
+
+        Double_t cll = Et(lep1 + lep2) / ((lep1 + lep2).Pt());
+        tree->SetBranchAddress("cll", &cll);
+
+        Double_t dptl_met = lep1.Pt() - met_pt;
+        tree->SetBranchAddress("dpt_l_met", &dptl_met);
+
+        int njet = static_cast<int>(selectedJets.size());
+        tree->SetBranchAddress("njets", &njet);
+
+        int nbjet = static_cast<int>(selectedBJets.size());
+        tree->SetBranchAddress("nbjets", &nbjet);
+
+        vector<TLorentzVector *> vec;
+        vec.push_back(&lep1);
+        vec.push_back(&lep2);
+        Double_t htll = HTsum(vec);
+
+        vec.push_back(&jet1);
+        vec.push_back(&met);
+        Double_t htlljmet = HTsum(vec);
+        tree->SetBranchAddress("htlljmet", &htlljmet);
+
+        Double_t ptj = jet1.Pt();
+        tree->SetBranchAddress("ptj", &ptj);
+
+        Double_t pt_over_ht = ptllmetj / htlljmet;
+        tree->SetBranchAddress("pt_over_ht", &pt_over_ht);
+
+        Double_t mlljmet = (lep1 + lep2 + jet1 + this->getMET()).Mag();
+        tree->SetBranchAddress("mlljmet", &mlljmet);
+
+        Double_t ptllj = (lep1 + lep2 + jet1).Pt();
+        tree->SetBranchAddress("ptllj", &ptllj);
+
+        Double_t htll_over_ht = htll / htlljmet;
+        tree->SetBranchAddress("htll_over_ht", &htll_over_ht);
+
+        Double_t ptll = (lep1 + lep2).Pt();
+        tree->SetBranchAddress("ptll", &ptll);
+
+        Double_t drll_metjj = (lep1 + lep2).DeltaR(met + jet1 + jet2);
+        tree->SetBranchAddress("dr_llmetjj", &drll_metjj);
+
+        Double_t drll_jj = (lep1 + lep2).DeltaR(jet1 + jet2);
+        tree->SetBranchAddress("dr_lljj", &drll_jj);
+
+        Double_t mlj2 = (lep1 + jet2).Mag();
+        tree->SetBranchAddress("mlj2", &mlj2);
+
+        Double_t dptl_j = lep1.Pt() - jet1.Pt();
+        tree->SetBranchAddress("dpt_l_j", &dptl_j);
+
+        Double_t mlj = (lep1 + jet1).Mag();
+        tree->SetBranchAddress("mlj", &mlj);
+
+        Double_t ptl = lep1.Pt();
+        tree->SetBranchAddress("ptl", &ptl);
+
+        Double_t drl_j = lep1.DeltaR(jet1);
+        tree->SetBranchAddress("dr_l_j", &drl_j);
+
+        Double_t ptj2 = jet2.Pt();
+        tree->SetBranchAddress("ptj2", &ptj2);
+
+        Double_t ml2jj = (lep2 + jet1 + jet2).Mag();
+        tree->SetBranchAddress("ml2jj", &ml2jj);
+
+        Double_t ml2j1 = (lep2 + jet1).Mag();
+        tree->SetBranchAddress("ml2j1", &ml2j1);
+
+        Double_t ml2j2 = (lep2 + jet2).Mag();
+        tree->SetBranchAddress("ml2j2", &ml2j2);
 
         tree->Fill();
     }

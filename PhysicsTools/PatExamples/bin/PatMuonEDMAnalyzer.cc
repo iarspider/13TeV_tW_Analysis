@@ -60,6 +60,39 @@ void MakeBranches(TTree *tree)
     tree->Branch("eventID", evid);
 }
 
+void MakeBDTBranches(TTree *tree)
+{
+    float* temp = NULL;
+    int* temp_ = NULL;
+    tree->Branch("ptsys", temp);
+    tree->Branch("dpt_ll_metj", temp);
+    tree->Branch("MET", temp);
+    tree->Branch("dpt_ll_met", temp);
+    tree->Branch("pt_lMETj", temp);
+    tree->Branch("cll", temp);
+    tree->Branch("dpt_l_met", temp);
+    tree->Branch("njets", temp_);
+    tree->Branch("nbjets", temp_);
+    tree->Branch("htlljmet", temp);
+    tree->Branch("ptj", temp);
+    tree->Branch("pt_over_ht", temp);
+    tree->Branch("mlljmet", temp);
+    tree->Branch("ptllj", temp);
+    tree->Branch("htll_over_ht", temp);
+    tree->Branch("ptll", temp);
+    tree->Branch("dr_llmetjj", temp);
+    tree->Branch("dr_lljj", temp);
+    tree->Branch("mlj2", temp);
+    tree->Branch("dpt_l_j", temp);
+    tree->Branch("mlj", temp);
+    tree->Branch("ptl", temp);
+    tree->Branch("dr_l_j", temp);
+    tree->Branch("ptj2", temp);
+    tree->Branch("ml2jj", temp);
+    tree->Branch("ml2j1", temp);
+    tree->Branch("ml2j2", temp);
+}
+
 int main(int argc, char *argv[])
 {
     // ----------------------------------------------------------------------
@@ -108,7 +141,9 @@ int main(int argc, char *argv[])
 #elif defined(SYNC_TW)
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
     TTree *tree = fs.make<TTree>("tW", "tW");
+    TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
     MakeBranches(tree);
+    MakeBDTBranches(bdt_tree);
 #endif
 #else
     fwlite::TFileService fs = fwlite::TFileService("tW_main.root");
@@ -613,6 +648,7 @@ int main(int argc, char *argv[])
                 counter[event_tag][5]++;
                 cout << "+ Accept step 4.1.2" << endl;
                 event->add_flag("2+j1+t", true);
+                event->fill_tree_2(bdt_tree);
             }
 
 
@@ -640,6 +676,7 @@ int main(int argc, char *argv[])
                 counter[event_tag][7]++;
                 event->add_flag("1j1t", true);
                 cout << "+ Accept step 4.2.2" << endl;
+                event->fill_tree_2(bdt_tree);
             }
 
             if (event_tag == EE)
