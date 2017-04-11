@@ -39,7 +39,7 @@ void MakeBranches(TTree *tree)
     tree->Branch("LeptonIsMuon", &LepMuon);
     tree->Branch("LeptonDxy", &LepDxy);
     tree->Branch("LeptonDz", &LepDxy);
-    tree->Branch("LeptonEtaSC", &LepEtaSC)
+    tree->Branch("LeptonEtaSC", &LepEtaSC);
 
 
     tree->Branch("JetVec", &JetV);
