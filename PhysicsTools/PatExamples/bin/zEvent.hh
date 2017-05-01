@@ -11,6 +11,7 @@
 #include "zJet.hh"
 #include "zHLT.hh"
 
+#define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(this->##x));}
 
 #define EE 0
 #define EMu 1
@@ -66,11 +67,10 @@ private:
     int puNtrueInteractons;
     double weight;
 
-    ULong64_t evID;
 public:
     ULong64_t getEvID() const
     {
-        return evID;
+        return this->ev_event;
     }
 
     const vector<zHLT> &getTriggers() const
@@ -151,6 +151,241 @@ public:
                             }) != this->triggers.cend();
     }
 
+    zEvent()
+    {
+
+    }
+
+    zEvent(TTree *tree)
+    {
+        tree->SetBranchStatus("*", 0);
+        LOAD_BRANCH(tree, ev_event)
+        LOAD_BRANCH(tree, mc_trueNumInteractions)
+        LOAD_BRANCH(tree, mc_PU_NumInteractions)
+        LOAD_BRANCH(tree, pv_n)
+        LOAD_BRANCH(tree, pv_z)
+        LOAD_BRANCH(tree, pv_ndof)
+        LOAD_BRANCH(tree, pv_normalizedChi2)
+        LOAD_BRANCH(tree, pv_isValid)
+        LOAD_BRANCH(tree, pv_isFake)
+        LOAD_BRANCH(tree, gsf_n)
+        LOAD_BRANCH(tree, gsf80_energy)
+        LOAD_BRANCH(tree, gsf80_pt)
+        LOAD_BRANCH(tree, gsf_eta)
+        LOAD_BRANCH(tree, gsf_phi)
+        LOAD_BRANCH(tree, gsf_charge)
+        LOAD_BRANCH(tree, gsf_VIDTight)
+        LOAD_BRANCH(tree, gsf_dxy)
+        LOAD_BRANCH(tree, gsf_dz)
+        LOAD_BRANCH(tree, gsf_relIso)
+        LOAD_BRANCH(tree, gsf_sc_eta)
+        LOAD_BRANCH(tree, mu_n)
+        LOAD_BRANCH(tree, mu_gt_charge)
+        LOAD_BRANCH(tree, mu_gt_pt)
+        LOAD_BRANCH(tree, mu_gt_eta)
+        LOAD_BRANCH(tree, mu_gt_phi)
+        LOAD_BRANCH(tree, mu_gt_d0)
+        LOAD_BRANCH(tree, mu_gt_dz)
+        LOAD_BRANCH(tree, mu_gt_dz_beamspot)
+        LOAD_BRANCH(tree, mu_gt_dz_firstPVtx)
+        LOAD_BRANCH(tree, mu_gt_dxy)
+        LOAD_BRANCH(tree, mu_gt_dxy_beamspot)
+        LOAD_BRANCH(tree, mu_gt_dxy_firstPVtx)
+        LOAD_BRANCH(tree, mu_isTightMuon)
+        LOAD_BRANCH(tree, jet_n)
+        LOAD_BRANCH(tree, jet_pt)
+        LOAD_BRANCH(tree, jet_eta)
+        LOAD_BRANCH(tree, jet_phi)
+        LOAD_BRANCH(tree, jet_energy)
+        LOAD_BRANCH(tree, jet_CSVv2)
+        LOAD_BRANCH(tree, jet_isJetIDLoose)
+        LOAD_BRANCH(tree, jet_Smeared_pt)
+        LOAD_BRANCH(tree, jet_Smeared_energy)
+        LOAD_BRANCH(tree, MET_Px)
+        LOAD_BRANCH(tree, MET_Py)
+        LOAD_BRANCH(tree, trig_Flag_HBHENoiseFilter_accept)
+        LOAD_BRANCH(tree, trig_Flag_HBHENoiseIsoFilter_accept)
+        LOAD_BRANCH(tree, trig_Flag_globalTightHalo2016Filter_accept)
+        LOAD_BRANCH(tree, trig_Flag_goodVertices_accept)
+        LOAD_BRANCH(tree, trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept)
+        LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
+        LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
+    }
+
+private:
+    void reset()
+    {
+        this->leptons.clear();
+        this->jets.clear();
+        this->triggers.clear();
+        this->vertices.clear();
+        this->event_flags.clear();
+    }
+
+    void read_electrons()
+    {
+        for (auto i = 0; i < this->gsf_n; i++)
+        {
+            auto j = static_cast<vector::size_type>(i);
+            TLorentzVector v;
+            v.SetPtEtaPhiE(this->gsf80_pt.at(j), this->gsf_eta.at(j), this->gsf_phi.at(j), this->gsf80_energy.at(j));
+            zLepton thisElectron = zLepton(v, this->gsf_charge.at(j), this->gsf_sc_eta.at(j), 0,
+                                           this->gsf_VIDTight.at(j), false, this->gsf_dxy.at(j), this->gsf_dz.at(j));
+            this->leptons.push_back(thisElectron);
+        }
+    }
+
+    void read_muons()
+    {
+        for (auto i = 0; i < this->mu_n; i++)
+        {
+            auto j = static_cast<vector::size_type>(i);
+            TLorentzVector v;
+            v.SetPtEtaPhiE(this->mu_gt_pt.at(j), this->mu_gt_eta.at(j), this->mu_gt_phi.at(j), 0);
+            zLepton thisMuon = zLepton(v, this->mu_gt_charge.at(j), 0, this->gsf_relIso.at(j),
+                                       this->mu_isTightMuon.at(j), true, 0, 0);
+            this->leptons.push_back(thisMuon);
+        }
+    }
+
+    void read_jets()
+    {
+        for (auto i = 0; i < this->jet_n; i++)
+        {
+            auto j = static_cast<vector::size_type>(i);
+            TLorentzVector v;
+            v.SetPtEtaPhiE(this->jet_pt.at(j), this->jet_eta.at(j), this->jet_phi.at(j), this->jet_energy.at(j));
+            zJet thisJet = zJet(v, 0, this->jet_CSVv2.at(j), this->jet_isJetIDLoose.at(j));
+            this->jets.push_back(thisJet);
+        }
+    }
+
+    void read_vertices()
+    {
+/*
+        for (auto i = 0; i < this->pv_n; i++)
+        {
+            auto j = static_cast<vector::size_type>(i);
+            zVertex thisVertex;
+            thisVertex.z;
+        }
+*/
+    }
+
+    void read_MET()
+    {
+        this->MET = TLorentzVector(this->MET_Px, this->MET_Py, 0, 0);
+        this->isMETok_ = this->trig_Flag_BadChargedCandidateFilter_accept && this->trig_Flag_BadPFMuonFilter_accept &&
+                         this->trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
+                         this->trig_Flag_globalTightHalo2016Filter_accept && this->trig_Flag_goodVertices_accept &&
+                         this->trig_Flag_HBHENoiseFilter_accept && this->trig_Flag_HBHENoiseIsoFilter_accept;
+    }
+
+public:
+    /*
+    zEvent(edm::EventBase const &ev)
+    {
+        // Fill event information
+#ifndef SYNC_EX
+        get_userdata(ev);
+        get_triggers(ev);
+        get_vertices(ev);
+#endif
+        edm::Handle<ULong64_t> event_id;
+        ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
+        this->evID = *event_id;
+        read_electrons(ev);
+        read_muons(ev);
+        std::sort(this->leptons.begin(), this->leptons.end());
+        read_jets(ev);
+        clean_jets();
+        read_MET(ev);
+    }
+*/
+    bool loadEvent(TTree *tree, Long64_t id)
+    {
+        reset();
+        tree->GetEntry(id);
+        this->leptons.reserve(this->gsf_n + this->mu_n);
+
+        read_electrons();
+        read_muons();
+        std::sort(this->leptons.begin(), this->leptons.end());
+        clean_jets();
+        read_MET();
+
+        return true;
+    }
+
+private:
+    Bool_t trig_Flag_BadPFMuonFilter_accept;
+    Bool_t trig_Flag_BadChargedCandidateFilter_accept;
+    ULong64_t ev_event;
+    Int_t mc_trueNumInteractions;
+    Int_t mc_PU_NumInteractions;
+
+    // Primary vertex
+    UInt_t pv_n;
+    vector<float> pv_x;
+    vector<float> pv_y;
+    vector<float> pv_z;
+    vector<float> pv_ndof;
+    vector<float> pv_normalizedChi2;
+    vector<bool> pv_isValid;
+    vector<bool> pv_isFake;
+
+    // Electron?
+    UInt_t gsf_n;
+    vector<float> gsf80_energy;
+    vector<float> gsf80_pt;
+    vector<float> gsf_eta;
+    vector<float> gsf_phi;
+    vector<int> gsf_charge;
+    vector<bool> gsf_VIDTight;
+    vector<float> gsf_dxy;
+    vector<float> gsf_dz;
+    vector<float> gsf_relIso;
+    vector<float> gsf_sc_eta;
+
+    // Muon
+    UInt_t mu_n;
+    vector<int> mu_gt_charge;
+    vector<float> mu_gt_pt;
+    vector<float> mu_gt_eta;
+    vector<float> mu_gt_phi;
+    vector<float> mu_gt_d0;
+    vector<float> mu_gt_dz;
+    vector<float> mu_gt_dz_beamspot;
+    vector<float> mu_gt_dz_firstPVtx;
+    vector<float> mu_gt_dxy;
+    vector<float> mu_gt_dxy_beamspot;
+    vector<float> mu_gt_dxy_firstPVtx;
+    vector<bool> mu_isTightMuon;
+    // Where is energy - nowhere! Cool!
+
+    // Jet
+    UInt_t jet_n;
+    vector<float> jet_pt;
+    vector<float> jet_eta;
+    vector<float> jet_phi;
+    vector<float> jet_energy;
+    vector<float> jet_CSVv2;
+    vector<bool> jet_isJetIDLoose;
+    vector<float> jet_Smeared_pt;
+    vector<float> jet_Smeared_energy;
+
+    // MET
+    Float_t MET_Px;
+    Float_t MET_Py;
+
+    // Trigger
+    Int_t trig_Flag_HBHENoiseFilter_accept;
+    Int_t trig_Flag_HBHENoiseIsoFilter_accept;
+    Int_t trig_Flag_globalTightHalo2016Filter_accept;
+    Int_t trig_Flag_goodVertices_accept;
+    Int_t trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept;
+
+/*
     zEvent(edm::EventBase const &ev)
     {
         // Fill event information
@@ -354,20 +589,6 @@ private:
         std::sort(this->jets.begin(), this->jets.end());
     }
 
-public:
-    void clean_jets()
-    {
-        for (auto thisJet = this->jets.begin(); thisJet != this->jets.end(); thisJet++)
-        {
-            bool jet_flag = std::all_of(this->leptons.begin(), this->leptons.end(),
-                                        [thisJet](const zLepton &thisLepton) {
-                                            return !(thisLepton.is_selected() && thisJet->deltaR(thisLepton) <= 0.4);
-                                        });
-
-            thisJet->set_clean_flag(jet_flag);
-        }
-    }
-
     void read_MET(edm::EventBase const &event)
     {
         edm::Handle<std::vector<float> > MetPx;
@@ -427,6 +648,21 @@ public:
             this_vtx.RHO = rhoo->at(i);
 
             this->vertices.push_back(this_vtx);
+        }
+    }
+*/
+
+public:
+    void clean_jets()
+    {
+        for (auto thisJet = this->jets.begin(); thisJet != this->jets.end(); thisJet++)
+        {
+            bool jet_flag = std::all_of(this->leptons.begin(), this->leptons.end(),
+                                        [thisJet](const zLepton &thisLepton) {
+                                            return !(thisLepton.is_selected() && thisJet->deltaR(thisLepton) <= 0.4);
+                                        });
+
+            thisJet->set_clean_flag(jet_flag);
         }
     }
 
@@ -515,7 +751,7 @@ public:
         tree->SetBranchAddress("MetBadPFM", &BadPFMuonFilter_);
 
         tree->SetBranchAddress("Flags", &flags);
-        tree->SetBranchAddress("eventID", &evID);
+        tree->SetBranchAddress("eventID", &this->ev_event);
 
         tree->Fill();
     }
