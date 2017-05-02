@@ -152,49 +152,8 @@ public:
                             }) != triggers.cend();
     }
 
-    void init()
-    {
-        pv_z = new vector<float>();
-        pv_ndof = new vector<float>();
-        pv_normalizedChi2 = new vector<float>();
-        pv_isValid = new vector<bool>();
-        pv_isFake = new vector<bool>();
-        gsf80_energy = new vector<float>();
-        gsf80_pt = new vector<float>();
-        gsf_eta = new vector<float>();
-        gsf_phi = new vector<float>();
-        gsf_charge = new vector<int>();
-        gsf_VIDTight = new vector<bool>();
-        gsf_dxy = new vector<float>();
-        gsf_dz = new vector<float>();
-        gsf_relIso = new vector<float>();
-        gsf_sc_eta = new vector<float>();
-        mu_gt_charge = new vector<int>();
-        mu_gt_pt = new vector<float>();
-        mu_gt_eta = new vector<float>();
-        mu_gt_phi = new vector<float>();
-        mu_gt_d0 = new vector<float>();
-        mu_gt_dz = new vector<float>();
-        mu_gt_dz_beamspot = new vector<float>();
-        mu_gt_dz_firstPVtx = new vector<float>();
-        mu_gt_dxy = new vector<float>();
-        mu_gt_dxy_beamspot = new vector<float>();
-        mu_gt_dxy_firstPVtx = new vector<float>();
-        mu_isTightMuon = new vector<bool>();
-        mu_isoTrackerBased03 = new vector<float>();
-        jet_pt = new vector<float>();
-        jet_eta = new vector<float>();
-        jet_phi = new vector<float>();
-        jet_energy = new vector<float>();
-        jet_CSVv2 = new vector<float>();
-        jet_isJetIDLoose = new vector<bool>();
-        jet_Smeared_pt = new vector<float>();
-        jet_Smeared_energy = new vector<float>();
-    }
-
     zEvent(TTree *tree)
     {
-//        init();
         // tree->SetBranchStatus("*", 0);
         /*
         LOAD_BRANCH(tree, ev_event)
@@ -212,7 +171,8 @@ public:
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
 */
-        LOAD_BRANCH(tree, gsf_charge)
+        // LOAD_BRANCH(tree, gsf_charge)
+        tree->SetBranchAddress("gsf_charge", &gsf_charge);
 /*
         LOAD_BRANCH(tree, gsf_VIDTight)
         LOAD_BRANCH(tree, gsf_dxy)
