@@ -11,8 +11,8 @@
 #include "zJet.hh"
 #include "zHLT.hh"
 
-// #define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x"*", 1); t->SetBranchAddress(#x, &(x));}
-#define LOAD_BRANCH(t, x) {t->SetBranchAddress(#x, &(x));}
+ #define LOAD_BRANCH(t, x) {x = 0; t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(x));}
+//#define LOAD_BRANCH(t, x) {t->SetBranchAddress(#x, &(x));}
 
 #define EE 0
 #define EMu 1
@@ -171,7 +171,7 @@ public:
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
 */
-        gsf_charge = 0;
+//        gsf_charge = 0;
         LOAD_BRANCH(tree, gsf_charge)
 /*
         LOAD_BRANCH(tree, gsf_VIDTight)
