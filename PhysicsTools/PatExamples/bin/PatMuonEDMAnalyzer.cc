@@ -183,12 +183,13 @@ int main(int argc, char *argv[])
         TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
         zEvent *event = new zEvent(rTree);
 
-        for (int evtID = 0; evtID < /*rTree->GetEntriesFast()*/10; evtID++)
+        for (Long64_t evtID = 0; evtID < /*rTree->GetEntriesFast()*/10; evtID++)
         {
             counter[EE][0]++;
             counter[EMu][0]++;
             counter[MuMu][0]++;
 
+            cout << "evtID=" << evtID<< endl;
             event->loadEvent(rTree, evtID);
             continue;
 #ifndef SYNC_EX

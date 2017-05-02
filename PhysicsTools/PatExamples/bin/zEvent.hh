@@ -210,7 +210,9 @@ public:
         LOAD_BRANCH(tree, gsf80_pt)
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
+*/
         LOAD_BRANCH(tree, gsf_charge)
+/*
         LOAD_BRANCH(tree, gsf_VIDTight)
         LOAD_BRANCH(tree, gsf_dxy)
         LOAD_BRANCH(tree, gsf_dz)
