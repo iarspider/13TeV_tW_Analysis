@@ -155,7 +155,7 @@ public:
     zEvent(TTree *tree)
     {
         tree->SetBranchStatus("*", 0);
-        /*
+
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
         LOAD_BRANCH(tree, mc_PU_NumInteractions)
@@ -170,10 +170,7 @@ public:
         LOAD_BRANCH(tree, gsf80_pt)
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
-*/
-//        gsf_charge = 0;
         LOAD_BRANCH(tree, gsf_charge)
-/*
         LOAD_BRANCH(tree, gsf_VIDTight)
         LOAD_BRANCH(tree, gsf_dxy)
         LOAD_BRANCH(tree, gsf_dz)
@@ -211,7 +208,6 @@ public:
         LOAD_BRANCH(tree, trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
-         */
     }
 
 private:
