@@ -160,8 +160,6 @@ int main(int argc, char *argv[])
     zEvent *event = new zEvent();
     vector<llPair_t> llPairs;
 
-    int iEvent = 0;
-
     try
     {
 #ifdef SYNC_EX
@@ -255,7 +253,7 @@ int main(int argc, char *argv[])
             copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                     [](const zJet &jet) { return jet.is_bjet(); });
 
-            cout << "=== BEGIN EVENT " << iEvent << " (" << event->getEvID() << ")" << endl;
+            cout << "=== BEGIN EVENT " << evtID << " (" << event->getEvID() << ")" << endl;
             cout << "Raw: # leptons = " << event->getLeptons().size() << ", # jets = " << event->getJets().size()
                  << endl;
             cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
@@ -273,7 +271,7 @@ int main(int argc, char *argv[])
 
             if (selectedLeptons.size() >= 2)
             {
-                cout << "=== New ll candidate " << iEvent << "(" << event->getEvID() << ") ===" << endl;
+                cout << "=== New ll candidate " << evtID << "(" << event->getEvID() << ") ===" << endl;
                 event->add_flag("is_ll", true);
 
                 auto leading_l = selectedLeptons.at(0);
