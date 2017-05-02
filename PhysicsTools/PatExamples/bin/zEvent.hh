@@ -11,7 +11,7 @@
 #include "zJet.hh"
 #include "zHLT.hh"
 
-#define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(x));}
+#define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x##"*", 1); t->SetBranchAddress(#x, &(x));}
 
 #define EE 0
 #define EMu 1
