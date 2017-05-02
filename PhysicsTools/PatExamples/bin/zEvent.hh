@@ -304,15 +304,14 @@ public:
     {
         reset();
         tree->GetEntry(id);
-        /*
-        leptons.reserve(gsf_n + mu_n);
 
+        leptons.reserve(gsf_n + mu_n);
         read_electrons();
         read_muons();
         std::sort(leptons.begin(), leptons.end());
         read_jets();
         read_MET();
-        */
+
         return true;
     }
 

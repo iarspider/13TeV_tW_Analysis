@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
 
             cout << "evtID=" << evtID<< endl;
             event->loadEvent(rTree, evtID);
-//            continue;
+
 #ifndef SYNC_EX
             cNetEvWt += event->getWeight();
             if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
