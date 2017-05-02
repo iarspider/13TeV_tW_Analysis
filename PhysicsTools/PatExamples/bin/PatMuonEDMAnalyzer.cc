@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
         int evtID = 0;
 
-        for (evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
+        for (evtID = 0; evtID < /*rTree->GetEntriesFast()*/10; evtID++)
         {
             counter[EE][0]++;
             counter[EMu][0]++;

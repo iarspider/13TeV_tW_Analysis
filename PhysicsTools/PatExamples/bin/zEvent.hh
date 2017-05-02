@@ -192,6 +192,7 @@ public:
         LOAD_BRANCH(tree, mu_gt_dxy_beamspot)
         LOAD_BRANCH(tree, mu_gt_dxy_firstPVtx)
         LOAD_BRANCH(tree, mu_isTightMuon)
+        LOAD_BRANCH(tree, mu_isolationR03_sumPt)
         LOAD_BRANCH(tree, jet_n)
         LOAD_BRANCH(tree, jet_pt)
         LOAD_BRANCH(tree, jet_eta)
@@ -242,7 +243,7 @@ private:
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
             v.SetPtEtaPhiE(mu_gt_pt.at(j), mu_gt_eta.at(j), mu_gt_phi.at(j), 0);
-            zLepton thisMuon = zLepton(v, mu_gt_charge.at(j), 0, gsf_relIso.at(j),
+            zLepton thisMuon = zLepton(v, mu_gt_charge.at(j), 0, mu_isolationR03_sumPt.at(j),
                                        mu_isTightMuon.at(j), true, 0, 0);
             leptons.push_back(thisMuon);
         }
@@ -361,6 +362,7 @@ private:
     vector<float> mu_gt_dxy_beamspot;
     vector<float> mu_gt_dxy_firstPVtx;
     vector<bool> mu_isTightMuon;
+    vector<float> mu_isolationR03_sumPt;
     // Where is energy - nowhere! Cool!
 
     // Jet
