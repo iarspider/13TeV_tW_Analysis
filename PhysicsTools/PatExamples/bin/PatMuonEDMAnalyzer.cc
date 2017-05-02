@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
     vector<zJet> selectedJets;
     vector<zJet> selectedBJets;
 
-    zEvent *event = new zEvent();
+
     vector<llPair_t> llPairs;
 
     try
@@ -182,6 +182,7 @@ int main(int argc, char *argv[])
         }
 
         TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
+        zEvent *event = new zEvent(rTree);
 
         int evtID = 0;
 
