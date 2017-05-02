@@ -171,9 +171,8 @@ public:
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
 */
-        // LOAD_BRANCH(tree, gsf_charge)
-        gsf_charge = (vector<int>*) 0;
-        tree->SetBranchAddress("gsf_charge", &gsf_charge);
+        gsf_charge = 0;
+        LOAD_BRANCH(tree, gsf_charge)
 /*
         LOAD_BRANCH(tree, gsf_VIDTight)
         LOAD_BRANCH(tree, gsf_dxy)
