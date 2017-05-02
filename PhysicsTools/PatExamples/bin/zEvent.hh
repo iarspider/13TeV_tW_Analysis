@@ -153,11 +153,47 @@ public:
 
     zEvent()
     {
-
+        pv_z = new vector<float>();
+        pv_ndof = new vector<float>();
+        pv_normalizedChi2 = new vector<float>();
+        pv_isValid = new vector<bool>();
+        pv_isFake = new vector<bool>();
+        gsf80_energy = new vector<float>();
+        gsf80_pt = new vector<float>();
+        gsf_eta = new vector<float>();
+        gsf_phi = new vector<float>();
+        gsf_charge = new vector<int>();
+        gsf_VIDTight = new vector<bool>();
+        gsf_dxy = new vector<float>();
+        gsf_dz = new vector<float>();
+        gsf_relIso = new vector<float>();
+        gsf_sc_eta = new vector<float>();
+        mu_gt_charge = new vector<int>();
+        mu_gt_pt = new vector<float>();
+        mu_gt_eta = new vector<float>();
+        mu_gt_phi = new vector<float>();
+        mu_gt_d0 = new vector<float>();
+        mu_gt_dz = new vector<float>();
+        mu_gt_dz_beamspot = new vector<float>();
+        mu_gt_dz_firstPVtx = new vector<float>();
+        mu_gt_dxy = new vector<float>();
+        mu_gt_dxy_beamspot = new vector<float>();
+        mu_gt_dxy_firstPVtx = new vector<float>();
+        mu_isTightMuon = new vector<bool>();
+        mu_isoTrackerBased03 = new vector<float>();
+        jet_pt = new vector<float>();
+        jet_eta = new vector<float>();
+        jet_phi = new vector<float>();
+        jet_energy = new vector<float>();
+        jet_CSVv2 = new vector<float>();
+        jet_isJetIDLoose = new vector<bool>();
+        jet_Smeared_pt = new vector<float>();
+        jet_Smeared_energy = new vector<float>();
     }
 
     zEvent(TTree *tree)
     {
+        zEvent();
         tree->SetBranchStatus("*", 0);
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
@@ -277,9 +313,9 @@ private:
     {
         MET = TLorentzVector(MET_Px, MET_Py, 0, 0);
         isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
-                         trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
-                         trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
-                         trig_Flag_HBHENoiseFilter_accept && trig_Flag_HBHENoiseIsoFilter_accept;
+                   trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
+                   trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
+                   trig_Flag_HBHENoiseFilter_accept && trig_Flag_HBHENoiseIsoFilter_accept;
     }
 
 public:
@@ -327,54 +363,52 @@ private:
 
     // Primary vertex
     UInt_t pv_n;
-    vector<float> pv_x;
-    vector<float> pv_y;
-    vector<float> pv_z;
-    vector<float> pv_ndof;
-    vector<float> pv_normalizedChi2;
-    vector<bool> pv_isValid;
-    vector<bool> pv_isFake;
+    vector<float> *pv_z;
+    vector<float> *pv_ndof;
+    vector<float> *pv_normalizedChi2;
+    vector<bool> *pv_isValid;
+    vector<bool> *pv_isFake;
 
     // Electron?
     UInt_t gsf_n;
-    vector<float> gsf80_energy;
-    vector<float> gsf80_pt;
-    vector<float> gsf_eta;
-    vector<float> gsf_phi;
-    vector<int> gsf_charge;
-    vector<bool> gsf_VIDTight;
-    vector<float> gsf_dxy;
-    vector<float> gsf_dz;
-    vector<float> gsf_relIso;
-    vector<float> gsf_sc_eta;
+    vector<float> *gsf80_energy;
+    vector<float> *gsf80_pt;
+    vector<float> *gsf_eta;
+    vector<float> *gsf_phi;
+    vector<int> *gsf_charge;
+    vector<bool> *gsf_VIDTight;
+    vector<float> *gsf_dxy;
+    vector<float> *gsf_dz;
+    vector<float> *gsf_relIso;
+    vector<float> *gsf_sc_eta;
 
     // Muon
     UInt_t mu_n;
-    vector<int> mu_gt_charge;
-    vector<float> mu_gt_pt;
-    vector<float> mu_gt_eta;
-    vector<float> mu_gt_phi;
-    vector<float> mu_gt_d0;
-    vector<float> mu_gt_dz;
-    vector<float> mu_gt_dz_beamspot;
-    vector<float> mu_gt_dz_firstPVtx;
-    vector<float> mu_gt_dxy;
-    vector<float> mu_gt_dxy_beamspot;
-    vector<float> mu_gt_dxy_firstPVtx;
-    vector<bool> mu_isTightMuon;
-    vector<float> mu_isoTrackerBased03;
+    vector<int> *mu_gt_charge;
+    vector<float> *mu_gt_pt;
+    vector<float> *mu_gt_eta;
+    vector<float> *mu_gt_phi;
+    vector<float> *mu_gt_d0;
+    vector<float> *mu_gt_dz;
+    vector<float> *mu_gt_dz_beamspot;
+    vector<float> *mu_gt_dz_firstPVtx;
+    vector<float> *mu_gt_dxy;
+    vector<float> *mu_gt_dxy_beamspot;
+    vector<float> *mu_gt_dxy_firstPVtx;
+    vector<bool> *mu_isTightMuon;
+    vector<float> *mu_isoTrackerBased03;
     // Where is energy - nowhere! Cool!
 
     // Jet
     UInt_t jet_n;
-    vector<float> jet_pt;
-    vector<float> jet_eta;
-    vector<float> jet_phi;
-    vector<float> jet_energy;
-    vector<float> jet_CSVv2;
-    vector<bool> jet_isJetIDLoose;
-    vector<float> jet_Smeared_pt;
-    vector<float> jet_Smeared_energy;
+    vector<float> *jet_pt;
+    vector<float> *jet_eta;
+    vector<float> *jet_phi;
+    vector<float> *jet_energy;
+    vector<float> *jet_CSVv2;
+    vector<bool> *jet_isJetIDLoose;
+    vector<float> *jet_Smeared_pt;
+    vector<float> *jet_Smeared_energy;
 
     // MET
     Float_t MET_Px;
