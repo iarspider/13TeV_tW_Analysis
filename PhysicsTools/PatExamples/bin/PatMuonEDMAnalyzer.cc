@@ -142,9 +142,9 @@ int main(int argc, char *argv[])
     MakeBranches(tree);
 #elif defined(SYNC_TW)
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
-    TTree *tree = fs.make<TTree>("tW", "tW");
+    TTree *tW_tree = fs.make<TTree>("tW", "tW");
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
-    MakeBranches(tree);
+    MakeBranches(tW_tree);
     MakeBDTBranches(bdt_tree);
 #endif
 #else
@@ -191,7 +191,7 @@ int main(int argc, char *argv[])
             counter[EMu][0]++;
             counter[MuMu][0]++;
 
-            event->loadEvent(tree, evtID);
+            event->loadEvent(rTree, evtID);
 #ifndef SYNC_EX
             cNetEvWt += event->getWeight();
             if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
@@ -262,7 +262,7 @@ int main(int argc, char *argv[])
 
             if (!event->isMETok())
             {
-                event->fill_tree(tree);
+                event->fill_tree(tW_tree);
                 cout << "- Reject step 0.1" << endl;
                 continue;
             }
@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
             else
             {
                 event->add_flag("no_ll", true);
-                event->fill_tree(tree);
+                event->fill_tree(tW_tree);
                 cout << "- Reject step 1" << endl;
                 continue;
             }
@@ -324,7 +324,7 @@ int main(int argc, char *argv[])
             else
             {
                 event->add_flag("not_dilepton", true);
-                event->fill_tree(tree);
+                event->fill_tree(tW_tree);
                 continue;
             }
 
@@ -336,8 +336,7 @@ int main(int argc, char *argv[])
             if (massFlag)
             {
                 cout << "- Reject step 2" << endl;
-                event->add_flag("pass_dilepton_mass", false);
-                event->fill_tree(tree);
+                event->fill_tree(tW_tree);
                 continue;
             }
             else
@@ -353,8 +352,7 @@ int main(int argc, char *argv[])
             {
                 if (event->getMET().Pt() <= 40)
                 {
-                    event->add_flag("pass_met_cut", false);
-                    event->fill_tree(tree);
+                    event->fill_tree(tW_tree);
                     cout << "- Reject step 3" << endl;
                     continue;
                 }
@@ -419,7 +417,7 @@ int main(int argc, char *argv[])
                 }
             }
 
-            event->fill_tree(tree);
+            event->fill_tree(tW_tree);
         }
     }
     catch (exception &e)
