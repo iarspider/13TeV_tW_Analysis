@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
                 "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
 #elif defined(SYNC_TW)
         sprintf(fname,
-                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/sync/CRAB_UserFiles/crab_sync/170404_071616/0000/B2GEDMNtuple_1.root");
+                "/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
 #endif
 #endif
         cout << "File Name:" << fname << endl;
