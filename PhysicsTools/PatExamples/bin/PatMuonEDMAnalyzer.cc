@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
             counter[EMu][0]++;
             counter[MuMu][0]++;
 
-            cout << "evtID=" << evtID<< endl;
+//            cout << "evtID=" << evtID<< endl;
             event->read_event(rTree, evtID);
 
 #ifndef SYNC_EX

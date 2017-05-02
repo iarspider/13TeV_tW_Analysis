@@ -11,7 +11,7 @@
 #include "zJet.hh"
 #include "zHLT.hh"
 
- #define LOAD_BRANCH(t, x) {x = 0; t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(x));}
+#define LOAD_BRANCH(t, x) {x = 0; t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(x));}
 //#define LOAD_BRANCH(t, x) {t->SetBranchAddress(#x, &(x));}
 
 #define EE 0
@@ -222,7 +222,7 @@ private:
 
     void read_electrons()
     {
-        cout << "Loading electons" << endl;
+//        cout << "Loading electons" << endl;
         for (UInt_t i = 0; i < gsf80_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
@@ -232,12 +232,12 @@ private:
                                            gsf_VIDTight->at(j), false, gsf_dxy->at(j), gsf_dz->at(j));
             leptons.push_back(thisElectron);
         }
-        cout << "Loaded electons" << endl;
+//        cout << "Loaded electons" << endl;
     }
 
     void read_muons()
     {
-        cout << "Loading muons" << endl;
+//        cout << "Loading muons" << endl;
         for (UInt_t i = 0; i < mu_gt_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
@@ -247,12 +247,12 @@ private:
                                        mu_isTightMuon->at(j), true, 0, 0);
             leptons.push_back(thisMuon);
         }
-        cout << "Loaded muons" << endl;
+//        cout << "Loaded muons" << endl;
     }
 
     void read_jets()
     {
-        cout << "Loading jets" << endl;
+//        cout << "Loading jets" << endl;
         for (UInt_t i = 0; i < jet_pt->size(); i++)
         {
             auto j = static_cast<vector<zJet>::size_type>(i);
@@ -261,7 +261,7 @@ private:
             zJet thisJet = zJet(v, 0, jet_CSVv2->at(j), jet_isJetIDLoose->at(j));
             jets.push_back(thisJet);
         }
-        cout << "Loaded jets" << endl;
+//        cout << "Loaded jets" << endl;
         jets.shrink_to_fit();
     }
 
@@ -313,13 +313,14 @@ public:
         tree->GetEntry(id);
 
         leptons.reserve(gsf_n + mu_n);
-        jets.reserve(jet_n);
         read_electrons();
         read_muons();
+        leptons.shrink_to_fit();
         std::sort(leptons.begin(), leptons.end());
+        jets.reserve(jet_n);
         read_jets();
+        clean_jets();
         read_MET();
-
         return true;
     }
 
