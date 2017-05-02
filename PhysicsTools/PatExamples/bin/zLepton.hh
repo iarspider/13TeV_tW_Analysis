@@ -137,10 +137,11 @@ public:
     {
         if (!lepton.is_muon())
             os << "Electron is_tight_: " << lepton.is_tight_ << ", is_gap " << lepton.in_gap() << ", eta_sc: "
-               << lepton.eta_sc << "; " << static_cast<const zParticle &>(lepton);
+               << lepton.eta_sc << ", d0 " << lepton.d0_ << ", dz" << lepton.dz_ << "; "
+               << static_cast<const zParticle &>(lepton);
         else
             os << "Muon is_tight_: " << lepton.is_tight_ << ", iso: " << lepton.iso_ << ", is_iso: " << lepton.is_iso()
-               << "; "
+               << ", d0 " << lepton.d0_ << ", dz" << lepton.dz_ << "; "
                << static_cast<const zParticle &>(lepton);
 
         return os;
