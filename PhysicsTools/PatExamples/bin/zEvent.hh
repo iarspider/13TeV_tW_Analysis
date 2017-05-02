@@ -253,7 +253,7 @@ private:
     void read_jets()
     {
         cout << "Loading jets" << endl;
-        for (UInt_t i = 0; i < jet_n; i++)
+        for (UInt_t i = 0; i < jet_pt->size(); i++)
         {
             auto j = static_cast<vector<zJet>::size_type>(i);
             TLorentzVector v;
@@ -262,6 +262,7 @@ private:
             jets.push_back(thisJet);
         }
         cout << "Loaded jets" << endl;
+        jets.shrink_to_fit()
     }
 
     void read_vertices()
