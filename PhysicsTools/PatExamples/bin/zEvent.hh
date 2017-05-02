@@ -223,7 +223,7 @@ private:
     void read_electrons()
     {
         cout << "Loading electons" << endl;
-        for (UInt_t i = 0; i < gsf_n; i++)
+        for (UInt_t i = 0; i < gsf80_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
@@ -238,7 +238,7 @@ private:
     void read_muons()
     {
         cout << "Loading muons" << endl;
-        for (UInt_t i = 0; i < mu_n; i++)
+        for (UInt_t i = 0; i < mu_gt_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
