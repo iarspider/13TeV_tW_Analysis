@@ -183,14 +183,16 @@ int main(int argc, char *argv[])
             return 1;
         }
 
+        TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
+
         int evtID = 0;
-        counter[EE][0] = tree->GetEntriesFast();
-        counter[EMu][0] = tree->GetEntriesFast();
-        counter[MuMu][0] = tree->GetEntriesFast();
 
-
-        for (evtID = 0; evtID < tree->GetEntriesFast(); evtID++)
+        for (evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
         {
+            counter[EE][0]++;
+            counter[EMu][0]++;
+            counter[MuMu][0]++;
+
             event->loadEvent(tree, evtID);
 #ifndef SYNC_EX
             cNetEvWt += event->getWeight();
