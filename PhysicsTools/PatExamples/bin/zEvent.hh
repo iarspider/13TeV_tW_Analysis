@@ -233,12 +233,14 @@ private:
                                            gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
                                            gsf_dz_firstPVtx->at(j));
             leptons.push_back(thisElectron);
+            /*
             if (ev_event == 927179)
             {
                 cout << "Lepton " << i << endl;
                 cout << "Tight in tree:" << gsf_VIDTight->at(j) << endl;
                 cout << thisElectron << endl;
             }
+            */
         }
 //        cout << "Loaded electons" << endl;
     }
