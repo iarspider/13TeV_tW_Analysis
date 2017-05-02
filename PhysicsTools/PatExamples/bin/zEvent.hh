@@ -265,9 +265,9 @@ private:
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(gsf80_pt.at(j), gsf_eta.at(j), gsf_phi.at(j), gsf80_energy.at(j));
-            zLepton thisElectron = zLepton(v, gsf_charge.at(j), gsf_sc_eta.at(j), 0,
-                                           gsf_VIDTight.at(j), false, gsf_dxy.at(j), gsf_dz.at(j));
+            v.SetPtEtaPhiE(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), gsf80_energy->at(j));
+            zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
+                                           gsf_VIDTight->at(j), false, gsf_dxy->at(j), gsf_dz->at(j));
             leptons.push_back(thisElectron);
         }
     }
@@ -278,9 +278,9 @@ private:
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(mu_gt_pt.at(j), mu_gt_eta.at(j), mu_gt_phi.at(j), 0);
-            zLepton thisMuon = zLepton(v, mu_gt_charge.at(j), 0, mu_isoTrackerBased03.at(j),
-                                       mu_isTightMuon.at(j), true, 0, 0);
+            v.SetPtEtaPhiE(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0);
+            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
+                                       mu_isTightMuon->at(j), true, 0, 0);
             leptons.push_back(thisMuon);
         }
     }
@@ -291,8 +291,8 @@ private:
         {
             auto j = static_cast<vector<zJet>::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(jet_pt.at(j), jet_eta.at(j), jet_phi.at(j), jet_energy.at(j));
-            zJet thisJet = zJet(v, 0, jet_CSVv2.at(j), jet_isJetIDLoose.at(j));
+            v.SetPtEtaPhiE(jet_pt->at(j), jet_eta->at(j), jet_phi->at(j), jet_energy->at(j));
+            zJet thisJet = zJet(v, 0, jet_CSVv2->at(j), jet_isJetIDLoose->at(j));
             jets.push_back(thisJet);
         }
     }
