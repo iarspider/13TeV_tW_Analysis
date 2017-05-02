@@ -112,7 +112,6 @@ int main(int argc, char *argv[])
     char fname[160];
 
     //vector<zEvent> events;
-    zEvent thisEvent;
 //    double cNetEvWt = 0;
     Long64_t counter[4][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
                               {0, 0, 0, 0, 0, 0, 0, 0},
