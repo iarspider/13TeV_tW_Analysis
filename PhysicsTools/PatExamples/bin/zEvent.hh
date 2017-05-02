@@ -224,9 +224,9 @@ private:
 
     void read_electrons()
     {
-        for (auto i = 0; i < gsf_n; i++)
+        for (UInt_t i = 0; i < gsf_n; i++)
         {
-            auto j = static_cast<vector::size_type>(i);
+            auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
             v.SetPtEtaPhiE(gsf80_pt.at(j), gsf_eta.at(j), gsf_phi.at(j), gsf80_energy.at(j));
             zLepton thisElectron = zLepton(v, gsf_charge.at(j), gsf_sc_eta.at(j), 0,
@@ -239,7 +239,7 @@ private:
     {
         for (auto i = 0; i < mu_n; i++)
         {
-            auto j = static_cast<vector::size_type>(i);
+            auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
             v.SetPtEtaPhiE(mu_gt_pt.at(j), mu_gt_eta.at(j), mu_gt_phi.at(j), 0);
             zLepton thisMuon = zLepton(v, mu_gt_charge.at(j), 0, gsf_relIso.at(j),
@@ -252,7 +252,7 @@ private:
     {
         for (auto i = 0; i < jet_n; i++)
         {
-            auto j = static_cast<vector::size_type>(i);
+            auto j = static_cast<vector<zJet>::size_type>(i);
             TLorentzVector v;
             v.SetPtEtaPhiE(jet_pt.at(j), jet_eta.at(j), jet_phi.at(j), jet_energy.at(j));
             zJet thisJet = zJet(v, 0, jet_CSVv2.at(j), jet_isJetIDLoose.at(j));
@@ -311,7 +311,7 @@ public:
         read_electrons();
         read_muons();
         std::sort(leptons.begin(), leptons.end());
-        clean_jets();
+        read_jets();
         read_MET();
 
         return true;
