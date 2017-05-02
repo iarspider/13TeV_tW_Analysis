@@ -223,6 +223,7 @@ private:
     void read_electrons()
     {
 //        cout << "Loading electons" << endl;
+
         for (UInt_t i = 0; i < gsf80_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
@@ -231,6 +232,11 @@ private:
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
                                            gsf_VIDTight->at(j), false, gsf_dxy->at(j), gsf_dz->at(j));
             leptons.push_back(thisElectron);
+            if (ev_event == 927179) {
+                cout << "Lepton " << i << endl;
+                cout << "Tight in tree:" << gsf_VIDTight->at(j) << endl;
+                cout << thisElectron << endl;
+            }
         }
 //        cout << "Loaded electons" << endl;
     }
