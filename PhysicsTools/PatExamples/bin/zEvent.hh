@@ -237,7 +237,7 @@ private:
 
     void read_muons()
     {
-        for (auto i = 0; i < mu_n; i++)
+        for (UInt_t i = 0; i < mu_n; i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
@@ -250,7 +250,7 @@ private:
 
     void read_jets()
     {
-        for (auto i = 0; i < jet_n; i++)
+        for (UInt_t i = 0; i < jet_n; i++)
         {
             auto j = static_cast<vector<zJet>::size_type>(i);
             TLorentzVector v;
@@ -758,7 +758,8 @@ public:
 
     void fill_tree_2(TTree *tree)
     {
-        vector<TLorentzVector> selectedLeptons, selectedJets, selectedBJets;
+        vector<zLepton> selectedLeptons;
+        vector<zJet> selectedJets, selectedBJets;
         copy_if(getLeptons().begin(), getLeptons().end(), back_inserter(selectedLeptons),
                 [](const zLepton &part) { return part.is_selected(); });
 
