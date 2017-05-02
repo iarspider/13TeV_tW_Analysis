@@ -66,6 +66,9 @@ public:
         if (this->in_gap())
             return false;
 
+        if (this->is_muon())
+            return true;
+
         return fabs(this->d0_) < (this->is_barrel() ? this->d0_cut_eb : this->d0_cut_ee);
     }
 
@@ -73,6 +76,9 @@ public:
     {
         if (this->in_gap())
             return false;
+
+        if (this->is_muon())
+            return true;
 
         return fabs(this->dz_) < (this->is_barrel() ? this->dz_cut_eb : this->dz_cut_ee);
     }
