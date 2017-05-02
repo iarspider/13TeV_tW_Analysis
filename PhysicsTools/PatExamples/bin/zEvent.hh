@@ -172,8 +172,8 @@ public:
         LOAD_BRANCH(tree, gsf_phi)
         LOAD_BRANCH(tree, gsf_charge)
         LOAD_BRANCH(tree, gsf_VIDTight)
-        LOAD_BRANCH(tree, gsf_dxy)
-        LOAD_BRANCH(tree, gsf_dz)
+        LOAD_BRANCH(tree, gsf_dxy_firstPVtx)
+        LOAD_BRANCH(tree, gsf_dz_firstPVtx)
         LOAD_BRANCH(tree, gsf_relIso)
         LOAD_BRANCH(tree, gsf_sc_eta)
         LOAD_BRANCH(tree, mu_n)
@@ -230,9 +230,11 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiE(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), gsf80_energy->at(j));
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
-                                           gsf_VIDTight->at(j), false, gsf_dxy->at(j), gsf_dz->at(j));
+                                           gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
+                                           gsf_dz_firstPVtx->at(j));
             leptons.push_back(thisElectron);
-            if (ev_event == 927179) {
+            if (ev_event == 927179)
+            {
                 cout << "Lepton " << i << endl;
                 cout << "Tight in tree:" << gsf_VIDTight->at(j) << endl;
                 cout << thisElectron << endl;
@@ -353,8 +355,8 @@ private:
     vector<float> *gsf_phi;
     vector<int> *gsf_charge;
     vector<bool> *gsf_VIDTight;
-    vector<float> *gsf_dxy;
-    vector<float> *gsf_dz;
+    vector<float> *gsf_dxy_firstPVtx;
+    vector<float> *gsf_dz_firstPVtx;
     vector<float> *gsf_relIso;
     vector<float> *gsf_sc_eta;
 
