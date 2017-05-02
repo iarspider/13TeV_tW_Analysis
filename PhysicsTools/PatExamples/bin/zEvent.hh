@@ -262,7 +262,7 @@ private:
             jets.push_back(thisJet);
         }
         cout << "Loaded jets" << endl;
-        jets.shrink_to_fit()
+        jets.shrink_to_fit();
     }
 
     void read_vertices()
