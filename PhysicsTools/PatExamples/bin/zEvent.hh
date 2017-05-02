@@ -222,6 +222,7 @@ private:
 
     void read_electrons()
     {
+        cout << "Loading electons" << endl;
         for (UInt_t i = 0; i < gsf_n; i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
@@ -231,10 +232,12 @@ private:
                                            gsf_VIDTight->at(j), false, gsf_dxy->at(j), gsf_dz->at(j));
             leptons.push_back(thisElectron);
         }
+        cout << "Loaded electons" << endl;
     }
 
     void read_muons()
     {
+        cout << "Loading muons" << endl;
         for (UInt_t i = 0; i < mu_n; i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
@@ -244,10 +247,12 @@ private:
                                        mu_isTightMuon->at(j), true, 0, 0);
             leptons.push_back(thisMuon);
         }
+        cout << "Loaded muons" << endl;
     }
 
     void read_jets()
     {
+        cout << "Loading jets" << endl;
         for (UInt_t i = 0; i < jet_n; i++)
         {
             auto j = static_cast<vector<zJet>::size_type>(i);
@@ -256,6 +261,7 @@ private:
             zJet thisJet = zJet(v, 0, jet_CSVv2->at(j), jet_isJetIDLoose->at(j));
             jets.push_back(thisJet);
         }
+        cout << "Loaded jets" << endl;
     }
 
     void read_vertices()
