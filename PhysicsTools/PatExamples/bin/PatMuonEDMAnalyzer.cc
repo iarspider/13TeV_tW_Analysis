@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
             counter[MuMu][0]++;
 
             cout << "evtID=" << evtID<< endl;
-            event->loadEvent(rTree, evtID);
+            event->read_event(rTree, evtID);
 
 #ifndef SYNC_EX
             cNetEvWt += event->getWeight();

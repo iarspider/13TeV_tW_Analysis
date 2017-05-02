@@ -306,12 +306,13 @@ public:
         read_MET(ev);
     }
 */
-    bool loadEvent(TTree *tree, Long64_t id)
+    bool read_event(TTree *tree, Long64_t id)
     {
         reset();
         tree->GetEntry(id);
 
         leptons.reserve(gsf_n + mu_n);
+        jets.reserve(jet_n);
         read_electrons();
         read_muons();
         std::sort(leptons.begin(), leptons.end());
