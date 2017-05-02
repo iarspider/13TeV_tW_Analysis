@@ -252,7 +252,7 @@ private:
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0);
+            v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
                                        mu_isTightMuon->at(j), true, 0, 0);
             leptons.push_back(thisMuon);
