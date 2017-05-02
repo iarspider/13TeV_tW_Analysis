@@ -195,6 +195,7 @@ public:
     {
 //        init();
         tree->SetBranchStatus("*", 0);
+        /*
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
         LOAD_BRANCH(tree, mc_PU_NumInteractions)
@@ -247,6 +248,7 @@ public:
         LOAD_BRANCH(tree, trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
+         */
     }
 
 private:
@@ -343,6 +345,7 @@ public:
     {
         reset();
         tree->GetEntry(id);
+        /*
         leptons.reserve(gsf_n + mu_n);
 
         read_electrons();
@@ -350,7 +353,7 @@ public:
         std::sort(leptons.begin(), leptons.end());
         read_jets();
         read_MET();
-
+        */
         return true;
     }
 

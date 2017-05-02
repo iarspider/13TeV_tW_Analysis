@@ -183,15 +183,14 @@ int main(int argc, char *argv[])
         TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
         zEvent *event = new zEvent(rTree);
 
-        int evtID = 0;
-
-        for (evtID = 0; evtID < /*rTree->GetEntriesFast()*/10; evtID++)
+        for (int evtID = 0; evtID < /*rTree->GetEntriesFast()*/10; evtID++)
         {
             counter[EE][0]++;
             counter[EMu][0]++;
             counter[MuMu][0]++;
 
             event->loadEvent(rTree, evtID);
+            continue;
 #ifndef SYNC_EX
             cNetEvWt += event->getWeight();
             if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
