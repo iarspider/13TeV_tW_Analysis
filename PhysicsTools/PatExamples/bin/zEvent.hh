@@ -151,7 +151,7 @@ public:
                             }) != triggers.cend();
     }
 
-    zEvent()
+    void init()
     {
         pv_z = new vector<float>();
         pv_ndof = new vector<float>();
@@ -193,7 +193,7 @@ public:
 
     zEvent(TTree *tree)
     {
-        zEvent();
+//        init();
         tree->SetBranchStatus("*", 0);
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
