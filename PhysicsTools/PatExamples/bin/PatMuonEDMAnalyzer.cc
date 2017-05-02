@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
         TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
         zEvent *event = new zEvent(rTree);
 
-        for (Long64_t evtID = 0; evtID < /*rTree->GetEntriesFast()*/10; evtID++)
+        for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
         {
             counter[EE][0]++;
             counter[EMu][0]++;
