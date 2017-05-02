@@ -154,7 +154,7 @@ public:
 
     zEvent(TTree *tree)
     {
-        // tree->SetBranchStatus("*", 0);
+        tree->SetBranchStatus("*", 0);
         /*
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
