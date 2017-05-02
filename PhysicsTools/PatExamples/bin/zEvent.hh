@@ -11,7 +11,8 @@
 #include "zJet.hh"
 #include "zHLT.hh"
 
-#define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x"*", 1); t->SetBranchAddress(#x, &(x));}
+// #define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x"*", 1); t->SetBranchAddress(#x, &(x));}
+#define LOAD_BRANCH(t, x) {t->SetBranchAddress(#x, &(x));}
 
 #define EE 0
 #define EMu 1
@@ -194,7 +195,7 @@ public:
     zEvent(TTree *tree)
     {
 //        init();
-        tree->SetBranchStatus("*", 0);
+        // tree->SetBranchStatus("*", 0);
         /*
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
