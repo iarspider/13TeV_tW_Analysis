@@ -11,7 +11,7 @@
 #include "zJet.hh"
 #include "zHLT.hh"
 
-#define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(this->##x));}
+#define LOAD_BRANCH(t, x) {t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(x));}
 
 #define EE 0
 #define EMu 1
@@ -70,7 +70,7 @@ private:
 public:
     ULong64_t getEvID() const
     {
-        return this->ev_event;
+        return ev_event;
     }
 
     const vector<zHLT> &getTriggers() const
@@ -120,12 +120,12 @@ private:
 public:
     void add_flag(zFlag flag)
     {
-        auto it = std::find_if(this->event_flags.begin(), this->event_flags.end(),
+        auto it = std::find_if(event_flags.begin(), event_flags.end(),
                                [flag](zFlag item) { return flag.first == item.first; });
-        if (it != this->event_flags.end())
+        if (it != event_flags.end())
             event_flags.erase(it);
 
-        this->event_flags.push_back(flag);
+        event_flags.push_back(flag);
     }
 
     void add_flag(string name, bool value)
@@ -135,9 +135,9 @@ public:
 
     int get_flag(string flag_name)
     {
-        auto it = std::find_if(this->event_flags.begin(), this->event_flags.end(),
+        auto it = std::find_if(event_flags.begin(), event_flags.end(),
                                [flag_name](zFlag item) { return flag_name == item.first; });
-        if (it != this->event_flags.end())
+        if (it != event_flags.end())
             return it->second ? 0 : 1;
         else
             return -1;
@@ -145,10 +145,10 @@ public:
 
     bool has_trigger(string name)
     {
-        return std::find_if(this->triggers.cbegin(), this->triggers.cend(),
+        return std::find_if(triggers.cbegin(), triggers.cend(),
                             [name](zHLT trig) {
                                 return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
-                            }) != this->triggers.cend();
+                            }) != triggers.cend();
     }
 
     zEvent()
@@ -215,55 +215,55 @@ public:
 private:
     void reset()
     {
-        this->leptons.clear();
-        this->jets.clear();
-        this->triggers.clear();
-        this->vertices.clear();
-        this->event_flags.clear();
+        leptons.clear();
+        jets.clear();
+        triggers.clear();
+        vertices.clear();
+        event_flags.clear();
     }
 
     void read_electrons()
     {
-        for (auto i = 0; i < this->gsf_n; i++)
+        for (auto i = 0; i < gsf_n; i++)
         {
             auto j = static_cast<vector::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(this->gsf80_pt.at(j), this->gsf_eta.at(j), this->gsf_phi.at(j), this->gsf80_energy.at(j));
-            zLepton thisElectron = zLepton(v, this->gsf_charge.at(j), this->gsf_sc_eta.at(j), 0,
-                                           this->gsf_VIDTight.at(j), false, this->gsf_dxy.at(j), this->gsf_dz.at(j));
-            this->leptons.push_back(thisElectron);
+            v.SetPtEtaPhiE(gsf80_pt.at(j), gsf_eta.at(j), gsf_phi.at(j), gsf80_energy.at(j));
+            zLepton thisElectron = zLepton(v, gsf_charge.at(j), gsf_sc_eta.at(j), 0,
+                                           gsf_VIDTight.at(j), false, gsf_dxy.at(j), gsf_dz.at(j));
+            leptons.push_back(thisElectron);
         }
     }
 
     void read_muons()
     {
-        for (auto i = 0; i < this->mu_n; i++)
+        for (auto i = 0; i < mu_n; i++)
         {
             auto j = static_cast<vector::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(this->mu_gt_pt.at(j), this->mu_gt_eta.at(j), this->mu_gt_phi.at(j), 0);
-            zLepton thisMuon = zLepton(v, this->mu_gt_charge.at(j), 0, this->gsf_relIso.at(j),
-                                       this->mu_isTightMuon.at(j), true, 0, 0);
-            this->leptons.push_back(thisMuon);
+            v.SetPtEtaPhiE(mu_gt_pt.at(j), mu_gt_eta.at(j), mu_gt_phi.at(j), 0);
+            zLepton thisMuon = zLepton(v, mu_gt_charge.at(j), 0, gsf_relIso.at(j),
+                                       mu_isTightMuon.at(j), true, 0, 0);
+            leptons.push_back(thisMuon);
         }
     }
 
     void read_jets()
     {
-        for (auto i = 0; i < this->jet_n; i++)
+        for (auto i = 0; i < jet_n; i++)
         {
             auto j = static_cast<vector::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(this->jet_pt.at(j), this->jet_eta.at(j), this->jet_phi.at(j), this->jet_energy.at(j));
-            zJet thisJet = zJet(v, 0, this->jet_CSVv2.at(j), this->jet_isJetIDLoose.at(j));
-            this->jets.push_back(thisJet);
+            v.SetPtEtaPhiE(jet_pt.at(j), jet_eta.at(j), jet_phi.at(j), jet_energy.at(j));
+            zJet thisJet = zJet(v, 0, jet_CSVv2.at(j), jet_isJetIDLoose.at(j));
+            jets.push_back(thisJet);
         }
     }
 
     void read_vertices()
     {
 /*
-        for (auto i = 0; i < this->pv_n; i++)
+        for (auto i = 0; i < pv_n; i++)
         {
             auto j = static_cast<vector::size_type>(i);
             zVertex thisVertex;
@@ -274,11 +274,11 @@ private:
 
     void read_MET()
     {
-        this->MET = TLorentzVector(this->MET_Px, this->MET_Py, 0, 0);
-        this->isMETok_ = this->trig_Flag_BadChargedCandidateFilter_accept && this->trig_Flag_BadPFMuonFilter_accept &&
-                         this->trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
-                         this->trig_Flag_globalTightHalo2016Filter_accept && this->trig_Flag_goodVertices_accept &&
-                         this->trig_Flag_HBHENoiseFilter_accept && this->trig_Flag_HBHENoiseIsoFilter_accept;
+        MET = TLorentzVector(MET_Px, MET_Py, 0, 0);
+        isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
+                         trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
+                         trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
+                         trig_Flag_HBHENoiseFilter_accept && trig_Flag_HBHENoiseIsoFilter_accept;
     }
 
 public:
@@ -293,10 +293,10 @@ public:
 #endif
         edm::Handle<ULong64_t> event_id;
         ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
-        this->evID = *event_id;
+        evID = *event_id;
         read_electrons(ev);
         read_muons(ev);
-        std::sort(this->leptons.begin(), this->leptons.end());
+        std::sort(leptons.begin(), leptons.end());
         read_jets(ev);
         clean_jets();
         read_MET(ev);
@@ -306,11 +306,11 @@ public:
     {
         reset();
         tree->GetEntry(id);
-        this->leptons.reserve(this->gsf_n + this->mu_n);
+        leptons.reserve(gsf_n + mu_n);
 
         read_electrons();
         read_muons();
-        std::sort(this->leptons.begin(), this->leptons.end());
+        std::sort(leptons.begin(), leptons.end());
         clean_jets();
         read_MET();
 
@@ -396,10 +396,10 @@ private:
 #endif
         edm::Handle<ULong64_t> event_id;
         ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
-        this->evID = *event_id;
+        evID = *event_id;
         read_electrons(ev);
         read_muons(ev);
-        std::sort(this->leptons.begin(), this->leptons.end());
+        std::sort(leptons.begin(), leptons.end());
         read_jets(ev);
         clean_jets();
         read_MET(ev);
@@ -446,7 +446,7 @@ private:
             zLepton thisElectron = zLepton(v, electronCharge->at(i), electronSCeta->at(i), 0,
                                            elvidTight->at(i) != 0, false, electronD0->at(i), electronDz->at(i));
 
-            this->leptons.push_back(thisElectron);
+            leptons.push_back(thisElectron);
         }
     }
 
@@ -455,12 +455,12 @@ private:
         // Handle to the genEventWeight, which I added in eventUserData class
         edm::Handle<double> genEventWeight;
         event.getByLabel(std::string("eventUserData:eventWeight"), genEventWeight);
-        this->weight = *genEventWeight;
+        weight = *genEventWeight;
 
         // Handle to the pu, which I added in eventUserData class
         edm::Handle<int> puNtrueIntMC;
         event.getByLabel(std::string("eventUserData:puNtrueInt"), puNtrueIntMC);
-        this->puNtrueInteractons = *puNtrueIntMC;
+        puNtrueInteractons = *puNtrueIntMC;
     }
 
     void read_triggers(edm::EventBase const &event)
@@ -478,7 +478,7 @@ private:
         for (size_t i = 0; i < HLTdecision->size(); i++)
         {
             zHLT thisHLT = zHLT(HLTname->at(i), HLTprescale->at(i), HLTdecision->at(i));
-            this->triggers.push_back(thisHLT);
+            triggers.push_back(thisHLT);
             // cout << "Trigger " << HLTname->at(i) << " prescale " << HLTprescale->at(i) << " decision "
             //     << HLTdecision->at(i) << endl;
         }
@@ -515,7 +515,7 @@ private:
             v.SetPtEtaPhiE(muonPt->at(i), muonEta->at(i), muonPhi->at(i), muonEn->at(i));
 
             zLepton thisMuon(v, muonCharge->at(i), 0, muonIso04->at(i), muonTight->at(i) != 0, true, 0, 0);
-            this->leptons.push_back(thisMuon);
+            leptons.push_back(thisMuon);
         }
     }
 
@@ -583,10 +583,10 @@ private:
                                  jetchargedHadronEnergyFrac->at(i), jetchargedEmEnergyFrac->at(i),
                                  jetNumConstituents->at(i), jetchargedMultiplicity->at(i),
                                  jetneutralMultiplicity->at(i));
-            this->jets.push_back(this_jet);
+            jets.push_back(this_jet);
         }
 
-        std::sort(this->jets.begin(), this->jets.end());
+        std::sort(jets.begin(), jets.end());
     }
 
     void read_MET(edm::EventBase const &event)
@@ -625,8 +625,8 @@ private:
             }
         }
 
-        this->MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
-        this->isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter) && (otherMetFilters == 1));
+        MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
+        isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter) && (otherMetFilters == 1));
     }
 
     void read_vertices(edm::EventBase const &event)
@@ -647,7 +647,7 @@ private:
             this_vtx.dof = dof->at(i);
             this_vtx.RHO = rhoo->at(i);
 
-            this->vertices.push_back(this_vtx);
+            vertices.push_back(this_vtx);
         }
     }
 */
@@ -655,9 +655,9 @@ private:
 public:
     void clean_jets()
     {
-        for (auto thisJet = this->jets.begin(); thisJet != this->jets.end(); thisJet++)
+        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
         {
-            bool jet_flag = std::all_of(this->leptons.begin(), this->leptons.end(),
+            bool jet_flag = std::all_of(leptons.begin(), leptons.end(),
                                         [thisJet](const zLepton &thisLepton) {
                                             return !(thisLepton.is_selected() && thisJet->deltaR(thisLepton) <= 0.4);
                                         });
@@ -751,7 +751,7 @@ public:
         tree->SetBranchAddress("MetBadPFM", &BadPFMuonFilter_);
 
         tree->SetBranchAddress("Flags", &flags);
-        tree->SetBranchAddress("eventID", &this->ev_event);
+        tree->SetBranchAddress("eventID", &ev_event);
 
         tree->Fill();
     }
@@ -759,10 +759,10 @@ public:
     void fill_tree_2(TTree *tree)
     {
         vector<TLorentzVector> selectedLeptons, selectedJets, selectedBJets;
-        copy_if(this->getLeptons().begin(), this->getLeptons().end(), back_inserter(selectedLeptons),
+        copy_if(getLeptons().begin(), getLeptons().end(), back_inserter(selectedLeptons),
                 [](const zLepton &part) { return part.is_selected(); });
 
-        copy_if(this->getJets().begin(), this->getJets().end(), back_inserter(selectedJets),
+        copy_if(getJets().begin(), getJets().end(), back_inserter(selectedJets),
                 [](const zJet &jet) { return jet.is_selected(); });
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
@@ -773,7 +773,7 @@ public:
         TLorentzVector bjet1(selectedBJets.at(0));
         TLorentzVector jet1(selectedJets.at(0));
         TLorentzVector jet2(0, 0, 0, 0);
-        TLorentzVector met(this->getMET());
+        TLorentzVector met(getMET());
         if (selectedJets.size() > 1)
         {
             jet2 = selectedJets.at(1);
@@ -785,7 +785,7 @@ public:
         Double_t dptll_metj = (lep1 + lep2).Pt() - (met + jet1).Pt();
         tree->SetBranchAddress("dpt_ll_metj", &dptll_metj);
 
-        Double_t met_pt = this->getMET().Pt();
+        Double_t met_pt = getMET().Pt();
         tree->SetBranchAddress("MET", &met_pt);
 
         Double_t dptll_met = (lep1 + lep2).Pt() - met_pt;
@@ -822,7 +822,7 @@ public:
         Double_t pt_over_ht = ptllmetj / htlljmet;
         tree->SetBranchAddress("pt_over_ht", &pt_over_ht);
 
-        Double_t mlljmet = (lep1 + lep2 + jet1 + this->getMET()).Mag();
+        Double_t mlljmet = (lep1 + lep2 + jet1 + getMET()).Mag();
         tree->SetBranchAddress("mlljmet", &mlljmet);
 
         Double_t ptllj = (lep1 + lep2 + jet1).Pt();
