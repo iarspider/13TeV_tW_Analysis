@@ -243,6 +243,18 @@ int main(int argc, char *argv[])
 
             TLorentzVector ll;
 
+
+            if (event->getEvID() == 927179)
+            {
+                cout << "In analyzer" << endl;
+                for (auto i = event->getLeptons().begin(); i != event->getLeptons().end(); i++)
+                {
+                    cout << *i << endl;
+                }
+
+                break;
+            }
+
             // in_gap will return false for muons; is_iso will return true for electrons
             copy_if(event->getLeptons().begin(), event->getLeptons().end(), back_inserter(selectedLeptons),
                     [](const zLepton &part) { return part.is_selected(); });
