@@ -63,8 +63,8 @@ void MakeBranches(TTree *tree)
 
 void MakeBDTBranches(TTree *tree)
 {
-    float* temp = NULL;
-    int* temp_ = NULL;
+    Double_t * temp = NULL;
+    Int_t* temp_ = NULL;
     tree->Branch("ptsys", temp);
     tree->Branch("dpt_ll_metj", temp);
     tree->Branch("MET", temp);
