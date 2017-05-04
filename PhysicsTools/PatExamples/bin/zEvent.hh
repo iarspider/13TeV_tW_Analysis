@@ -277,6 +277,8 @@ private:
         for (UInt_t i = 0; i < mu_gt_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
+            if (mu_gt_pt->at(j) < 0)
+                continue;
             TLorentzVector v;
             v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
