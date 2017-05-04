@@ -525,7 +525,10 @@ public:
 
     void fill_tree_2(TTree *tree)
     {
-        vector<TLorentzVector> selectedLeptons, selectedJets, selectedBJets;
+        vector<zLepton> selectedLeptons;
+        vector<zJet> selectedJets;
+        vector<zJet> selectedBJets;
+
         copy_if(this->getLeptons().begin(), this->getLeptons().end(), back_inserter(selectedLeptons),
                 [](const zLepton &part) { return part.is_selected(); });
 
