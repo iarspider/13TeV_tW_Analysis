@@ -155,6 +155,7 @@ public:
     zEvent(TTree *tree)
     {
         tree->SetBranchStatus("*", 0);
+        this->pt_cut_ = 20;
 
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
@@ -242,11 +243,14 @@ private:
         for (UInt_t i = 0; i < gsf_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
+            if (gsf_pt->at(j) < pt_cut_)
+                continue;
+
             TLorentzVector v;
             v.SetPtEtaPhiE(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), gsf_energy->at(j));
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
                                            gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
-                                           gsf_dz_firstPVtx->at(j));
+                                           gsf_dz_firstPVtx->at(j), pt_cut_);
             leptons.push_back(thisElectron);
             /*
             if (ev_event == 927179)
@@ -277,12 +281,12 @@ private:
         for (UInt_t i = 0; i < mu_gt_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
-            if (mu_gt_pt->at(j) < 0)
+            if (mu_gt_pt->at(j) < pt_cut_)
                 continue;
             TLorentzVector v;
             v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
-                    /*mu_isTightMuon->at(j)*/muon_is_tight(i), true, 0, 0);
+                    /*mu_isTightMuon->at(j)*/muon_is_tight(i), true, 0, 0, pt_cut_);
             leptons.push_back(thisMuon);
         }
 //        cout << "Loaded muons" << endl;
@@ -363,6 +367,8 @@ public:
     }
 
 private:
+    Double_t pt_cut_ = 0.;
+
     Bool_t trig_Flag_BadPFMuonFilter_accept;
     Bool_t trig_Flag_BadChargedCandidateFilter_accept;
     ULong64_t ev_event;
