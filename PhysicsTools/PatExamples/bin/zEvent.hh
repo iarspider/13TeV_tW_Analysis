@@ -166,8 +166,15 @@ public:
         LOAD_BRANCH(tree, pv_isValid)
         LOAD_BRANCH(tree, pv_isFake)
         LOAD_BRANCH(tree, gsf_n)
+#ifdef SYNC_EX
+        LOAD_BRANCH(tree, gsf_energy)
+        LOAD_BRANCH(tree, gsf_pt)
+#else
         LOAD_BRANCH(tree, gsf80_energy)
         LOAD_BRANCH(tree, gsf80_pt)
+        gsf_energy = gsf80_energy;
+        gsf_pt = gsf80_pt;
+#endif
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
         LOAD_BRANCH(tree, gsf_charge)
@@ -232,11 +239,11 @@ private:
     {
 //        cout << "Loading electons" << endl;
 
-        for (UInt_t i = 0; i < gsf80_pt->size(); i++)
+        for (UInt_t i = 0; i < gsf_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             TLorentzVector v;
-            v.SetPtEtaPhiE(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), gsf80_energy->at(j));
+            v.SetPtEtaPhiE(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), gsf_energy->at(j));
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
                                            gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
                                            gsf_dz_firstPVtx->at(j));
@@ -273,7 +280,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
-                                       /*mu_isTightMuon->at(j)*/muon_is_tight(i), true, 0, 0);
+                    /*mu_isTightMuon->at(j)*/muon_is_tight(i), true, 0, 0);
             leptons.push_back(thisMuon);
         }
 //        cout << "Loaded muons" << endl;
@@ -370,7 +377,9 @@ private:
 
     // Electron?
     UInt_t gsf_n;
+    vector<float> *gsf_energy;
     vector<float> *gsf80_energy;
+    vector<float> *gsf_pt;
     vector<float> *gsf80_pt;
     vector<float> *gsf_eta;
     vector<float> *gsf_phi;
