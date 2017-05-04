@@ -208,6 +208,14 @@ public:
         LOAD_BRANCH(tree, trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
+        LOAD_BRANCH(tree, mu_dB)
+        LOAD_BRANCH(tree, mu_isGlobalMuon)
+        LOAD_BRANCH(tree, mu_isPFMuon)
+        LOAD_BRANCH(tree, mu_gt_normalizedChi2)
+        LOAD_BRANCH(tree, mu_numberOfValidMuonHits)
+        LOAD_BRANCH(tree, mu_numberOfMatchedStations)
+        LOAD_BRANCH(tree, mu_numberOfValidPixelHits)
+        LOAD_BRANCH(tree, mu_trackerLayersWithMeasurement)
     }
 
 private:
@@ -245,6 +253,17 @@ private:
 //        cout << "Loaded electons" << endl;
     }
 
+    bool muon_is_tight(const UInt_t i) const
+    {
+        bool isTight_manual_0 = mu_isGlobalMuon->at(i) && mu_isPFMuon->at(i) && (mu_gt_normalizedChi2->at(i) < 10.) &&
+                                (mu_numberOfValidMuonHits->at(i) > 0) && (mu_numberOfMatchedStations->at(i) > 1) &&
+                                (mu_numberOfValidPixelHits->at(i) > 0) &&
+                                (mu_trackerLayersWithMeasurement->at(i) > 5) && (mu_dB->at(i) < 0.2) &&
+                                (mu_gt_dz_firstPVtx->at(i) < 0.5);
+
+        return isTight_manual_0;
+    }
+
     void read_muons()
     {
 //        cout << "Loading muons" << endl;
@@ -254,7 +273,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
-                                       mu_isTightMuon->at(j), true, 0, 0);
+                                       /*mu_isTightMuon->at(j)*/muon_is_tight(i), true, 0, 0);
             leptons.push_back(thisMuon);
         }
 //        cout << "Loaded muons" << endl;
@@ -377,7 +396,14 @@ private:
     vector<float> *mu_gt_dxy_firstPVtx;
     vector<bool> *mu_isTightMuon;
     vector<float> *mu_isoTrackerBased03;
-    // Where is energy - nowhere! Cool!
+    vector<float> *mu_dB;
+    vector<bool> *mu_isGlobalMuon;
+    vector<bool> *mu_isPFMuon;
+    vector<float> *mu_gt_normalizedChi2;
+    vector<int> *mu_numberOfValidMuonHits;
+    vector<int> *mu_numberOfMatchedStations;
+    vector<int> *mu_numberOfValidPixelHits;
+    vector<int> *mu_trackerLayersWithMeasurement;
 
     // Jet
     UInt_t jet_n;
