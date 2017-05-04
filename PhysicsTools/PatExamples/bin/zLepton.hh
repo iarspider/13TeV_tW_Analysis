@@ -175,6 +175,11 @@ public:
         this->dz_cut_eb = dz_cut_eb;
     }
 
+    float get_Iso() const
+    {
+        return iso_;
+    }
+
 };
 
 #endif //INC_13TEV_TW_ANALYSIS_ZLEPTON_HH

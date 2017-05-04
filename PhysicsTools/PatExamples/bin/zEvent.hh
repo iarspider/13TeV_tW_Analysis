@@ -685,7 +685,7 @@ public:
     void fill_tree(TTree *tree)
     {
         std::vector<TLorentzVector> *JetV, *LepV;
-        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC;
+        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC, *LepIsoVal;
         std::vector<int> *LepWhere;
         std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepIso, *LepTight, *LepMuon;
         std::vector<string> *flags;
@@ -702,6 +702,7 @@ public:
         LepSel = new std::vector<bool>();
         LepWhere = new std::vector<int>();
         LepIso = new std::vector<bool>();
+        LepIsoVal = new std::vector<float>();
         LepTight = new std::vector<bool>();
         LepMuon = new std::vector<bool>();
         LepDxy = new std::vector<float>();
@@ -722,6 +723,7 @@ public:
             LepDxy->push_back(thisLepton->get_d0());
             LepDz->push_back(thisLepton->get_dz());
             LepEtaSC->push_back(thisLepton->get_etaSC());
+            LepIsoVal->push_back(thisLepton->get_Iso());
         }
 
         for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
@@ -750,6 +752,7 @@ public:
         tree->SetBranchAddress("LeptonDxy", &LepDxy);
         tree->SetBranchAddress("LeptonDz", &LepDz);
         tree->SetBranchAddress("LeptonEtaSC", &LepEtaSC);
+        tree->SetBranchAddress("LeptonIso", &LepIsoVal);
 
         tree->SetBranchAddress("JetVec", &JetV);
         tree->SetBranchAddress("JetCharge", &JetCh);
@@ -889,3 +892,5 @@ public:
 };
 
 #endif //INC_13TEV_TW_ANALYSIS_ZEVENT_HH
+
+#pragma clang diagnostic pop
