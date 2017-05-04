@@ -286,7 +286,7 @@ private:
             TLorentzVector v;
             v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
-                    /*mu_isTightMuon->at(j)*/muon_is_tight(i), true, 0, 0, pt_cut_);
+                                       mu_isTightMuon->at(j)/*muon_is_tight(i)*/, true, 0, 0, pt_cut_);
             leptons.push_back(thisMuon);
         }
 //        cout << "Loaded muons" << endl;
