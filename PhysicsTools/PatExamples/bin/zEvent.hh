@@ -433,9 +433,9 @@ public:
     void fill_tree(TTree *tree)
     {
         std::vector<TLorentzVector> *JetV, *LepV;
-        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC;
+        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC, *LepIso;
         std::vector<int> *LepWhere;
-        std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepIso, *LepTight, *LepMuon;
+        std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepIsIso, *LepTight, *LepMuon;
         std::vector<string> *flags;
 
         JetV = new std::vector<TLorentzVector>();
@@ -449,12 +449,13 @@ public:
         JetLoose = new std::vector<bool>();
         LepSel = new std::vector<bool>();
         LepWhere = new std::vector<int>();
-        LepIso = new std::vector<bool>();
+        LepIsIso = new std::vector<bool>();
         LepTight = new std::vector<bool>();
         LepMuon = new std::vector<bool>();
         LepDxy = new std::vector<float>();
         LepDz = new std::vector<float>();
         LepEtaSC = new std::vector<float>();
+        LepIso = new std::vector<float>();
 
         flags = new std::vector<string>();
 
@@ -464,12 +465,13 @@ public:
             LepCh->push_back(thisLepton->get_charge());
             LepSel->push_back(thisLepton->is_selected());
             LepWhere->push_back(thisLepton->where());
-            LepIso->push_back(thisLepton->is_iso());
+            LepIsIso->push_back(thisLepton->is_iso());
             LepTight->push_back(thisLepton->is_tight());
             LepMuon->push_back(thisLepton->is_muon());
             LepDxy->push_back(thisLepton->get_d0());
             LepDz->push_back(thisLepton->get_dz());
             LepEtaSC->push_back(thisLepton->get_etaSC());
+            LepIso->push_back(thisLepton->get_iso());
         }
 
         for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
@@ -492,12 +494,13 @@ public:
         tree->SetBranchAddress("LeptonCharge", &LepCh);
         tree->SetBranchAddress("LeptonSelected", &LepSel);
         tree->SetBranchAddress("LeptonWhere", &LepWhere);
-        tree->SetBranchAddress("LeptonIsIso", &LepIso);
+        tree->SetBranchAddress("LeptonIsIso", &LepIsIso);
         tree->SetBranchAddress("LeptonIsTight", &LepTight);
         tree->SetBranchAddress("LeptonIsMuon", &LepMuon);
         tree->SetBranchAddress("LeptonDxy", &LepDxy);
         tree->SetBranchAddress("LeptonDz", &LepDz);
         tree->SetBranchAddress("LeptonEtaSC", &LepEtaSC);
+        tree->SetBranchAddress("LeptonIso", &LepIso);
 
         tree->SetBranchAddress("JetVec", &JetV);
         tree->SetBranchAddress("JetCharge", &JetCh);

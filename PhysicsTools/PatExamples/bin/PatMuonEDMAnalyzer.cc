@@ -38,8 +38,9 @@ void MakeBranches(TTree *tree)
     tree->Branch("LeptonIsTight", &LepTight);
     tree->Branch("LeptonIsMuon", &LepMuon);
     tree->Branch("LeptonDxy", &LepDxy);
-    tree->Branch("LeptonDz", &LepDxy);
+    tree->Branch("LeptonDz", &LepDz);
     tree->Branch("LeptonEtaSC", &LepEtaSC);
+    tree->Branch("LeptonIso", &LepCh);
 
 
     tree->Branch("JetVec", &JetV);

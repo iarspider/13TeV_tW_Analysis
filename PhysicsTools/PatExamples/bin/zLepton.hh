@@ -156,6 +156,11 @@ public:
         return dz_;
     }
 
+    float get_iso() const
+    {
+        return iso_;
+    }
+
     void set_d0_cut(float d0_cut_ee, float d0_cut_eb)
     {
         this->d0_cut_ee = d0_cut_ee;
