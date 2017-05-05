@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
         }
 
         TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
-        zEvent *event = new zEvent(rTree);
+        zEvent *event = new zEvent(rTree, false);
 
         for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
         {

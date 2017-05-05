@@ -152,10 +152,10 @@ public:
                             }) != triggers.cend();
     }
 
-    zEvent(TTree *tree)
+    zEvent(TTree *tree, bool is_data_) : is_data(is_data_)
     {
         tree->SetBranchStatus("*", 0);
-        this->pt_cut_ = 20;
+//        this->pt_cut_ = 20;
 
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
@@ -168,12 +168,12 @@ public:
         LOAD_BRANCH(tree, pv_isFake)
         LOAD_BRANCH(tree, gsf_n)
 #ifdef SYNC_EX
-        LOAD_BRANCH(tree, gsf_energy)
+        // LOAD_BRANCH(tree, gsf_energy)
         LOAD_BRANCH(tree, gsf_pt)
 #else
-        LOAD_BRANCH(tree, gsf80_energy)
+        // LOAD_BRANCH(tree, gsf80_energy)
         LOAD_BRANCH(tree, gsf80_pt)
-        gsf_energy = gsf80_energy;
+        // gsf_energy = gsf80_energy;
         gsf_pt = gsf80_pt;
 #endif
         LOAD_BRANCH(tree, gsf_eta)
@@ -198,6 +198,7 @@ public:
         LOAD_BRANCH(tree, mu_gt_dxy_firstPVtx)
         LOAD_BRANCH(tree, mu_isTightMuon)
         LOAD_BRANCH(tree, mu_isoTrackerBased03)
+        LOAD_BRANCH(tree, mu_pfIsoDbCorrected04)
         LOAD_BRANCH(tree, jet_n)
         LOAD_BRANCH(tree, jet_pt)
         LOAD_BRANCH(tree, jet_eta)
@@ -207,8 +208,15 @@ public:
         LOAD_BRANCH(tree, jet_isJetIDLoose)
         LOAD_BRANCH(tree, jet_Smeared_pt)
         LOAD_BRANCH(tree, jet_Smeared_energy)
-        LOAD_BRANCH(tree, MET_Px)
-        LOAD_BRANCH(tree, MET_Py)
+#ifdef SYNC_EX
+        LOAD_BRANCH(tree, MET_nominal_Px)
+        LOAD_BRANCH(tree, MET_nominal_Py)
+#else
+        LOAD_BRANCH(tree, MET_T1Txy_Px)
+        LOAD_BRANCH(tree, MET_T1Txy_Py)
+        MET_nominal_Px = MET_T1Txy_Px
+        MET_nominal_Py = MET_T1Txy_Py
+#endif
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseIsoFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_globalTightHalo2016Filter_accept)
@@ -216,6 +224,7 @@ public:
         LOAD_BRANCH(tree, trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
+        LOAD_BRANCH(tree, trig_Flag_eeBadScFilter_accept)
         LOAD_BRANCH(tree, mu_dB)
         LOAD_BRANCH(tree, mu_isGlobalMuon)
         LOAD_BRANCH(tree, mu_isPFMuon)
@@ -238,58 +247,35 @@ private:
 
     void read_electrons()
     {
-//        cout << "Loading electons" << endl;
-
         for (UInt_t i = 0; i < gsf_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
-            if (gsf_pt->at(j) < pt_cut_)
+            if (gsf_pt->at(j) < 20.)
                 continue;
 
             TLorentzVector v;
-            v.SetPtEtaPhiE(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), gsf_energy->at(j));
+            v.SetPtEtaPhiM(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
                                            gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
-                                           gsf_dz_firstPVtx->at(j), pt_cut_);
+                                           gsf_dz_firstPVtx->at(j));
             leptons.push_back(thisElectron);
-            /*
-            if (ev_event == 927179)
-            {
-                cout << "Lepton " << i << endl;
-                cout << "Tight in tree:" << gsf_VIDTight->at(j) << endl;
-                cout << thisElectron << endl;
-            }
-            */
         }
-//        cout << "Loaded electons" << endl;
-    }
-
-    bool muon_is_tight(const UInt_t i) const
-    {
-        bool isTight_manual_0 = mu_isGlobalMuon->at(i) && mu_isPFMuon->at(i) && (mu_gt_normalizedChi2->at(i) < 10.) &&
-                                (mu_numberOfValidMuonHits->at(i) > 0) && (mu_numberOfMatchedStations->at(i) > 1) &&
-                                (mu_numberOfValidPixelHits->at(i) > 0) &&
-                                (mu_trackerLayersWithMeasurement->at(i) > 5) && (mu_dB->at(i) < 0.2) &&
-                                (mu_gt_dz_firstPVtx->at(i) < 0.5);
-
-        return isTight_manual_0;
     }
 
     void read_muons()
     {
-//        cout << "Loading muons" << endl;
         for (UInt_t i = 0; i < mu_gt_pt->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
-            if (mu_gt_pt->at(j) < pt_cut_)
+            if (mu_gt_pt->at(j) < 20.)
                 continue;
             TLorentzVector v;
             v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
-            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, mu_isoTrackerBased03->at(j),
-                                       mu_isTightMuon->at(j)/*muon_is_tight(i)*/, true, 0, 0, pt_cut_);
+            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, /*mu_isoTrackerBased03->at(j)*/
+                                       mu_pfIsoDbCorrected04->at(j),
+                                       mu_isTightMuon->at(j), true, 0, 0);
             leptons.push_back(thisMuon);
         }
-//        cout << "Loaded muons" << endl;
     }
 
     void read_jets()
@@ -321,11 +307,13 @@ private:
 
     void read_MET()
     {
-        MET = TLorentzVector(MET_Px, MET_Py, 0, 0);
+        MET = TLorentzVector(MET_nominal_Px, MET_nominal_Py, 0, 0);
         isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
                    trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
                    trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
                    trig_Flag_HBHENoiseFilter_accept && trig_Flag_HBHENoiseIsoFilter_accept;
+        if (is_data)
+            isMETok_ = isMETok_ && trig_Flag_eeBadScFilter_accept;
     }
 
 public:
@@ -367,13 +355,12 @@ public:
     }
 
 private:
-    Double_t pt_cut_ = 0.;
-
     Bool_t trig_Flag_BadPFMuonFilter_accept;
     Bool_t trig_Flag_BadChargedCandidateFilter_accept;
     ULong64_t ev_event;
     Int_t mc_trueNumInteractions;
     Int_t mc_PU_NumInteractions;
+    bool is_data;
 
     // Primary vertex
     UInt_t pv_n;
@@ -385,8 +372,8 @@ private:
 
     // Electron?
     UInt_t gsf_n;
-    vector<float> *gsf_energy;
-    vector<float> *gsf80_energy;
+    // vector<float> *gsf_energy;
+    // vector<float> *gsf80_energy;
     vector<float> *gsf_pt;
     vector<float> *gsf80_pt;
     vector<float> *gsf_eta;
@@ -413,6 +400,7 @@ private:
     vector<float> *mu_gt_dxy_firstPVtx;
     vector<bool> *mu_isTightMuon;
     vector<float> *mu_isoTrackerBased03;
+    vector<float> *mu_pfIsoDbCorrected04;
     vector<float> *mu_dB;
     vector<bool> *mu_isGlobalMuon;
     vector<bool> *mu_isPFMuon;
@@ -434,8 +422,10 @@ private:
     vector<float> *jet_Smeared_energy;
 
     // MET
-    Float_t MET_Px;
-    Float_t MET_Py;
+    Float_t MET_nominal_Px;
+    Float_t MET_nominal_Py;
+    Float_t MET_T1Txy_Px;
+    Float_t MET_T1Txy_Py;
 
     // Trigger
     Int_t trig_Flag_HBHENoiseFilter_accept;
@@ -443,6 +433,7 @@ private:
     Int_t trig_Flag_globalTightHalo2016Filter_accept;
     Int_t trig_Flag_goodVertices_accept;
     Int_t trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept;
+    Int_t trig_Flag_eeBadScFilter_accept;
 
 /*
     zEvent(edm::EventBase const &ev)

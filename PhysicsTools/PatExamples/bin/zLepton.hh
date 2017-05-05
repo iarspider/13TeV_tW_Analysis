@@ -16,18 +16,19 @@ private:
     bool is_tight_;
     bool is_muon_;
     float d0_, dz_;
-    Double_t pt_cut_, eta_cut_, pt_lead_cut_, d0_cut_eb, dz_cut_eb, d0_cut_ee, dz_cut_ee;
+    Double_t pt_cut_, eta_cut_, pt_lead_cut_, d0_cut_eb, dz_cut_eb, d0_cut_ee, dz_cut_ee, iso_cut_;
 
 public:
     zLepton(const TLorentzVector &v, float charge, float eta_sc, float iso, bool is_tight, bool is_muon, float d0,
-            float dz, Double_t pt_cut)
+            float dz)
             : zParticle(v, charge),
               eta_sc(eta_sc), iso_(iso),
-              is_tight_(is_tight), is_muon_(is_muon), d0_(d0), dz_(dz), pt_cut_(pt_cut)
+              is_tight_(is_tight), is_muon_(is_muon), d0_(d0), dz_(dz)
     {
         this->eta_cut_ = 2.4;
-        this->pt_cut_ = 20;
-        this->pt_lead_cut_ = 25;
+        this->pt_cut_ = 20.;
+        this->pt_lead_cut_ = 25.;
+        this->iso_cut_ = 0.15;
         this->d0_cut_ee = 0.10;
         this->dz_cut_ee = 0.20;
         this->d0_cut_eb = 0.05;
