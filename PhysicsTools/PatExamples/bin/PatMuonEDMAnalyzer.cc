@@ -148,15 +148,13 @@ int main(int argc, char *argv[])
     MakeBranches(tree);
 #elif defined(SYNC_TW)
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
+#endif
+#else
+    fwlite::TFileService fs = fwlite::TFileService("tW_main.root");
     TTree *tW_tree = fs.make<TTree>("tW", "tW");
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
     MakeBranches(tW_tree);
     MakeBDTBranches(bdt_tree);
-#endif
-#else
-    fwlite::TFileService fs = fwlite::TFileService("tW_main.root");
-    TTree *tree = fs.make<TTree>("tW", "tW");
-    MakeBranches(tree);
 #endif
 
     vector<zLepton> selectedLeptons;
