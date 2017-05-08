@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
                               {0, 0, 0, 0, 0, 0, 0, 0}};
 
     cout << boolalpha;
-
+#ifdef TW_SYNC
     fstream ee_lep_evid("ee_ihepru_ttbar_lepsel.txt", ee_lep_evid.out | ee_lep_evid.trunc);
     fstream emu_lep_evid("emu_ihepru_ttbar_lepsel.txt", emu_lep_evid.out | emu_lep_evid.trunc);
     fstream mumu_lep_evid("mumu_ihepru_ttbar_lepsel.txt", mumu_lep_evid.out | mumu_lep_evid.trunc);
@@ -140,22 +140,22 @@ int main(int argc, char *argv[])
     fstream mumu_jet2_evid("mumu_ihepru_ttbar_jetsel2.txt", mumu_lep_evid.out | mumu_lep_evid.trunc);
 
     fstream debug("debug.log", debug.out | debug.trunc);
+#endif
 
 #ifdef SYNC_EX
 #ifdef SYNC_TT
     fwlite::TFileService fs = fwlite::TFileService("ttbar_sync.root");
-    TTree *tree = fs.make<TTree>("tW", "tW");
-    MakeBranches(tree);
 #elif defined(SYNC_TW)
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
 #endif
 #else
     fwlite::TFileService fs = fwlite::TFileService("tW_main.root");
+#endif
+
     TTree *tW_tree = fs.make<TTree>("tW", "tW");
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
     MakeBranches(tW_tree);
     MakeBDTBranches(bdt_tree);
-#endif
 
     vector<zLepton> selectedLeptons;
     vector<zJet> selectedJets;
@@ -303,17 +303,23 @@ int main(int argc, char *argv[])
 
             if (event_tag == EE)
             {
+#ifdef SYNC_EX
                 ee_lep_evid << event->getEvID() << endl;
+#endif
                 event->add_flag("EE", true);
             }
             else if (event_tag == EMu)
             {
+#ifdef SYNC_EX
                 emu_lep_evid << event->getEvID() << endl;
+#endif
                 event->add_flag("EMu", true);
             }
             else if (event_tag == MuMu)
             {
+#ifdef SYNC_EX
                 mumu_lep_evid << event->getEvID() << endl;
+#endif
                 event->add_flag("MuMu", true);
             }
             else
@@ -370,7 +376,7 @@ int main(int argc, char *argv[])
                     event->fill_tree_2(bdt_tree);
                 }
 
-
+#ifdef SYNC_EX
                 if (event_tag == EE)
                 {
                     ee_jet2_evid << event->getEvID() << endl;
@@ -383,6 +389,7 @@ int main(int argc, char *argv[])
                 {
                     mumu_jet2_evid << event->getEvID() << endl;
                 }
+#endif
             }
 
             if (selectedJets.size() == 1)
@@ -397,7 +404,7 @@ int main(int argc, char *argv[])
                     cout << "+ Accept step 4.2.2" << endl;
                     event->fill_tree_2(bdt_tree);
                 }
-
+#ifdef SYNC_EX
                 if (event_tag == EE)
                 {
                     ee_jet1_evid << event->getEvID() << endl;
@@ -410,6 +417,7 @@ int main(int argc, char *argv[])
                 {
                     mumu_jet1_evid << event->getEvID() << endl;
                 }
+#endif
             }
 
             event->fill_tree(tW_tree);
@@ -421,7 +429,7 @@ int main(int argc, char *argv[])
         cout << "File Name:" << fname << " is not valid!" << endl << endl << endl;
     }
 
-
+#ifdef SYNC_EX
     ee_lep_evid.close();
     emu_lep_evid.close();
     mumu_lep_evid.close();
@@ -433,7 +441,7 @@ int main(int argc, char *argv[])
     ee_jet2_evid.close();
     emu_jet2_evid.close();
     mumu_jet2_evid.close();
-
+#endif
     for (int i = 0; i < 4; i++)
     {
         if (i == 2)

@@ -214,8 +214,8 @@ public:
 #else
         LOAD_BRANCH(tree, MET_T1Txy_Px)
         LOAD_BRANCH(tree, MET_T1Txy_Py)
-        MET_nominal_Px = MET_T1Txy_Px
-        MET_nominal_Py = MET_T1Txy_Py
+        MET_nominal_Px = MET_T1Txy_Px;
+        MET_nominal_Py = MET_T1Txy_Py;
 #endif
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseIsoFilter_accept)
