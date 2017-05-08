@@ -156,7 +156,7 @@ public:
     {
         tree->SetBranchStatus("*", 0);
 //        this->pt_cut_ = 20;
-
+        LOAD_BRANCH(tree, mc_w_sign)
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
         LOAD_BRANCH(tree, mc_PU_NumInteractions)
@@ -361,6 +361,7 @@ private:
     Int_t mc_trueNumInteractions;
     Int_t mc_PU_NumInteractions;
     bool is_data;
+    Float_t mc_w_sign;
 
     // Primary vertex
     UInt_t pv_n;
@@ -920,7 +921,7 @@ public:
 
         Double_t ml2j2 = (lep2 + jet2).Mag();
         tree->SetBranchAddress("ml2j2", &ml2j2);
-
+        tree->SetBranchAddress("mc_w_sign", &mc_w_sign);
         tree->Fill();
     }
 };

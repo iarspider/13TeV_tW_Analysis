@@ -14,8 +14,8 @@
 
 using namespace std;
 
-#define SYNC_EX
-#define SYNC_TW
+//#define SYNC_EX
+//#define SYNC_TW
 
 #include "zEvent.hh"
 
@@ -92,6 +92,7 @@ void MakeBDTBranches(TTree *tree)
     tree->Branch("ml2jj", temp);
     tree->Branch("ml2j1", temp);
     tree->Branch("ml2j2", temp);
+    tree->Branch("mc_w_sign", temp);
 }
 
 int main(int argc, char *argv[])
@@ -103,7 +104,13 @@ int main(int argc, char *argv[])
     //  * book the histograms of interest
     //  * open the input file
     // ----------------------------------------------------------------------
-
+#ifndef SYNC_EX
+    if (argc < 2)
+    {
+        cout << "Usage: "<< argv[0] << "file1 file2 ..."<< endl;
+        return 0;
+    }
+#endif
     // load framework libraries
     gSystem->Load("libFWCoreFWLite");
 //    gROOT->ProcessLine("#include <vector>");
@@ -169,6 +176,9 @@ int main(int argc, char *argv[])
         sprintf(fname,
                 "/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
 #endif
+#else
+        strncpy(fname, argv[1], 159);
+        fname[159] = '\0';
 #endif
         cout << "File Name:" << fname << endl;
 
@@ -180,7 +190,7 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        TTree* rTree = (TTree*) inFile->Get("IIHEAnalysis");
+        TTree *rTree = (TTree *) inFile->Get("IIHEAnalysis");
         zEvent *event = new zEvent(rTree, false);
 
         for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
@@ -193,6 +203,7 @@ int main(int argc, char *argv[])
             event->read_event(rTree, evtID);
 
 #ifndef SYNC_EX
+/*
             cNetEvWt += event->getWeight();
             if (event->has_trigger("HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_v9"))
             {
@@ -204,33 +215,7 @@ int main(int argc, char *argv[])
                 event->add_flag(make_pair("trigger", false));
                 continue;
             }
-
-            double Vtx_Cut_z = 24.0;
-            int Vtx_Cut_ndof = 4;
-            double Vtx_Cut_rho = 2.0;
-            bool has_pv = false;
-
-            if (event->NVtx() > 0)
-            {
-                for (size_t iVtx = 0; iVtx < event->NVtx(); iVtx++)
-                {
-                    const zVertex vtx = event->get_vertex(iVtx);
-
-                    if ((fabs(vtx.z) < Vtx_Cut_z) && (vtx.dof > Vtx_Cut_ndof) && (vtx.RHO < Vtx_Cut_rho))
-                    {
-                        event->add_flag(make_pair("vertex", true));
-                        cVertexEv++;
-                        has_pv = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!has_pv)
-            {
-                event->add_flag(make_pair("vertex", false));
-                continue;
-            }
+*/
 #endif
             selectedBJets.clear();
             selectedLeptons.clear();
@@ -475,7 +460,7 @@ int main(int argc, char *argv[])
         for (int j = 0; j < 8; j++)
             cout << "Step " << j << " events " << counter[i][j] << endl;
     }
-    
+
     return 0;
 }
 
