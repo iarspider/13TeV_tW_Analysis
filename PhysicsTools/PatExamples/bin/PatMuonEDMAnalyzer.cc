@@ -65,6 +65,7 @@ void MakeBDTBranches(TTree *tree)
 {
     Double_t *temp = NULL;
     int *temp_ = NULL;
+    Float_t *temp__ = NULL;
     tree->Branch("ptsys", temp);
     tree->Branch("dpt_ll_metj", temp);
     tree->Branch("MET", temp);
@@ -92,7 +93,7 @@ void MakeBDTBranches(TTree *tree)
     tree->Branch("ml2jj", temp);
     tree->Branch("ml2j1", temp);
     tree->Branch("ml2j2", temp);
-    tree->Branch("mc_w_sign", temp);
+    tree->Branch("mc_w_sign", temp__);
 }
 
 int main(int argc, char *argv[])
