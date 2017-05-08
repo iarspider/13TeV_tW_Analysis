@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 //    gROOT->ProcessLine("#include <vector>");
     FWLiteEnabler::enable();
 
-    char fname[160];
+    char fname[256];
 
     //vector<zEvent> events;
 //    double cNetEvWt = 0;
@@ -173,8 +173,8 @@ int main(int argc, char *argv[])
             "/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
 #endif
 #else
-    strncpy(fname, argv[1], 159);
-    fname[159] = '\0';
+    strncpy(fname, argv[1], 255);
+    fname[255] = '\0';
 #endif
     cout << "Input file Name:" << fname << endl;
 
