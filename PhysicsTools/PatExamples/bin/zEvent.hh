@@ -361,7 +361,7 @@ private:
     Int_t mc_trueNumInteractions;
     Int_t mc_PU_NumInteractions;
     bool is_data;
-    Float_t mc_w_sign;
+    Double_t mc_w_sign;
 
     // Primary vertex
     UInt_t pv_n;
