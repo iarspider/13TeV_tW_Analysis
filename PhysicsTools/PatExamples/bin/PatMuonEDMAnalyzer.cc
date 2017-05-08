@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 #ifndef SYNC_EX
     if (argc < 2)
     {
-        cout << "Usage: "<< argv[0] << "file1 file2 ..."<< endl;
+        cout << "Usage: " << argv[0] << "file1 file2 ..." << endl;
         return 0;
     }
 #endif
@@ -149,8 +149,34 @@ int main(int argc, char *argv[])
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
 #endif
 #else
-    fwlite::TFileService fs = fwlite::TFileService("tW_main.root");
+    std::string outfile(argv[1]);
+    auto pos = outfile.find("outfile");
+    if (pos == std::string::npos)
+    {
+        std::cout << "Not found!" << std::endl;
+        return 1;
+    }
+
+    outfile.replace(pos, 7, "bdtfile");
+    outfile = outfile.substr(pos);
+//    std::cout << outfile << std::endl;
+
+    fwlite::TFileService fs = fwlite::TFileService(outfile);
 #endif
+
+#ifdef SYNC_EX
+#ifdef SYNC_TT
+    sprintf(fname,
+            "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
+#elif defined(SYNC_TW)
+    sprintf(fname,
+            "/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
+#endif
+#else
+    strncpy(fname, argv[1], 159);
+    fname[159] = '\0';
+#endif
+    cout << "Input file Name:" << fname << endl;
 
     TTree *tW_tree = fs.make<TTree>("tW", "tW");
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
@@ -166,19 +192,6 @@ int main(int argc, char *argv[])
 
     try
     {
-#ifdef SYNC_EX
-#ifdef SYNC_TT
-        sprintf(fname,
-                "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
-#elif defined(SYNC_TW)
-        sprintf(fname,
-                "/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
-#endif
-#else
-        strncpy(fname, argv[1], 159);
-        fname[159] = '\0';
-#endif
-        cout << "File Name:" << fname << endl;
 
         TFile *inFile = TFile::Open(fname);
 
