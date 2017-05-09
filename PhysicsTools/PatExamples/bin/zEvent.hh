@@ -168,13 +168,10 @@ public:
         LOAD_BRANCH(tree, pv_isFake)
         LOAD_BRANCH(tree, gsf_n)
 #ifdef SYNC_EX
-        // LOAD_BRANCH(tree, gsf_energy)
         LOAD_BRANCH(tree, gsf_pt)
 #else
-        // LOAD_BRANCH(tree, gsf80_energy)
         LOAD_BRANCH(tree, gsf80_pt)
-        // gsf_energy = gsf80_energy;
-        gsf_pt = gsf80_pt;
+//        gsf_pt = gsf80_pt;
 #endif
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
@@ -214,8 +211,8 @@ public:
 #else
         LOAD_BRANCH(tree, MET_T1Txy_Px)
         LOAD_BRANCH(tree, MET_T1Txy_Py)
-        MET_nominal_Px = MET_T1Txy_Px;
-        MET_nominal_Py = MET_T1Txy_Py;
+//        MET_nominal_Px = MET_T1Txy_Px;
+//        MET_nominal_Py = MET_T1Txy_Py;
 #endif
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseIsoFilter_accept)
@@ -247,14 +244,23 @@ private:
 
     void read_electrons()
     {
-        for (UInt_t i = 0; i < gsf_pt->size(); i++)
+        for (UInt_t i = 0; i < gsf_eta->size(); i++)
         {
             auto j = static_cast<vector<zLepton>::size_type>(i);
+#ifdef SYNC_EX
             if (gsf_pt->at(j) < 20.)
                 continue;
+#else
+            if (gsf80_pt->at(j) < 20.)
+                continue;
+#endif
 
             TLorentzVector v;
+#ifdef SYNC_EX
             v.SetPtEtaPhiM(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
+#else
+            v.SetPtEtaPhiM(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
+#endif
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
                                            gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
                                            gsf_dz_firstPVtx->at(j));
@@ -307,7 +313,11 @@ private:
 
     void read_MET()
     {
+#ifdef SYNC_EX
         MET = TLorentzVector(MET_nominal_Px, MET_nominal_Py, 0, 0);
+#else
+        MET = TLorentzVector(MET_T1Txy_Px, MET_T1Txy_Py, 0, 0);
+#endif
         isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
                    trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
                    trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
