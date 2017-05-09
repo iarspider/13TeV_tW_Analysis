@@ -317,6 +317,7 @@ int main(int argc, char *argv[])
 
             if (event_tag == EE)
             {
+                cout << "Event type: EE" << endl;
 #ifdef SYNC_EX
                 ee_lep_evid << event->getEvID() << endl;
 #endif
@@ -324,6 +325,7 @@ int main(int argc, char *argv[])
             }
             else if (event_tag == EMu)
             {
+                cout << "Event type: EMu" << endl;
 #ifdef SYNC_EX
                 emu_lep_evid << event->getEvID() << endl;
 #endif
@@ -331,6 +333,7 @@ int main(int argc, char *argv[])
             }
             else if (event_tag == MuMu)
             {
+                cout << "Event type: MuMu" << endl;
 #ifdef SYNC_EX
                 mumu_lep_evid << event->getEvID() << endl;
 #endif
@@ -363,6 +366,8 @@ int main(int argc, char *argv[])
 
             counter[event_tag][2]++;
 
+            cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
+                 << event->getMET().Pt() << endl;
             if (event_tag != EMu)
             {
                 if (event->getMET().Pt() <= 40)
