@@ -62,6 +62,7 @@ private:
     vector<zHLT> triggers;
     TLorentzVector MET;
     bool isMETok_;
+    bool isTrgOk_[4];
     bool BadChargedCandidateFilter_;
     bool BadPFMuonFilter_;
 
@@ -87,6 +88,11 @@ public:
     bool isMETok() const
     {
         return isMETok_;
+    }
+
+    bool isTrgOk(const int type) const
+    {
+        return isTrgOk_[type];
     }
 
     int getPuNtrueInteractons() const
@@ -142,14 +148,6 @@ public:
             return it->second ? 0 : 1;
         else
             return -1;
-    }
-
-    bool has_trigger(string name)
-    {
-        return std::find_if(triggers.cbegin(), triggers.cend(),
-                            [name](zHLT trig) {
-                                return trig.HLTName == name && trig.HTLDecision == 1 && trig.HTLPrescale >= 1;
-                            }) != triggers.cend();
     }
 
     zEvent(TTree *tree, bool is_data_) : is_data(is_data_)
@@ -222,6 +220,18 @@ public:
         LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_eeBadScFilter_accept)
+        LOAD_BRANCH(tree, trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+        LOAD_BRANCH(tree, trig_HLT_Ele27_WPTight_Gsf_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept)
+        LOAD_BRANCH(tree, trig_HLT_IsoMu24)
+        LOAD_BRANCH(tree, trig_HLT_IsoTkMu24)
+        LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept)
+        LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
         LOAD_BRANCH(tree, mu_dB)
         LOAD_BRANCH(tree, mu_isGlobalMuon)
         LOAD_BRANCH(tree, mu_isPFMuon)
@@ -326,6 +336,28 @@ private:
             isMETok_ = isMETok_ && trig_Flag_eeBadScFilter_accept;
     }
 
+    void read_check_trigger()
+    {
+        // EE
+        isTrgOk_[EE] = (trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept + trig_HLT_Ele27_WPTight_Gsf_accept != 0);
+
+        // EMu
+        Int_t isTrgOk_EMu = trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_EMu += trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
+        isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
+        isTrgOk_EMu += trig_HLT_Ele27_WPTight_Gsf_accept;
+        isTrgOk_EMu += trig_HLT_IsoMu24 + trig_HLT_IsoTkMu24;
+        isTrgOk_[EMu] = (isTrgOk_EMu != 0);
+
+        Int_t isTrgOk_MuMu = trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept ;
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
+        isTrgOk_MuMu += trig_HLT_IsoMu24 + trig_HLT_IsoTkMu24;
+        isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
+    }
+
 public:
     /*
     zEvent(edm::EventBase const &ev)
@@ -361,6 +393,7 @@ public:
         read_jets();
         clean_jets();
         read_MET();
+        read_check_trigger();
         return true;
     }
 
@@ -445,6 +478,25 @@ private:
     Int_t trig_Flag_goodVertices_accept;
     Int_t trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept;
     Int_t trig_Flag_eeBadScFilter_accept;
+
+    //ee triggers
+    Int_t trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept;
+    Int_t trig_HLT_Ele27_WPTight_Gsf_accept;
+
+    //mumu triggers
+    Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept;
+    Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept;
+    Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
+    Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
+    Int_t trig_HLT_IsoMu24;
+    Int_t trig_HLT_IsoTkMu24;
+
+    //emu
+    Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept;
+    Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept;
+    Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
+    Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
+
 
 /*
     zEvent(edm::EventBase const &ev)

@@ -346,10 +346,12 @@ int main(int argc, char *argv[])
                 continue;
             }
 
-            bool massFlag = false;
+            bool massFlag;
 
             if (event_tag != EMu)
-                massFlag = (ll.Mag() >= 76 && ll.Mag() <= 106);
+                massFlag = (ll.Mag() >= 81 && ll.Mag() <= 101);
+            else
+                massFlag = ll.Mag() <= 80;
 
             if (massFlag)
             {
@@ -368,9 +370,18 @@ int main(int argc, char *argv[])
 
             cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
                  << event->getMET().Pt() << endl;
-            if (event_tag != EMu)
+            if (event_tag == EMu)
             {
                 if (event->getMET().Pt() <= 40)
+                {
+                    event->fill_tree(tW_tree);
+                    cout << "- Reject step 3" << endl;
+                    continue;
+                }
+            }
+            else
+            {
+                if (event->getMET().Pt() <= 50)
                 {
                     event->fill_tree(tW_tree);
                     cout << "- Reject step 3" << endl;
@@ -382,6 +393,19 @@ int main(int argc, char *argv[])
 
             counter[event_tag][3]++;
 
+            if (!event->isTrgOk(event_tag))
+            {
+                cout << "- Reject step 4.t" << endl;
+                event->fill_tree(tW_tree);
+                continue;
+            }
+
+            if ((selectedJets.size() <= 1) && (selectedBJets.size() == 0))
+            {
+                counter[event_tag][4]++;
+                event->fill_tree_2(bdt_tree);
+            }
+/*
             if (selectedJets.size() >= 2)
             {
                 counter[event_tag][4]++;
@@ -438,7 +462,7 @@ int main(int argc, char *argv[])
                 }
 #endif
             }
-
+*/
             event->fill_tree(tW_tree);
         }
     }
@@ -482,7 +506,7 @@ int main(int argc, char *argv[])
                 cout << "None";
         }
         cout << " channel ===" << endl;
-        for (int j = 0; j < 8; j++)
+        for (int j = 0; j < /*8*/ 5; j++)
             cout << "Step " << j << " events " << counter[i][j] << endl;
     }
 
