@@ -226,8 +226,8 @@ public:
         LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept)
         LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept)
         LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept)
-        LOAD_BRANCH(tree, trig_HLT_IsoMu24)
-        LOAD_BRANCH(tree, trig_HLT_IsoTkMu24)
+        LOAD_BRANCH(tree, trig_HLT_IsoMu24_accept)
+        LOAD_BRANCH(tree, trig_HLT_IsoTkMu24_accept)
         LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept)
         LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept)
         LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept)
@@ -347,14 +347,14 @@ private:
         isTrgOk_EMu += trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
         isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
         isTrgOk_EMu += trig_HLT_Ele27_WPTight_Gsf_accept;
-        isTrgOk_EMu += trig_HLT_IsoMu24 + trig_HLT_IsoTkMu24;
+        isTrgOk_EMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
         isTrgOk_[EMu] = (isTrgOk_EMu != 0);
 
         Int_t isTrgOk_MuMu = trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
         isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
         isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept ;
         isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
-        isTrgOk_MuMu += trig_HLT_IsoMu24 + trig_HLT_IsoTkMu24;
+        isTrgOk_MuMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
         isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
     }
 
@@ -488,8 +488,8 @@ private:
     Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept;
     Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
     Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
-    Int_t trig_HLT_IsoMu24;
-    Int_t trig_HLT_IsoTkMu24;
+    Int_t trig_HLT_IsoMu24_accept;
+    Int_t trig_HLT_IsoTkMu24_accept;
 
     //emu
     Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept;
