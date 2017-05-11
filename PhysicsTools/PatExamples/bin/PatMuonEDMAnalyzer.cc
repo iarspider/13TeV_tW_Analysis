@@ -400,10 +400,12 @@ int main(int argc, char *argv[])
 
             if (!event->isTrgOk(event_tag))
             {
-                cout << "- Reject step 4.tag" << endl;
+                cout << "- Reject step 4.trigger" << endl;
                 event->fill_dump_tree(tW_tree);
                 continue;
             }
+            event->add_flag("pass_trigger", true);
+            cout << "+ Accept step 4.trigger" << endl;
 
             if ((selectedJets.size() <= 1) && (selectedBJets.size() == 0))
             {

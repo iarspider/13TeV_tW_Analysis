@@ -352,7 +352,7 @@ private:
 
         Int_t isTrgOk_MuMu = trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
         isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
-        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept ;
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
         isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
         isTrgOk_MuMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
         isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
@@ -887,7 +887,7 @@ public:
 
         TLorentzVector lep1(selectedLeptons.at(0));
         TLorentzVector lep2(selectedLeptons.at(1));
-        TLorentzVector bjet1(selectedBJets.at(0));
+        TLorentzVector bjet1(0, 0, 0, 0);
         TLorentzVector jet1(0, 0, 0, 0);
         TLorentzVector jet2(0, 0, 0, 0);
 
@@ -897,6 +897,9 @@ public:
 
         if (selectedJets.size() > 1)
             jet2 = selectedJets.at(1);
+
+        if (selectedBJets.size() > 0)
+            bjet1 = selectedBJets.at(0);
 
         Double_t ptllmetj = (lep1 + lep2 + jet1 + met).Pt();
         tree->SetBranchAddress("ptsys", &ptllmetj);
