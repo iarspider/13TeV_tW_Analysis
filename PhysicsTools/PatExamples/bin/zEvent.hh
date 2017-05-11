@@ -995,7 +995,10 @@ public:
         Double_t ml2j2 = (lep2 + jet2).Mag();
         tree->SetBranchAddress("ml2j2", &ml2j2);
 
-        float j1tag = selectedJets.at(0).get_csv();
+        float j1tag = -1;
+        if (selectedJets.size() > 0)
+            j1tag = selectedJets.at(0).get_csv();
+
         tree->SetBranchAddress("j1csv", &j1tag);
 
         tree->SetBranchAddress("mc_w_sign", &mc_w_sign);
