@@ -888,13 +888,15 @@ public:
         TLorentzVector lep1(selectedLeptons.at(0));
         TLorentzVector lep2(selectedLeptons.at(1));
         TLorentzVector bjet1(selectedBJets.at(0));
-        TLorentzVector jet1(selectedJets.at(0));
+        TLorentzVector jet1(0, 0, 0, 0);
         TLorentzVector jet2(0, 0, 0, 0);
+
         TLorentzVector met(getMET());
+        if (selectedJets.size() > 0)
+            jet1 = selectedJets.at(0);
+
         if (selectedJets.size() > 1)
-        {
             jet2 = selectedJets.at(1);
-        }
 
         Double_t ptllmetj = (lep1 + lep2 + jet1 + met).Pt();
         tree->SetBranchAddress("ptsys", &ptllmetj);
