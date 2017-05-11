@@ -87,13 +87,15 @@ void MakeBDTBranches(TTree *tree)
     tree->Branch("mlj2", temp);
     tree->Branch("dpt_l_j", temp);
     tree->Branch("mlj", temp);
-    tree->Branch("ptl", temp);
+    tree->Branch("ptll", temp);
+    tree->Branch("ptsl", temp);
     tree->Branch("dr_l_j", temp);
     tree->Branch("ptj2", temp);
     tree->Branch("ml2jj", temp);
     tree->Branch("ml2j1", temp);
     tree->Branch("ml2j2", temp);
     tree->Branch("mc_w_sign", temp__);
+    tree->Branch("j1csv", temp__);
 }
 
 int main(int argc, char *argv[])
@@ -271,7 +273,7 @@ int main(int argc, char *argv[])
 
             if (!event->isMETok())
             {
-                event->fill_tree(tW_tree);
+                event->fill_dump_tree(tW_tree);
                 cout << "- Reject step 0.1" << endl;
                 continue;
             }
@@ -308,7 +310,7 @@ int main(int argc, char *argv[])
             else
             {
                 event->add_flag("no_ll", true);
-                event->fill_tree(tW_tree);
+                event->fill_dump_tree(tW_tree);
                 cout << "- Reject step 1" << endl;
                 continue;
             }
@@ -342,7 +344,7 @@ int main(int argc, char *argv[])
             else
             {
                 event->add_flag("not_dilepton", true);
-                event->fill_tree(tW_tree);
+                event->fill_dump_tree(tW_tree);
                 continue;
             }
 
@@ -351,12 +353,12 @@ int main(int argc, char *argv[])
             if (event_tag != EMu)
                 massFlag = (ll.Mag() >= 81 && ll.Mag() <= 101);
             else
-                massFlag = ll.Mag() <= 80;
+                massFlag = (ll.Mag() <= 80 || event->getMET().Pt() <= 40);
 
             if (massFlag)
             {
                 cout << "- Reject step 2" << endl;
-                event->fill_tree(tW_tree);
+                event->fill_dump_tree(tW_tree);
                 continue;
             }
             else
@@ -370,20 +372,22 @@ int main(int argc, char *argv[])
 
             cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
                  << event->getMET().Pt() << endl;
-            if (event_tag == EMu)
+            if (event_tag != EMu)
+            /*
             {
                 if (event->getMET().Pt() <= 40)
                 {
-                    event->fill_tree(tW_tree);
+                    event->fill_dump_tree(tW_tree);
                     cout << "- Reject step 3" << endl;
                     continue;
                 }
             }
             else
+            */
             {
                 if (event->getMET().Pt() <= 50)
                 {
-                    event->fill_tree(tW_tree);
+                    event->fill_dump_tree(tW_tree);
                     cout << "- Reject step 3" << endl;
                     continue;
                 }
@@ -395,15 +399,15 @@ int main(int argc, char *argv[])
 
             if (!event->isTrgOk(event_tag))
             {
-                cout << "- Reject step 4.t" << endl;
-                event->fill_tree(tW_tree);
+                cout << "- Reject step 4.tag" << endl;
+                event->fill_dump_tree(tW_tree);
                 continue;
             }
 
             if ((selectedJets.size() <= 1) && (selectedBJets.size() == 0))
             {
                 counter[event_tag][4]++;
-                event->fill_tree_2(bdt_tree);
+                event->fill_BDT_tree(bdt_tree);
             }
 /*
             if (selectedJets.size() >= 2)
@@ -445,7 +449,7 @@ int main(int argc, char *argv[])
                     counter[event_tag][7]++;
                     event->add_flag("1j1t", true);
                     cout << "+ Accept step 4.2.2" << endl;
-                    event->fill_tree_2(bdt_tree);
+                    event->fill_BDT_tree(bdt_tree);
                 }
 #ifdef SYNC_EX
                 if (event_tag == EE)
@@ -463,7 +467,7 @@ int main(int argc, char *argv[])
 #endif
             }
 */
-            event->fill_tree(tW_tree);
+            event->fill_dump_tree(tW_tree);
         }
     }
     catch (exception &e)

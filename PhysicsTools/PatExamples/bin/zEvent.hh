@@ -779,7 +779,7 @@ public:
         }
     }
 
-    void fill_tree(TTree *tree)
+    void fill_dump_tree(TTree *tree)
     {
         std::vector<TLorentzVector> *JetV, *LepV;
         std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC, *LepIsoVal;
@@ -872,7 +872,7 @@ public:
         tree->Fill();
     }
 
-    void fill_tree_2(TTree *tree)
+    void fill_BDT_tree(TTree *tree)
     {
         vector<zLepton> selectedLeptons;
         vector<zJet> selectedJets, selectedBJets;
@@ -886,7 +886,7 @@ public:
                 [](const zJet &jet) { return jet.is_bjet(); });
 
         TLorentzVector lep1(selectedLeptons.at(0));
-        TLorentzVector lep2(selectedLeptons.at(0));
+        TLorentzVector lep2(selectedLeptons.at(1));
         TLorentzVector bjet1(selectedBJets.at(0));
         TLorentzVector jet1(selectedJets.at(0));
         TLorentzVector jet2(0, 0, 0, 0);
@@ -967,7 +967,10 @@ public:
         tree->SetBranchAddress("mlj", &mlj);
 
         Double_t ptl = lep1.Pt();
-        tree->SetBranchAddress("ptl", &ptl);
+        tree->SetBranchAddress("ptll", &ptl);
+
+        Double_t ptsl = lep2.Pt();
+        tree->SetBranchAddress("ptsl", &ptsl);
 
         Double_t drl_j = lep1.DeltaR(jet1);
         tree->SetBranchAddress("dr_l_j", &drl_j);
@@ -983,6 +986,10 @@ public:
 
         Double_t ml2j2 = (lep2 + jet2).Mag();
         tree->SetBranchAddress("ml2j2", &ml2j2);
+
+        float j1tag = selectedJets.at(0).get_csv();
+        tree->SetBranchAddress("j1csv", &j1tag);
+
         tree->SetBranchAddress("mc_w_sign", &mc_w_sign);
         tree->Fill();
     }

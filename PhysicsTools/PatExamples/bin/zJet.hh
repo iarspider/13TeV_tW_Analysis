@@ -32,6 +32,11 @@ public:
         return this->is_loose() && this->is_clean() && (this->Pt() > this->pt_cut_) && (fabs(this->Eta()) < this->eta_cut_);
     }
 
+    float get_csv() const
+    {
+        return this->btag;
+    }
+
 private:
     //friend std::ostream &operator<<(std::ostream &, const zJet &);
 
