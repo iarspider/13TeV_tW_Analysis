@@ -911,6 +911,9 @@ public:
         Double_t ptlmetj = (lep1 + jet1 + met).Pt();
         tree->SetBranchAddress("pt_lMETj", &ptlmetj);
 
+        Double_t mll = (lep1 + lep2).Mag();
+        tree->SetBranchAddress("mll", &mll);
+
         Double_t cll = Et(lep1 + lep2) / ((lep1 + lep2).Pt());
         tree->SetBranchAddress("cll", &cll);
 
