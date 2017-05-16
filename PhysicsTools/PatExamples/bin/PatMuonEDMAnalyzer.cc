@@ -10,6 +10,7 @@
 #include <TSystem.h>
 #include <FWCore/FWLite/interface/FWLiteEnabler.h>
 #include <PhysicsTools/FWLite/interface/TFileService.h>
+#include <PhysicsTools/Utilities/interface/LumiReweightingStandAlone.h>
 #include <TROOT.h>
 
 #include "argparse.hpp"
@@ -119,9 +120,9 @@ int main(int argc, const char *argv[])
     }
      */
     ArgumentParser parser;
-    parser.addArgument("--age", 1, true);
-    parser.addArgument("--input", 1, true);
-    parser.addArgument("--output", 1, true);
+    parser.addArgument("--epoch", "-e", 1, true);
+    parser.addArgument("--input", "-i", 1, true);
+    parser.addArgument("--output", "-o", 1, true);
 
     parser.parse(static_cast<size_t>(argc), argv);
 #endif
@@ -201,7 +202,36 @@ int main(int argc, const char *argv[])
         }
 
         TTree *rTree = (TTree *) inFile->Get("IIHEAnalysis");
-        zEvent *event = new zEvent(rTree, false);
+        zEvent *event = new zEvent(rTree, parser.retrieve<string>("epoch"));
+        vector<float> puMC, puData;
+
+        if (!event->getIsData())
+        {
+            TH1D hPileupMC("h", "h", 750, 0, 75);
+
+            for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
+            {
+                event->read_event(rTree, evtID);
+                hPileupMC.Fill(event->getPuNtrueInteractons());
+            }
+            TFile puFile("MyDataTruePileupHistogram.root");
+            TH1D *hPileupData = (TH1D *) puFile.Get("pileup");
+
+            for (int i = 1; i <= 750; i++)
+            {
+                puMC.push_back(static_cast<float>(hPileupMC.GetBinContent(i)));
+                puData.push_back(static_cast<float>(hPileupData->GetBinContent(i)));
+            }
+
+        }
+        /*
+        else
+        {
+            puMC.push_back(0);
+            puData.push_back(0);
+        }
+        */
+        reweight::LumiReWeighting LumiWeights_(puMC, puData);
 
         for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
         {
@@ -211,6 +241,8 @@ int main(int argc, const char *argv[])
 
 //            cout << "evtID=" << evtID<< endl;
             event->read_event(rTree, evtID);
+            if (!event->getIsData())
+                event->setLumiWeight(LumiWeights_.weight(event->getPuNtrueInteractons()));
 
 #ifndef SYNC_EX
 /*

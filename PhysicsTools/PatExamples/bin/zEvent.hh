@@ -25,12 +25,12 @@
 using namespace std;
 
 typedef std::pair<std::string, bool> zFlag;
-
+/*
 struct zVertex
 {
     float z, dof, RHO;
 };
-
+*/
 Double_t HTsum(vector<TLorentzVector *> v)
 {
     Double_t result = 0;
@@ -62,7 +62,7 @@ private:
     vector<zLepton> leptons;
     vector<zJet> jets;
 
-    vector<zVertex> vertices;
+//    vector<zVertex> vertices;
     vector<zHLT> triggers;
     TLorentzVector MET;
     bool isMETok_;
@@ -71,12 +71,17 @@ private:
     bool BadPFMuonFilter_;
 
     int puNtrueInteractons;
-    double weight;
+    double lumiWeight;
 
 public:
     ULong64_t getEvID() const
     {
         return ev_event;
+    }
+
+    bool getIsData() const
+    {
+        return is_data;
     }
 
     const vector<zHLT> &getTriggers() const
@@ -114,16 +119,10 @@ public:
         return jets;
     }
 
-    const vector<zVertex> &getVertices() const
+    void setLumiWeight(double w)
     {
-        return vertices;
+        lumiWeight = w;
     }
-
-    double getWeight() const
-    {
-        return weight;
-    }
-
 
 private:
     vector<zFlag> event_flags;
@@ -161,13 +160,24 @@ public:
                     BTagEntry::FLAV_B,    // btag flavour
                     "mujets");               // measurement type
 
-        if (epoch == "MC")
+        if (epoch == "MCB")
         {
             is_data = false;
             MuIdFile = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
             MuIdHist = (TH2F *) ((TDirectoryFile *) MuIdFile->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
                     "abseta_pt_ratio");
             MuIsoFile = new TFile("MuIso_EfficienciesAndSF_BCDEF.root");
+            MuIsoHist = (TH2F *) ((TDirectoryFile *) MuIsoFile->Get("TightISO_TightID_pt_eta"))->Get("abseta_pt_ratio");
+            EmIdFile = new TFile("egammaEffi.txt_EGM2D.root");
+            EmIdHist = (TH2F *) EmIdFile->Get("EGamma_SF2D");
+        }
+        else if (epoch == "MCG")
+        {
+            is_data = false;
+            MuIdFile = new TFile("MuID_EfficienciesAndSF_GH.root");
+            MuIdHist = (TH2F *) ((TDirectoryFile *) MuIdFile->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
+                    "abseta_pt_ratio");
+            MuIsoFile = new TFile("MuIso_EfficienciesAndSF_GH.root");
             MuIsoHist = (TH2F *) ((TDirectoryFile *) MuIsoFile->Get("TightISO_TightID_pt_eta"))->Get("abseta_pt_ratio");
             EmIdFile = new TFile("egammaEffi.txt_EGM2D.root");
             EmIdHist = (TH2F *) EmIdFile->Get("EGamma_SF2D");
@@ -270,13 +280,18 @@ public:
         LOAD_BRANCH(tree, mu_trackerLayersWithMeasurement)
     }
 
+    Int_t getMc_trueNumInteractions() const
+    {
+        return mc_trueNumInteractions;
+    }
+
 private:
     void reset()
     {
         leptons.clear();
         jets.clear();
         triggers.clear();
-        vertices.clear();
+//        vertices.clear();
         event_flags.clear();
     }
 
@@ -938,28 +953,34 @@ public:
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
 
-        double jet_scalefactor = 1.0;
-        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++)
+        // Apply SFs to MC
+        if (!is_data)
         {
-            jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
-                                                       static_cast<float>(it->Pt()));
-        }
-
-        mc_w_sign *= jet_scalefactor;
-
-        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++)
-        {
-            if (it->is_muon())
+            double jet_scalefactor = 1.0;
+            for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++)
             {
-                double mu_id_sf = MuIdHist->GetBinContent(MuIdHist->FindBin(abs(it->Eta()), it->Pt()));
-                double mu_iso_sf = MuIsoHist->GetBinContent(MuIsoHist->FindBin(abs(it->Eta()), it->Pt()));
-                mc_w_sign *= (mu_id_sf * mu_iso_sf);
+                jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
+                                                           static_cast<float>(it->Pt()));
             }
-            else
+
+            mc_w_sign *= jet_scalefactor;
+
+            for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++)
             {
-                double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
-                mc_w_sign *= em_id_sf;
+                if (it->is_muon())
+                {
+                    double mu_id_sf = MuIdHist->GetBinContent(MuIdHist->FindBin(abs(it->Eta()), it->Pt()));
+                    double mu_iso_sf = MuIsoHist->GetBinContent(MuIsoHist->FindBin(abs(it->Eta()), it->Pt()));
+                    mc_w_sign *= (mu_id_sf * mu_iso_sf);
+                }
+                else
+                {
+                    double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
+                    mc_w_sign *= em_id_sf;
+                }
             }
+
+            mc_w_sign *= lumiWeight;
         }
 
         TLorentzVector lep1(selectedLeptons.at(0));
