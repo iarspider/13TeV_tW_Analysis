@@ -6,10 +6,14 @@
 #include <math.h>
 
 #include <DataFormats/FWLite/interface/Event.h>
+#include <CondFormats/BTauObjects/interface/BTagCalibration.h>
+#include <CondFormats/BTauObjects/interface/BTagCalibrationReader.h>
+#include <TH2F.h>
 
 #include "zLepton.hh"
 #include "zJet.hh"
 #include "zHLT.hh"
+#include "RoccoR.h"
 
 #define LOAD_BRANCH(t, x) {x = 0; t->SetBranchStatus(#x, 1); t->SetBranchAddress(#x, &(x));}
 //#define LOAD_BRANCH(t, x) {t->SetBranchAddress(#x, &(x));}
@@ -150,8 +154,32 @@ public:
             return -1;
     }
 
-    zEvent(TTree *tree, bool is_data_) : is_data(is_data_)
+    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVV2.csv"), reader(BTagEntry::OP_TIGHT, "central"),
+                                        rc("rcdata.2016.v3")
     {
+        reader.load(calib,                // calibration instance
+                    BTagEntry::FLAV_B,    // btag flavour
+                    "mujets");               // measurement type
+
+        if (epoch == "MC")
+        {
+            is_data = false;
+            MuIdFile = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
+            MuIdHist = (TH2F *) ((TDirectoryFile *) MuIdFile->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
+                    "abseta_pt_ratio");
+            MuIsoFile = new TFile("MuIso_EfficienciesAndSF_BCDEF.root");
+            MuIsoHist = (TH2F *) ((TDirectoryFile *) MuIsoFile->Get("TightISO_TightID_pt_eta"))->Get("abseta_pt_ratio");
+            EmIdFile = new TFile("egammaEffi.txt_EGM2D.root");
+            EmIdHist = (TH2F *) EmIdFile->Get("EGamma_SF2D");
+        }
+        else
+        {
+            is_data = true;
+//            data_epoch = epoch;
+            MuIdHist = NULL;
+            MuIsoHist = NULL;
+            EmIdHist = NULL;
+        }
         tree->SetBranchStatus("*", 0);
 //        this->pt_cut_ = 20;
         LOAD_BRANCH(tree, mc_w_sign)
@@ -286,8 +314,19 @@ private:
             if (mu_gt_pt->at(j) < 20.)
                 continue;
             TLorentzVector v;
-            v.SetPtEtaPhiM(mu_gt_pt->at(j), mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
-            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0, /*mu_isoTrackerBased03->at(j)*/
+            double pt = mu_gt_pt->at(j);
+            if (is_data)
+            {
+                pt *= rc.kScaleDT(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0, 0);
+            }
+            else
+            {
+                pt *= rc.kScaleAndSmearMC(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j),
+                                          mu_trackerLayersWithMeasurement->at(j), gRandom->Rndm(), gRandom->Rndm(),
+                                          0, 0);
+            }
+            v.SetPtEtaPhiM(/*mu_gt_pt->at(j)*/pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
+            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0,
                                        mu_pfIsoDbCorrected04->at(j),
                                        mu_isTightMuon->at(j), true, 0, 0);
             leptons.push_back(thisMuon);
@@ -405,6 +444,7 @@ private:
     Int_t mc_PU_NumInteractions;
     bool is_data;
     Float_t mc_w_sign;
+    string data_epoch;
 
     // Primary vertex
     UInt_t pv_n;
@@ -497,7 +537,20 @@ private:
     Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
     Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
 
+    // calibration
+    BTagCalibration calib;
+    BTagCalibrationReader reader;
 
+    TFile *MuIdFile;
+    TH2F *MuIdHist;
+
+    TFile *MuIsoFile;
+    TH2F *MuIsoHist;
+
+    TFile *EmIdFile;
+    TH2F *EmIdHist;
+
+    RoccoR rc;
 /*
     zEvent(edm::EventBase const &ev)
     {
@@ -884,6 +937,30 @@ public:
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
+
+        double jet_scalefactor = 1.0;
+        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++)
+        {
+            jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
+                                                       static_cast<float>(it->Pt()));
+        }
+
+        mc_w_sign *= jet_scalefactor;
+
+        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++)
+        {
+            if (it->is_muon())
+            {
+                double mu_id_sf = MuIdHist->GetBinContent(MuIdHist->FindBin(abs(it->Eta()), it->Pt()));
+                double mu_iso_sf = MuIsoHist->GetBinContent(MuIsoHist->FindBin(abs(it->Eta()), it->Pt()));
+                mc_w_sign *= (mu_id_sf * mu_iso_sf);
+            }
+            else
+            {
+                double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
+                mc_w_sign *= em_id_sf;
+            }
+        }
 
         TLorentzVector lep1(selectedLeptons.at(0));
         TLorentzVector lep2(selectedLeptons.at(1));

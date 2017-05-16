@@ -12,6 +12,8 @@
 #include <PhysicsTools/FWLite/interface/TFileService.h>
 #include <TROOT.h>
 
+#include "argparse.hpp"
+
 using namespace std;
 
 //#define SYNC_EX
@@ -99,7 +101,7 @@ void MakeBDTBranches(TTree *tree)
     tree->Branch("mll", temp);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, const char *argv[])
 {
     // ----------------------------------------------------------------------
     // First Part:
@@ -109,11 +111,19 @@ int main(int argc, char *argv[])
     //  * open the input file
     // ----------------------------------------------------------------------
 #ifndef SYNC_EX
+    /*
     if (argc < 2)
     {
         cout << "Usage: " << argv[0] << "file1 file2 ..." << endl;
         return 0;
     }
+     */
+    ArgumentParser parser;
+    parser.addArgument("--age", 1, true);
+    parser.addArgument("--input", 1, true);
+    parser.addArgument("--output", 1, true);
+
+    parser.parse(static_cast<size_t>(argc), argv);
 #endif
     // load framework libraries
     gSystem->Load("libFWCoreFWLite");
@@ -153,16 +163,8 @@ int main(int argc, char *argv[])
     fwlite::TFileService fs = fwlite::TFileService("tW_sync.root");
 #endif
 #else
-    std::string outfile(argv[1]);
-    auto pos = outfile.find("outfile");
-    if (pos == std::string::npos)
-    {
-        std::cout << "Not found!" << std::endl;
-        return 1;
-    }
-
-    outfile.replace(pos, 7, "bdtfile");
-    outfile = outfile.substr(pos);
+    string infile = parser.retrieve<string>("input");
+    string outfile = parser.retrieve<string>("output");
 //    std::cout << outfile << std::endl;
 
     fwlite::TFileService fs = fwlite::TFileService(outfile);
@@ -170,17 +172,12 @@ int main(int argc, char *argv[])
 
 #ifdef SYNC_EX
 #ifdef SYNC_TT
-    sprintf(fname,
-            "root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
+    outfile = string("root://eoscms//eos/cms//store/group/phys_top/Priyanka/ttBar/TT_TuneCUETP8M2T4_13TeV-powheg-pythia8/crab_ttBar/170302_080613/0000/B2GEDMNtuple_7.root");
 #elif defined(SYNC_TW)
-    sprintf(fname,
-            "/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
+    outfile = string("/afs/cern.ch/work/r/razumov/Reza/CMSSW_8_0_26_patch1/src/tW/PatMuonEDMAnalyzer/sync_tW_in.root");
 #endif
-#else
-    strncpy(fname, argv[1], 255);
-    fname[255] = '\0';
 #endif
-    cout << "Input file Name:" << fname << endl;
+    cout << "Input file Name:" << infile << endl;
 
     TTree *tW_tree = fs.make<TTree>("tW", "tW");
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
@@ -190,14 +187,12 @@ int main(int argc, char *argv[])
     vector<zLepton> selectedLeptons;
     vector<zJet> selectedJets;
     vector<zJet> selectedBJets;
-
-
-    vector<llPair_t> llPairs;
+//    vector<llPair_t> llPairs;
 
     try
     {
 
-        TFile *inFile = TFile::Open(fname);
+        TFile *inFile = TFile::Open(infile.c_str());
 
         if (!inFile)
         {
@@ -238,7 +233,7 @@ int main(int argc, char *argv[])
 
             // event.write(fs);
 
-            llPairs.clear();
+//            llPairs.clear();
             int event_tag = -1;
 
             TLorentzVector ll;
@@ -374,17 +369,17 @@ int main(int argc, char *argv[])
             cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
                  << event->getMET().Pt() << endl;
             if (event_tag != EMu)
-            /*
-            {
-                if (event->getMET().Pt() <= 40)
+                /*
                 {
-                    event->fill_dump_tree(tW_tree);
-                    cout << "- Reject step 3" << endl;
-                    continue;
+                    if (event->getMET().Pt() <= 40)
+                    {
+                        event->fill_dump_tree(tW_tree);
+                        cout << "- Reject step 3" << endl;
+                        continue;
+                    }
                 }
-            }
-            else
-            */
+                else
+                */
             {
                 if (event->getMET().Pt() <= 50)
                 {
