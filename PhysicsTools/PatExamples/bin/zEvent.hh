@@ -167,7 +167,7 @@ public:
             return -1;
     }
 
-    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVV2.csv"), reader(BTagEntry::OP_TIGHT, "central"),
+    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVV2.csv"), reader(BTagEntry::OP_MEDIUM, "central"),
                                         rc("rcdata.2016.v3")
     {
         reader.load(calib,                // calibration instance
