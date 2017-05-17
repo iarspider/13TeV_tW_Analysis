@@ -22,9 +22,23 @@
 #define EMu 1
 #define MuMu 3
 
+const double lumEraB = 5444711054.147;
+const double lumEraC = 2395577279.972;
+const double lumEraD = 4255519670.666;
+const double lumEraE = 4054218536.816;
+const double lumEraF = 3105455590.598;
+const double lumEraG = 7544015569.439;
+const double lumEraH = 8746001362.368;
+
+const double lumEraBCDEF = (lumEraB + lumEraC + lumEraD + lumEraE + lumEraF);
+const double lumEraGH = (lumEraG + lumEraH);
+
+const double lumEraBCDEFGH = (lumEraBCDEF + lumEraGH);
+
 using namespace std;
 
 typedef std::pair<std::string, bool> zFlag;
+
 /*
 struct zVertex
 {
@@ -160,25 +174,28 @@ public:
                     BTagEntry::FLAV_B,    // btag flavour
                     "mujets");               // measurement type
 
-        if (epoch == "MCB")
+        MuIdFile = new TFile *[2];
+        MuIdHist = new TH2F *[2];
+        MuIsoFile = new TFile *[2];
+        MuIsoHist = new TH2F *[2];
+
+        if (epoch == "MC")
         {
             is_data = false;
-            MuIdFile = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
-            MuIdHist = (TH2F *) ((TDirectoryFile *) MuIdFile->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
+            MuIdFile[0] = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
+            MuIdHist[0] = (TH2F *) ((TDirectoryFile *) MuIdFile[0]->Get(
+                    "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
                     "abseta_pt_ratio");
-            MuIsoFile = new TFile("MuIso_EfficienciesAndSF_BCDEF.root");
-            MuIsoHist = (TH2F *) ((TDirectoryFile *) MuIsoFile->Get("TightISO_TightID_pt_eta"))->Get("abseta_pt_ratio");
-            EmIdFile = new TFile("egammaEffi.txt_EGM2D.root");
-            EmIdHist = (TH2F *) EmIdFile->Get("EGamma_SF2D");
-        }
-        else if (epoch == "MCG")
-        {
-            is_data = false;
-            MuIdFile = new TFile("MuID_EfficienciesAndSF_GH.root");
-            MuIdHist = (TH2F *) ((TDirectoryFile *) MuIdFile->Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
+            MuIsoFile[0] = new TFile("MuIso_EfficienciesAndSF_BCDEF.root");
+            MuIsoHist[0] = (TH2F *) ((TDirectoryFile *) MuIsoFile[0]->Get("TightISO_TightID_pt_eta"))->Get(
                     "abseta_pt_ratio");
-            MuIsoFile = new TFile("MuIso_EfficienciesAndSF_GH.root");
-            MuIsoHist = (TH2F *) ((TDirectoryFile *) MuIsoFile->Get("TightISO_TightID_pt_eta"))->Get("abseta_pt_ratio");
+            MuIdFile[1] = new TFile("MuID_EfficienciesAndSF_GH.root");
+            MuIdHist[1] = (TH2F *) ((TDirectoryFile *) MuIdFile[1]->Get(
+                    "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
+                    "abseta_pt_ratio");
+            MuIsoFile[1] = new TFile("MuIso_EfficienciesAndSF_GH.root");
+            MuIsoHist[1] = (TH2F *) ((TDirectoryFile *) MuIsoFile[1]->Get("TightISO_TightID_pt_eta"))->Get(
+                    "abseta_pt_ratio");
             EmIdFile = new TFile("egammaEffi.txt_EGM2D.root");
             EmIdHist = (TH2F *) EmIdFile->Get("EGamma_SF2D");
         }
@@ -556,11 +573,11 @@ private:
     BTagCalibration calib;
     BTagCalibrationReader reader;
 
-    TFile *MuIdFile;
-    TH2F *MuIdHist;
+    TFile **MuIdFile;
+    TH2F **MuIdHist;
 
-    TFile *MuIsoFile;
-    TH2F *MuIsoHist;
+    TFile **MuIsoFile;
+    TH2F **MuIsoHist;
 
     TFile *EmIdFile;
     TH2F *EmIdHist;
@@ -969,9 +986,15 @@ public:
             {
                 if (it->is_muon())
                 {
-                    double mu_id_sf = MuIdHist->GetBinContent(MuIdHist->FindBin(abs(it->Eta()), it->Pt()));
-                    double mu_iso_sf = MuIsoHist->GetBinContent(MuIsoHist->FindBin(abs(it->Eta()), it->Pt()));
-                    mc_w_sign *= (mu_id_sf * mu_iso_sf);
+                    double mu_id_sf[2] = {MuIdHist[0]->GetBinContent(MuIdHist[0]->FindBin(abs(it->Eta()), it->Pt())),
+                                          MuIdHist[1]->GetBinContent(MuIdHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
+                    double mu_iso_sf[2] = {MuIsoHist[0]->GetBinContent(MuIsoHist[0]->FindBin(abs(it->Eta()), it->Pt())),
+                                           MuIsoHist[1]->GetBinContent(
+                                                   MuIsoHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
+
+
+                    mc_w_sign *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
+                    mc_w_sign *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
                 }
                 else
                 {
