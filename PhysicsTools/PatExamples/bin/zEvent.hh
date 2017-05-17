@@ -7,7 +7,7 @@
 
 #include <DataFormats/FWLite/interface/Event.h>
 #include <CondFormats/BTauObjects/interface/BTagCalibration.h>
-#include <CondFormats/BTauObjects/interface/BTagCalibrationReader.h>
+#include <CondTools/BTau/interface/BTagCalibrationReader.h>
 #include <TH2F.h>
 
 #include "zLepton.hh"
