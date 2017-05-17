@@ -9,8 +9,12 @@
 <use   name="PhysicsTools/PatUtils"/>
 <use   name="PhysicsTools/PatExamples"/>
 <use   name="PhysicsTools/SelectorUtils"/>
+<use   name="CondFormats/BTauObjects"/>
+<use   name="CondTools/BTau"/>
+
 <environment>
-  <bin   file="PatMuonEDMAnalyzer.cc"></bin>
+  <library name="roccor" file="RoccoR.cc"></library>
+  <bin   file="PatMuonEDMAnalyzer.cc"><lib name="roccor"/></bin>
 <!--  <bin   file="PatMuonFWLiteAnalyzer.cc"></bin>
   <bin   file="PatBasicFWLiteAnalyzer.cc"></bin>
   <bin   file="PatBasicFWLiteJetAnalyzer.cc"></bin>
