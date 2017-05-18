@@ -1130,9 +1130,9 @@ public:
             chan = EE;
         else
         {
-            if (std::find(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "EMu";}) != event_flags.end())
+            if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "EMu";}) != event_flags.end())
                 chan = EMu;
-            else if (std::find(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "MuMu";}) != event_flags.end())
+            else if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "MuMu";}) != event_flags.end())
                 chan = MuMu;
         }
 
