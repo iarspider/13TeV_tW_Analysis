@@ -66,40 +66,41 @@ void MakeBranches(TTree *tree)
 
 void MakeBDTBranches(TTree *tree)
 {
-    Double_t *temp = NULL;
-    int *temp_ = NULL;
-    Float_t *temp__ = NULL;
-    tree->Branch("ptsys", temp);
-    tree->Branch("dpt_ll_metj", temp);
-    tree->Branch("MET", temp);
-    tree->Branch("dpt_ll_met", temp);
-    tree->Branch("pt_lMETj", temp);
-    tree->Branch("cll", temp);
-    tree->Branch("dpt_l_met", temp);
-    tree->Branch("njets", temp_);
-    tree->Branch("nbjets", temp_);
-    tree->Branch("htlljmet", temp);
-    tree->Branch("ptj", temp);
-    tree->Branch("pt_over_ht", temp);
-    tree->Branch("mlljmet", temp);
-    tree->Branch("ptllj", temp);
-    tree->Branch("htll_over_ht", temp);
-    tree->Branch("ptll", temp);
-    tree->Branch("dr_llmetjj", temp);
-    tree->Branch("dr_lljj", temp);
-    tree->Branch("mlj2", temp);
-    tree->Branch("dpt_l_j", temp);
-    tree->Branch("mlj", temp);
-    tree->Branch("ptll", temp);
-    tree->Branch("ptsl", temp);
-    tree->Branch("dr_l_j", temp);
-    tree->Branch("ptj2", temp);
-    tree->Branch("ml2jj", temp);
-    tree->Branch("ml2j1", temp);
-    tree->Branch("ml2j2", temp);
-    tree->Branch("mc_w_sign", temp__);
-    tree->Branch("j1csv", temp__);
-    tree->Branch("mll", temp);
+    Double_t *temp_double = NULL;
+    int *temp_int = NULL;
+    Float_t *temp_float = NULL;
+    tree->Branch("ptsys", temp_double);
+    tree->Branch("dpt_ll_metj", temp_double);
+    tree->Branch("MET", temp_double);
+    tree->Branch("dpt_ll_met", temp_double);
+    tree->Branch("pt_lMETj", temp_double);
+    tree->Branch("cll", temp_double);
+    tree->Branch("dpt_l_met", temp_double);
+    tree->Branch("njets", temp_int);
+    tree->Branch("nbjets", temp_int);
+    tree->Branch("htlljmet", temp_double);
+    tree->Branch("ptj", temp_double);
+    tree->Branch("pt_over_ht", temp_double);
+    tree->Branch("mlljmet", temp_double);
+    tree->Branch("ptllj", temp_double);
+    tree->Branch("htll_over_ht", temp_double);
+    tree->Branch("ptll", temp_double);
+    tree->Branch("dr_llmetjj", temp_double);
+    tree->Branch("dr_lljj", temp_double);
+    tree->Branch("mlj2", temp_double);
+    tree->Branch("dpt_l_j", temp_double);
+    tree->Branch("mlj", temp_double);
+    tree->Branch("ptll", temp_double);
+    tree->Branch("ptsl", temp_double);
+    tree->Branch("dr_l_j", temp_double);
+    tree->Branch("ptj2", temp_double);
+    tree->Branch("ml2jj", temp_double);
+    tree->Branch("ml2j1", temp_double);
+    tree->Branch("ml2j2", temp_double);
+    tree->Branch("mc_w_sign", temp_float);
+    tree->Branch("j1csv", temp_float);
+    tree->Branch("mll", temp_double);
+    tree->Branch("channel", temp_int);
 }
 
 int main(int argc, const char *argv[])

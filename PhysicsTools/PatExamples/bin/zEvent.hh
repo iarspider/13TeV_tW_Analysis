@@ -167,7 +167,8 @@ public:
             return -1;
     }
 
-    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"), reader(BTagEntry::OP_MEDIUM, "central"),
+    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
+                                        reader(BTagEntry::OP_MEDIUM, "central"),
                                         rc("rcdata.2016.v3")
     {
         reader.load(calib,                // calibration instance
@@ -1123,6 +1124,20 @@ public:
         tree->SetBranchAddress("j1csv", &j1tag);
 
         tree->SetBranchAddress("mc_w_sign", &mc_w_sign);
+
+        int chan = 0;
+        if (std::find(event_flags.begin(), event_flags.end(), "EE") != event_flags.end())
+            chan = EE;
+        else
+        {
+            if (std::find(event_flags.begin(), event_flags.end(), "EMu") != event_flags.end())
+                chan = EMu;
+            else if (std::find(event_flags.begin(), event_flags.end(), "MuMu") != event_flags.end())
+                chan = MuMu;
+        }
+
+        tree->SetBranchAddress("channel", &chan);
+
         tree->Fill();
     }
 };
