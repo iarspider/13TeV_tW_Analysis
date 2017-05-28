@@ -84,7 +84,7 @@ private:
     bool BadChargedCandidateFilter_;
     bool BadPFMuonFilter_;
 
-    int puNtrueInteractons;
+    //int puNtrueInteractons;
     double lumiWeight;
 
 public:
@@ -118,10 +118,10 @@ public:
         return isTrgOk_[type];
     }
 
-    int getPuNtrueInteractons() const
+    /*int getPuNtrueInteractons() const
     {
         return puNtrueInteractons;
-    }
+    }*/
 
     const vector<zLepton> &getLeptons() const
     {
@@ -213,7 +213,7 @@ public:
         LOAD_BRANCH(tree, mc_w_sign)
         LOAD_BRANCH(tree, ev_event)
         LOAD_BRANCH(tree, mc_trueNumInteractions)
-        LOAD_BRANCH(tree, mc_PU_NumInteractions)
+        // LOAD_BRANCH(tree, mc_PU_NumInteractions)
         LOAD_BRANCH(tree, pv_n)
         LOAD_BRANCH(tree, pv_z)
         LOAD_BRANCH(tree, pv_ndof)
@@ -474,7 +474,7 @@ private:
     Bool_t trig_Flag_BadChargedCandidateFilter_accept;
     ULong64_t ev_event;
     Int_t mc_trueNumInteractions;
-    Int_t mc_PU_NumInteractions;
+    //Int_t mc_PU_NumInteractions;
     bool is_data;
     Float_t mc_w_sign;
     string data_epoch;
