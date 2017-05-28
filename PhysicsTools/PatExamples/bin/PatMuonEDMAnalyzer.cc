@@ -183,7 +183,9 @@ int main(int argc, const char *argv[])
 
     TTree *tW_tree = fs.make<TTree>("tW", "tW");
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
+#ifdef SYNC_EX    
     MakeBranches(tW_tree);
+#endif
     MakeBDTBranches(bdt_tree);
 
     vector<zLepton> selectedLeptons;
@@ -213,7 +215,7 @@ int main(int argc, const char *argv[])
             for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
             {
                 event->read_event(rTree, evtID);
-                hPileupMC.Fill(event->getPuNtrueInteractons());
+                hPileupMC.Fill(event->getMc_trueNumInteractions());
             }
             TFile puFile("MyDataTruePileupHistogram.root");
             TH1D *hPileupData = (TH1D *) puFile.Get("pileup");
