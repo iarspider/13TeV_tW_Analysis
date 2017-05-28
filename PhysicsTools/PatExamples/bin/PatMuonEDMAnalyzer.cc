@@ -220,6 +220,8 @@ int main(int argc, const char *argv[])
 
             for (int i = 1; i <= 750; i++)
             {
+                cout << "MC: " << static_cast<float>(hPileupMC.GetBinContent(i)) << endl;
+                cout << "DT: " << (static_cast<float>(hPileupData->GetBinContent(i)) << endl;
                 puMC.push_back(static_cast<float>(hPileupMC.GetBinContent(i)));
                 puData.push_back(static_cast<float>(hPileupData->GetBinContent(i)));
             }
