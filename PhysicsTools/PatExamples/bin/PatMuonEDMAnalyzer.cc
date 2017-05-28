@@ -247,7 +247,7 @@ int main(int argc, const char *argv[])
 //            cout << "evtID=" << evtID<< endl;
             event->read_event(rTree, evtID);
             if (!event->getIsData())
-                event->setLumiWeight(LumiWeights_.weight(event->getPuNtrueInteractons()));
+                event->setLumiWeight(LumiWeights_.weight(event->getMc_trueNumInteractions()));
 
 #ifndef SYNC_EX
 /*
