@@ -867,6 +867,7 @@ public:
 
     void fill_dump_tree(TTree *tree)
     {
+#ifdef SYNC_EX
         std::vector<TLorentzVector> *JetV, *LepV;
         std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC, *LepIsoVal;
         std::vector<int> *LepWhere;
@@ -956,6 +957,7 @@ public:
         tree->SetBranchAddress("eventID", &ev_event);
 
         tree->Fill();
+#endif
     }
 
     void fill_BDT_tree(TTree *tree)
