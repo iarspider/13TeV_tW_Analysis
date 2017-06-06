@@ -181,11 +181,13 @@ int main(int argc, const char *argv[])
 #endif
     cout << "Input file Name:" << infile << endl;
 
-    TTree *tW_tree = fs.make<TTree>("tW", "tW");
-    TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
 #ifdef SYNC_EX    
+    TTree *tW_tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tW_tree);
+#else
+     TTree *tW_tree = NULL;
 #endif
+    TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
     MakeBDTBranches(bdt_tree);
 
     vector<zLepton> selectedLeptons;
