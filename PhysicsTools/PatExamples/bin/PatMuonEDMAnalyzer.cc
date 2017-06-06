@@ -440,12 +440,20 @@ int main(int argc, const char *argv[])
             }
             event->add_flag("pass_trigger", true);
             cout << "+ Accept step 4.trigger" << endl;
+            counter[event_tag][4]++;
 
-            if ((selectedJets.size() <= 1) && (selectedBJets.size() == 0))
+            if (selectedJets.size() == 0)
             {
-                counter[event_tag][4]++;
+                counter[event_tag][5]++;
                 event->fill_BDT_tree(bdt_tree);
             }
+
+            if ((selectedJets.size() == 1) && (selectedBJets.size() == 0))
+            {
+                counter[event_tag][6]++;
+                event->fill_BDT_tree(bdt_tree);
+            }
+
 /*
             if (selectedJets.size() >= 2)
             {
@@ -547,7 +555,7 @@ int main(int argc, const char *argv[])
                 cout << "None";
         }
         cout << " channel ===" << endl;
-        for (int j = 0; j < /*8*/ 5; j++)
+        for (int j = 0; j < 7; j++)
             cout << "Step " << j << " events " << counter[i][j] << endl;
     }
 
