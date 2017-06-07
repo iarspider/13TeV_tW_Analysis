@@ -22,6 +22,10 @@
 #define EMu 1
 #define MuMu 3
 
+#define DECAY_LL 1
+#define DECAY_JJ 2
+#define DECAY_LJ 3
+
 const double lumEraB = 5444711054.147;
 const double lumEraC = 2395577279.972;
 const double lumEraD = 4255519670.666;
@@ -136,6 +140,11 @@ public:
     void setLumiWeight(double w)
     {
         lumiWeight = w;
+    }
+
+    Float_t get_mc_w()
+    {
+        return mc_w_sign;
     }
 
 private:
@@ -296,6 +305,10 @@ public:
         LOAD_BRANCH(tree, mu_numberOfMatchedStations)
         LOAD_BRANCH(tree, mu_numberOfValidPixelHits)
         LOAD_BRANCH(tree, mu_trackerLayersWithMeasurement)
+        LOAD_BRANCH(tree, mc_index)
+        LOAD_BRANCH(tree, mc_pdgId)
+        LOAD_BRANCH(tree, mc_mother_index)
+        LOAD_BRANCH(tree, mc_mother_pdgId)
     }
 
     Int_t getMc_trueNumInteractions() const
@@ -309,8 +322,11 @@ private:
         leptons.clear();
         jets.clear();
         triggers.clear();
-//        vertices.clear();
         event_flags.clear();
+        selectedLeptons.clear();
+        selectedJets.clear();
+        selectedBJets.clear();
+        decay_mode = -1;
     }
 
     void read_electrons()
@@ -358,7 +374,7 @@ private:
                                           mu_trackerLayersWithMeasurement->at(j), gRandom->Rndm(), gRandom->Rndm(),
                                           0, 0);
             }
-            v.SetPtEtaPhiM(/*mu_gt_pt->at(j)*/pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
+            v.SetPtEtaPhiM(pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
             zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0,
                                        mu_pfIsoDbCorrected04->at(j),
                                        mu_isTightMuon->at(j), true, 0, 0);
@@ -368,7 +384,6 @@ private:
 
     void read_jets()
     {
-//        cout << "Loading jets" << endl;
         for (UInt_t i = 0; i < jet_pt->size(); i++)
         {
             auto j = static_cast<vector<zJet>::size_type>(i);
@@ -377,21 +392,9 @@ private:
             zJet thisJet = zJet(v, 0, jet_CSVv2->at(j), jet_isJetIDLoose->at(j));
             jets.push_back(thisJet);
         }
-//        cout << "Loaded jets" << endl;
         jets.shrink_to_fit();
     }
 
-    void read_vertices()
-    {
-/*
-        for (auto i = 0; i < pv_n; i++)
-        {
-            auto j = static_cast<vector::size_type>(i);
-            zVertex thisVertex;
-            thisVertex.z;
-        }
-*/
-    }
 
     void read_MET()
     {
@@ -430,27 +433,61 @@ private:
         isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
     }
 
-public:
-    /*
-    zEvent(edm::EventBase const &ev)
+    void get_decay_mode()
     {
-        // Fill event information
-#ifndef SYNC_EX
-        get_userdata(ev);
-        get_triggers(ev);
-        get_vertices(ev);
-#endif
-        edm::Handle<ULong64_t> event_id;
-        ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
-        evID = *event_id;
-        read_electrons(ev);
-        read_muons(ev);
-        std::sort(leptons.begin(), leptons.end());
-        read_jets(ev);
-        clean_jets();
-        read_MET(ev);
+        //TODO: Get decay mode (1: fully leptonic, 2: fully hadronic, 3: semileptonic)
+        /*
+        int nt = -1;
+        int nW = -1;
+        int nWt = -1;
+        for (UInt_t i = 0; i < mc_pdgId->size(); i++)
+            if (abs(mc_pdgId->at(i)) == 6)
+                nt = static_cast<int>(i);
+
+        if (nt == -1)
+            return;
+
+        */
+
     }
-*/
+
+    void update_mc_w()
+    {
+        // Apply SFs to MC
+        double jet_scalefactor = 1.0;
+        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++)
+        {
+            jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
+                                                       static_cast<float>(it->Pt()));
+        }
+
+        mc_w_sign *= jet_scalefactor;
+
+        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++)
+        {
+            if (it->is_muon())
+            {
+                double mu_id_sf[2] = {MuIdHist[0]->GetBinContent(MuIdHist[0]->FindBin(abs(it->Eta()), it->Pt())),
+                                      MuIdHist[1]->GetBinContent(MuIdHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
+                double mu_iso_sf[2] = {MuIsoHist[0]->GetBinContent(MuIsoHist[0]->FindBin(abs(it->Eta()), it->Pt())),
+                                       MuIsoHist[1]->GetBinContent(
+                                               MuIsoHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
+
+
+                mc_w_sign *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
+                mc_w_sign *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
+            }
+            else
+            {
+                double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
+                mc_w_sign *= em_id_sf;
+            }
+        }
+
+        mc_w_sign *= lumiWeight;
+    }
+
+public:
     bool read_event(TTree *tree, Long64_t id)
     {
         reset();
@@ -466,6 +503,22 @@ public:
         clean_jets();
         read_MET();
         read_check_trigger();
+
+        copy_if(getLeptons().begin(), getLeptons().end(), back_inserter(selectedLeptons),
+                [](const zLepton &part) { return part.is_selected(); });
+
+        copy_if(getJets().begin(), getJets().end(), back_inserter(selectedJets),
+                [](const zJet &jet) { return jet.is_selected(); });
+
+        copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
+                [](const zJet &jet) { return jet.is_bjet(); });
+
+        if (!this->is_data)
+        {
+            get_decay_mode();
+            update_mc_w();
+        }
+
         return true;
     }
 
@@ -574,6 +627,12 @@ private:
     BTagCalibration calib;
     BTagCalibrationReader reader;
 
+    // mc information
+    vector<int> *mc_index;
+    vector<int> *mc_pdgId;
+    vector<vector<int> > *mc_mother_index;
+    vector<vector<int> > *mc_mother_pdgId;
+
     TFile **MuIdFile;
     TH2F **MuIdHist;
 
@@ -584,273 +643,11 @@ private:
     TH2F *EmIdHist;
 
     RoccoR rc;
-/*
-    zEvent(edm::EventBase const &ev)
-    {
-        // Fill event information
-#ifndef SYNC_EX
-        get_userdata(ev);
-        get_triggers(ev);
-        get_vertices(ev);
-#endif
-        edm::Handle<ULong64_t> event_id;
-        ev.getByLabel(string("eventInfo:evtInfoEventNumber"), event_id);
-        evID = *event_id;
-        read_electrons(ev);
-        read_muons(ev);
-        std::sort(leptons.begin(), leptons.end());
-        read_jets(ev);
-        clean_jets();
-        read_MET(ev);
-    }
 
+    int decay_mode;
 
-private:
-    void read_electrons(edm::EventBase const &event)
-    {
-        edm::Handle<std::vector<float> > electronPt;
-        event.getByLabel(std::string("electrons:elPt"), electronPt);
-        // Handle to the electron eta
-        edm::Handle<std::vector<float> > electronEta;
-        event.getByLabel(std::string("electrons:elEta"), electronEta);
-        // Handle to the electron eta
-        edm::Handle<std::vector<float> > electronPhi;
-        event.getByLabel(std::string("electrons:elPhi"), electronPhi);
-        // Handle to the electron energy
-        edm::Handle<std::vector<float> > electronEn;
-        event.getByLabel(std::string("electrons:elE"), electronEn);
-
-        // Handle to the electron charge
-        edm::Handle<std::vector<float> > electronCharge;
-        event.getByLabel(std::string("electrons:elCharge"), electronCharge);
-        // Handle to the electron electronSCeta
-        edm::Handle<std::vector<float> > electronSCeta;
-        event.getByLabel(std::string("electrons:elSCEta"), electronSCeta);
-
-        edm::Handle<std::vector<float> > elvidTight;
-        event.getByLabel(std::string("electrons:elvidTight"), elvidTight);
-
-        // Handle to the electron electronD0
-        edm::Handle<std::vector<float> > electronD0;
-        event.getByLabel(std::string("electrons:elDxy"), electronD0);
-        // Handle to the electron electronDz
-        edm::Handle<std::vector<float> > electronDz;
-        event.getByLabel(std::string("electrons:elDz"), electronDz);
-
-        for (size_t i = 0; i < electronPt->size(); i++)
-        {
-            TLorentzVector v;
-            v.SetPtEtaPhiE(electronPt->at(i), electronEta->at(i), electronPhi->at(i), electronEn->at(i));
-
-            zLepton thisElectron = zLepton(v, electronCharge->at(i), electronSCeta->at(i), 0,
-                                           elvidTight->at(i) != 0, false, electronD0->at(i), electronDz->at(i));
-
-            leptons.push_back(thisElectron);
-        }
-    }
-
-    void read_userdata(edm::EventBase const &event)
-    {
-        // Handle to the genEventWeight, which I added in eventUserData class
-        edm::Handle<double> genEventWeight;
-        event.getByLabel(std::string("eventUserData:eventWeight"), genEventWeight);
-        weight = *genEventWeight;
-
-        // Handle to the pu, which I added in eventUserData class
-        edm::Handle<int> puNtrueIntMC;
-        event.getByLabel(std::string("eventUserData:puNtrueInt"), puNtrueIntMC);
-        puNtrueInteractons = *puNtrueIntMC;
-    }
-
-    void read_triggers(edm::EventBase const &event)
-    {
-        // Handle to the pass decision of hlt
-        edm::Handle<std::vector<float> > HLTdecision;
-        event.getByLabel(std::string("TriggerUserData:triggerBitTree"), HLTdecision);
-        // Handle to the prescale of hlt
-        edm::Handle<std::vector<int> > HLTprescale;
-        event.getByLabel(std::string("TriggerUserData:triggerPrescaleTree"), HLTprescale);
-        // Handle to the hlt name
-        edm::Handle<std::vector<string> > HLTname;
-        event.getByLabel(std::string("TriggerUserData:triggerNameTree"), HLTname);
-
-        for (size_t i = 0; i < HLTdecision->size(); i++)
-        {
-            zHLT thisHLT = zHLT(HLTname->at(i), HLTprescale->at(i), HLTdecision->at(i));
-            triggers.push_back(thisHLT);
-            // cout << "Trigger " << HLTname->at(i) << " prescale " << HLTprescale->at(i) << " decision "
-            //     << HLTdecision->at(i) << endl;
-        }
-    }
-
-    void read_muons(edm::EventBase const &event)
-    {
-        // Handle to the muon muonPt
-        edm::Handle<std::vector<float> > muonPt;
-        event.getByLabel(std::string("muons:muPt"), muonPt);
-        // Handle to the muon muonEta
-        edm::Handle<std::vector<float> > muonEta;
-        event.getByLabel(std::string("muons:muEta"), muonEta);
-        // Handle to the muon muonPhi
-        edm::Handle<std::vector<float> > muonPhi;
-        event.getByLabel(std::string("muons:muPhi"), muonPhi);
-        // Handle to the muon energy
-        edm::Handle<std::vector<float> > muonEn;
-        event.getByLabel(std::string("muons:muE"), muonEn);
-
-        // Handle to the muon muonIso04
-        edm::Handle<std::vector<float> > muonIso04;
-        event.getByLabel(std::string("muons:muIso04"), muonIso04);
-        // Handle to the muon charge
-        edm::Handle<std::vector<float> > muonCharge;
-        event.getByLabel(std::string("muons:muCharge"), muonCharge);
-        // Handle to the muon charge
-        edm::Handle<std::vector<float> > muonTight;
-        event.getByLabel(std::string("muons:muIsTightMuon"), muonTight);
-
-        for (size_t i = 0; i < muonPt->size(); i++)
-        {
-            TLorentzVector v;
-            v.SetPtEtaPhiE(muonPt->at(i), muonEta->at(i), muonPhi->at(i), muonEn->at(i));
-
-            zLepton thisMuon(v, muonCharge->at(i), 0, muonIso04->at(i), muonTight->at(i) != 0, true, 0, 0);
-            leptons.push_back(thisMuon);
-        }
-    }
-
-    void read_jets(edm::EventBase const &event)
-    {
-        // Handle to the jet b-tag
-        edm::Handle<std::vector<float> > jetBTag;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSCSVv2"), jetBTag);
-        // Handle to the jet charge
-        edm::Handle<std::vector<float> > jetCharge;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSCharge"), jetCharge);
-        // Handle to the jet energy
-        edm::Handle<std::vector<float> > jetEn;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSE"), jetEn);
-        // Handle to the jet eta
-        edm::Handle<std::vector<float> > jetEta;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSEta"), jetEta);
-        // Handle to the jet rapidity
-        edm::Handle<std::vector<float> > jetRapidity;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSY"), jetRapidity);
-        // Handle to the jet mass
-        edm::Handle<std::vector<float> > jetMass;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSMass"), jetMass);
-        // Handle to the jet phi
-        edm::Handle<std::vector<float> > jetPhi;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSPhi"), jetPhi);
-        // Handle to the jet pt
-        edm::Handle<std::vector<float> > jetPt;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSPt"), jetPt);
-        // Handle to the jet Area
-        edm::Handle<std::vector<float> > jetArea;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSjetArea"), jetArea);
-        ///////////////Jet Loose criteria//////////////////////////////////////////////////////////////////////
-        // Handle to the Neutral hadron fraction
-        edm::Handle<std::vector<float> > jetneutralHadronEnergyFrac;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSneutralHadronEnergyFrac"), jetneutralHadronEnergyFrac);
-        // Handle to the Neutral EM fraction
-        edm::Handle<std::vector<float> > jetneutralEmEnergyFrac;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSneutralEmEnergyFrac"), jetneutralEmEnergyFrac);
-        // Handle to the Number of constituents
-        edm::Handle<std::vector<float> > jetNumConstituents;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSNumConstituents"), jetNumConstituents);
-        // Handle to the Charged Hadron fraction
-        edm::Handle<std::vector<float> > jetchargedHadronEnergyFrac;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSchargedHadronEnergyFrac"), jetchargedHadronEnergyFrac);
-        // Handle to the Charged Multiplicity
-        edm::Handle<std::vector<float> > jetchargedMultiplicity;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSchargedMultiplicity"), jetchargedMultiplicity);
-        // Handle to the Charged EM fraction
-        edm::Handle<std::vector<float> > jetchargedEmEnergyFrac;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSchargedEmEnergyFrac"), jetchargedEmEnergyFrac);
-        // Handle to the Neutral particle multiplicity
-        edm::Handle<std::vector<float> > jetneutralMultiplicity;
-        event.getByLabel(std::string("jetsAK4CHS:jetAK4CHSneutralMultiplicity"), jetneutralMultiplicity);
-        /////////////////Jet b-tag/////////////////////////////////////////////////////////////////////////////////
-
-
-        for (size_t i = 0; i < jetBTag->size(); i++)
-        {
-            TLorentzVector v;
-            v.SetPtEtaPhiE(jetPt->at(i), jetEta->at(i), jetPhi->at(i), jetEn->at(i));
-
-            zJet this_jet = zJet(v, (int) jetCharge->at(i), jetBTag->at(i), jetRapidity->at(i), jetArea->at(i),
-                                 jetneutralHadronEnergyFrac->at(i), jetneutralEmEnergyFrac->at(i),
-                                 jetchargedHadronEnergyFrac->at(i), jetchargedEmEnergyFrac->at(i),
-                                 jetNumConstituents->at(i), jetchargedMultiplicity->at(i),
-                                 jetneutralMultiplicity->at(i));
-            jets.push_back(this_jet);
-        }
-
-        std::sort(jets.begin(), jets.end());
-    }
-
-    void read_MET(edm::EventBase const &event)
-    {
-        edm::Handle<std::vector<float> > MetPx;
-        event.getByLabel(std::string("metFull:metFullPx"), MetPx);
-
-        edm::Handle<std::vector<float> > MetPy;
-        event.getByLabel(std::string("metFull:metFullPy"), MetPy);
-
-        edm::Handle<bool> BadChargedCandidateFilter;
-        event.getByLabel(std::string("BadChargedCandidateFilter"), BadChargedCandidateFilter);
-        BadChargedCandidateFilter_ = *BadChargedCandidateFilter;
-
-        edm::Handle<bool> BadPFMuonFilter;
-        event.getByLabel(std::string("BadPFMuonFilter"), BadPFMuonFilter);
-        BadPFMuonFilter_ = *BadPFMuonFilter;
-
-        edm::Handle<std::vector<string>> METTriggerNameTree;
-        event.getByLabel(std::string("METUserData:triggerNameTree"), METTriggerNameTree);
-
-        edm::Handle<std::vector<float>> METTriggerBitTree;
-        event.getByLabel(std::string("METUserData:triggerBitTree"), METTriggerBitTree);
-
-        float otherMetFilters = 1;
-
-        for (size_t i = 0; i < METTriggerNameTree->size(); i++)
-        {
-            if (METTriggerNameTree->at(i) == "Flag_HBHENoiseFilter" ||
-                METTriggerNameTree->at(i) == "Flag_HBHENoiseIsoFilter" ||
-                METTriggerNameTree->at(i) == "Flag_globalTightHalo2016Filter" ||
-                METTriggerNameTree->at(i) == "Flag_goodVertices" ||
-                METTriggerNameTree->at(i) == "Flag_EcalDeadCellTriggerPrimitiveFilter")
-            {
-                otherMetFilters *= METTriggerBitTree->at(i);
-            }
-        }
-
-        MET = TLorentzVector(MetPx->at(0), MetPy->at(0), 0, 0);
-        isMETok_ = ((*BadChargedCandidateFilter) && (*BadPFMuonFilter) && (otherMetFilters == 1));
-    }
-
-    void read_vertices(edm::EventBase const &event)
-    {
-        edm::Handle<std::vector<float> > vtxZ;
-        event.getByLabel(std::string("vertexInfo:z"), vtxZ);
-        // Handle to the dof of vertex
-        edm::Handle<std::vector<int> > dof;
-        event.getByLabel(std::string("vertexInfo:ndof"), dof);
-        // Handle to the rho
-        edm::Handle<std::vector<float> > rhoo;
-        event.getByLabel(std::string("vertexInfo:rho"), rhoo);
-
-        for (size_t i = 0; i < vtxZ->size(); i++)
-        {
-            zVertex this_vtx;
-            this_vtx.z = vtxZ->at(i);
-            this_vtx.dof = dof->at(i);
-            this_vtx.RHO = rhoo->at(i);
-
-            vertices.push_back(this_vtx);
-        }
-    }
-*/
-
+    vector<zLepton> selectedLeptons;
+    vector<zJet> selectedJets, selectedBJets;
 public:
     void clean_jets()
     {
@@ -962,53 +759,6 @@ public:
 
     void fill_BDT_tree(TTree *tree)
     {
-        vector<zLepton> selectedLeptons;
-        vector<zJet> selectedJets, selectedBJets;
-        copy_if(getLeptons().begin(), getLeptons().end(), back_inserter(selectedLeptons),
-                [](const zLepton &part) { return part.is_selected(); });
-
-        copy_if(getJets().begin(), getJets().end(), back_inserter(selectedJets),
-                [](const zJet &jet) { return jet.is_selected(); });
-
-        copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
-                [](const zJet &jet) { return jet.is_bjet(); });
-
-        // Apply SFs to MC
-        if (!is_data)
-        {
-            double jet_scalefactor = 1.0;
-            for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++)
-            {
-                jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
-                                                           static_cast<float>(it->Pt()));
-            }
-
-            mc_w_sign *= jet_scalefactor;
-
-            for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++)
-            {
-                if (it->is_muon())
-                {
-                    double mu_id_sf[2] = {MuIdHist[0]->GetBinContent(MuIdHist[0]->FindBin(abs(it->Eta()), it->Pt())),
-                                          MuIdHist[1]->GetBinContent(MuIdHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
-                    double mu_iso_sf[2] = {MuIsoHist[0]->GetBinContent(MuIsoHist[0]->FindBin(abs(it->Eta()), it->Pt())),
-                                           MuIsoHist[1]->GetBinContent(
-                                                   MuIsoHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
-
-
-                    mc_w_sign *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
-                    mc_w_sign *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
-                }
-                else
-                {
-                    double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
-                    mc_w_sign *= em_id_sf;
-                }
-            }
-
-            mc_w_sign *= lumiWeight;
-        }
-
         TLorentzVector lep1(selectedLeptons.at(0));
         TLorentzVector lep2(selectedLeptons.at(1));
         TLorentzVector bjet1(0, 0, 0, 0);
@@ -1128,13 +878,16 @@ public:
         tree->SetBranchAddress("mc_w_sign", &mc_w_sign);
 
         int chan = 0;
-        if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "EE";}) != event_flags.end())
+        if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag &f) { return f.first == "EE"; }) !=
+            event_flags.end())
             chan = EE;
         else
         {
-            if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "EMu";}) != event_flags.end())
+            if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag &f) { return f.first == "EMu"; }) !=
+                event_flags.end())
                 chan = EMu;
-            else if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag& f){return f.first == "MuMu";}) != event_flags.end())
+            else if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag &f) { return f.first == "MuMu"; }) !=
+                     event_flags.end())
                 chan = MuMu;
         }
 

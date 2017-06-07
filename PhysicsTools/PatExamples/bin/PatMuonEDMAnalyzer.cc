@@ -386,9 +386,9 @@ int main(int argc, const char *argv[])
             bool massFlag;
 
             if (event_tag != EMu)
-                massFlag = (ll.Mag() >= 81 && ll.Mag() <= 101);
+                massFlag = (ll.Mag() >= 76 && ll.Mag() <= 106);
             else
-                massFlag = (ll.Mag() <= 80 || event->getMET().Pt() <= 40);
+                massFlag = false;
 
             if (massFlag)
             {
@@ -408,19 +408,8 @@ int main(int argc, const char *argv[])
             cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
                  << event->getMET().Pt() << endl;
             if (event_tag != EMu)
-                /*
-                {
-                    if (event->getMET().Pt() <= 40)
-                    {
-                        event->fill_dump_tree(tW_tree);
-                        cout << "- Reject step 3" << endl;
-                        continue;
-                    }
-                }
-                else
-                */
             {
-                if (event->getMET().Pt() <= 50)
+                if (event->getMET().Pt() <= 40)
                 {
                     event->fill_dump_tree(tW_tree);
                     cout << "- Reject step 3" << endl;
@@ -440,7 +429,7 @@ int main(int argc, const char *argv[])
             }
             event->add_flag("pass_trigger", true);
             cout << "+ Accept step 4.trigger" << endl;
-            counter[event_tag][4]++;
+            counter[event_tag][4]+= event->get_mc_w();
 
             if (selectedJets.size() == 0)
             {
