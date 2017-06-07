@@ -136,10 +136,10 @@ int main(int argc, const char *argv[])
 
     //vector<zEvent> events;
 //    double cNetEvWt = 0;
-    Long64_t counter[4][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0}};
+    Float_t counter[4][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
+                             {0, 0, 0, 0, 0, 0, 0, 0},
+                             {0, 0, 0, 0, 0, 0, 0, 0},
+                             {0, 0, 0, 0, 0, 0, 0, 0}};
 
     cout << boolalpha;
 #ifdef TW_SYNC
@@ -181,18 +181,18 @@ int main(int argc, const char *argv[])
 #endif
     cout << "Input file Name:" << infile << endl;
 
-#ifdef SYNC_EX    
+#ifdef SYNC_EX
     TTree *tW_tree = fs.make<TTree>("tW", "tW");
     MakeBranches(tW_tree);
 #else
-     TTree *tW_tree = NULL;
+    TTree *tW_tree = NULL;
 #endif
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
     MakeBDTBranches(bdt_tree);
 
-    vector<zLepton> selectedLeptons;
-    vector<zJet> selectedJets;
-    vector<zJet> selectedBJets;
+    vector <zLepton> selectedLeptons;
+    vector <zJet> selectedJets;
+    vector <zJet> selectedBJets;
 //    vector<llPair_t> llPairs;
 
     try
@@ -429,7 +429,7 @@ int main(int argc, const char *argv[])
             }
             event->add_flag("pass_trigger", true);
             cout << "+ Accept step 4.trigger" << endl;
-            counter[event_tag][4]+= event->get_mc_w();
+            counter[event_tag][4] += event->get_mc_w();
 
             if (selectedJets.size() == 0)
             {
