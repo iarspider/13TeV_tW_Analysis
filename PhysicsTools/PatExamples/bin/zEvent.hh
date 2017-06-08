@@ -159,6 +159,10 @@ public:
             return -1;
     }
 
+    int get_decay_mode() {
+        return decay_mode;
+    }
+
     zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
                                         reader(BTagEntry::OP_MEDIUM, "central"),
                                         rc("rcdata.2016.v3") {

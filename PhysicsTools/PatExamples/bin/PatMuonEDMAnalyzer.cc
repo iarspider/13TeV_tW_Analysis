@@ -25,8 +25,7 @@ using namespace std;
 typedef std::pair<std::vector<zLepton>::iterator, std::vector<zLepton>::iterator> llPair_t;
 
 
-void MakeBranches(TTree *tree)
-{
+void MakeBranches(TTree *tree) {
     std::vector<TLorentzVector> JetV, LepV;
     std::vector<float> JetCh, LepCh, LepDxy, LepDz, LepEtaSC;
     std::vector<bool> JetB, JetClean, JetSel, JetLoose, LepSel, LepIso, LepTight, LepMuon;
@@ -64,8 +63,7 @@ void MakeBranches(TTree *tree)
     tree->Branch("eventID", evid);
 }
 
-void MakeBDTBranches(TTree *tree)
-{
+void MakeBDTBranches(TTree *tree) {
     Double_t *temp_double = NULL;
     int *temp_int = NULL;
     Float_t *temp_float = NULL;
@@ -103,8 +101,7 @@ void MakeBDTBranches(TTree *tree)
     tree->Branch("channel", temp_int);
 }
 
-int main(int argc, const char *argv[])
-{
+int main(int argc, const char *argv[]) {
     // ----------------------------------------------------------------------
     // First Part:
     //
@@ -136,10 +133,10 @@ int main(int argc, const char *argv[])
 
     //vector<zEvent> events;
 //    double cNetEvWt = 0;
-    Float_t counter[4][8] = {{0, 0, 0, 0, 0, 0, 0, 0},
-                             {0, 0, 0, 0, 0, 0, 0, 0},
-                             {0, 0, 0, 0, 0, 0, 0, 0},
-                             {0, 0, 0, 0, 0, 0, 0, 0}};
+    Float_t counter[4][10] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
     cout << boolalpha;
 #ifdef TW_SYNC
@@ -190,18 +187,16 @@ int main(int argc, const char *argv[])
     TTree *bdt_tree = fs.make<TTree>("BDT", "BDT");
     MakeBDTBranches(bdt_tree);
 
-    vector <zLepton> selectedLeptons;
-    vector <zJet> selectedJets;
-    vector <zJet> selectedBJets;
+    vector<zLepton> selectedLeptons;
+    vector<zJet> selectedJets;
+    vector<zJet> selectedBJets;
 //    vector<llPair_t> llPairs;
 
-    try
-    {
+    try {
 
         TFile *inFile = TFile::Open(infile.c_str());
 
-        if (!inFile)
-        {
+        if (!inFile) {
             cout << "Input Root File not opened for processing " << endl;
             return 1;
         }
@@ -210,20 +205,17 @@ int main(int argc, const char *argv[])
         zEvent *event = new zEvent(rTree, parser.retrieve<string>("epoch"));
         vector<float> puMC, puData;
 
-        if (!event->getIsData())
-        {
+        if (!event->getIsData()) {
             TH1D hPileupMC("h", "h", 750, 0, 75);
 
-            for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
-            {
+            for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++) {
                 event->read_event(rTree, evtID);
                 hPileupMC.Fill(event->getMc_trueNumInteractions());
             }
             TFile puFile("MyDataTruePileupHistogram.root");
             TH1D *hPileupData = (TH1D *) puFile.Get("pileup");
 
-            for (int i = 1; i <= 750; i++)
-            {
+            for (int i = 1; i <= 750; i++) {
                 cout << "MC: " << static_cast<float>(hPileupMC.GetBinContent(i)) << endl;
                 cout << "DT: " << static_cast<float>(hPileupData->GetBinContent(i)) << endl;
                 puMC.push_back(static_cast<float>(hPileupMC.GetBinContent(i)));
@@ -240,8 +232,7 @@ int main(int argc, const char *argv[])
         */
         reweight::LumiReWeighting LumiWeights_(puMC, puData);
 
-        for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++)
-        {
+        for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++) {
             counter[EE][0]++;
             counter[EMu][0]++;
             counter[MuMu][0]++;
@@ -306,8 +297,7 @@ int main(int argc, const char *argv[])
             cout << ", # bjets = " << selectedBJets.size() << endl;
 
 
-            if (!event->isMETok())
-            {
+            if (!event->isMETok()) {
                 event->fill_dump_tree(tW_tree);
                 cout << "- Reject step 0.1" << endl;
                 continue;
@@ -315,8 +305,7 @@ int main(int argc, const char *argv[])
             else
                 event->add_flag("pass_met_filters", true);
 
-            if (selectedLeptons.size() >= 2)
-            {
+            if (selectedLeptons.size() >= 2) {
                 cout << "=== New ll candidate " << evtID << "(" << event->getEvID() << ") ===" << endl;
                 event->add_flag("is_ll", true);
 
@@ -331,8 +320,7 @@ int main(int argc, const char *argv[])
                      << ", "
                      << ll.E() << "), M = " << ll.Mag() << endl;
 
-                if (!leading_l.is_samesign(other_l) && leading_l.Pt() > 25 && ll.Mag() > 20)
-                {
+                if (!leading_l.is_samesign(other_l) && leading_l.Pt() > 25 && ll.Mag() > 20) {
                     cout << "+ Accept step 1" << endl;
                     if (leading_l.is_muon() && other_l.is_muon())
                         event_tag = MuMu;
@@ -342,8 +330,7 @@ int main(int argc, const char *argv[])
                         event_tag = EMu;
                 }
             }
-            else
-            {
+            else {
                 event->add_flag("no_ll", true);
                 event->fill_dump_tree(tW_tree);
                 cout << "- Reject step 1" << endl;
@@ -352,32 +339,28 @@ int main(int argc, const char *argv[])
 
             counter[event_tag][1]++;
 
-            if (event_tag == EE)
-            {
+            if (event_tag == EE) {
                 cout << "Event type: EE" << endl;
 #ifdef SYNC_EX
                 ee_lep_evid << event->getEvID() << endl;
 #endif
                 event->add_flag("EE", true);
             }
-            else if (event_tag == EMu)
-            {
+            else if (event_tag == EMu) {
                 cout << "Event type: EMu" << endl;
 #ifdef SYNC_EX
                 emu_lep_evid << event->getEvID() << endl;
 #endif
                 event->add_flag("EMu", true);
             }
-            else if (event_tag == MuMu)
-            {
+            else if (event_tag == MuMu) {
                 cout << "Event type: MuMu" << endl;
 #ifdef SYNC_EX
                 mumu_lep_evid << event->getEvID() << endl;
 #endif
                 event->add_flag("MuMu", true);
             }
-            else
-            {
+            else {
                 event->add_flag("not_dilepton", true);
                 event->fill_dump_tree(tW_tree);
                 continue;
@@ -390,14 +373,12 @@ int main(int argc, const char *argv[])
             else
                 massFlag = false;
 
-            if (massFlag)
-            {
+            if (massFlag) {
                 cout << "- Reject step 2" << endl;
                 event->fill_dump_tree(tW_tree);
                 continue;
             }
-            else
-            {
+            else {
                 event->add_flag("pass_dilepton_mass", true);
                 cout << "+ Accept step 2" << endl;
             }
@@ -407,10 +388,8 @@ int main(int argc, const char *argv[])
 
             cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
                  << event->getMET().Pt() << endl;
-            if (event_tag != EMu)
-            {
-                if (event->getMET().Pt() <= 40)
-                {
+            if (event_tag != EMu) {
+                if (event->getMET().Pt() <= 40) {
                     event->fill_dump_tree(tW_tree);
                     cout << "- Reject step 3" << endl;
                     continue;
@@ -421,8 +400,7 @@ int main(int argc, const char *argv[])
 
             counter[event_tag][3]++;
 
-            if (!event->isTrgOk(event_tag))
-            {
+            if (!event->isTrgOk(event_tag)) {
                 cout << "- Reject step 4.trigger" << endl;
                 event->fill_dump_tree(tW_tree);
                 continue;
@@ -431,16 +409,25 @@ int main(int argc, const char *argv[])
             cout << "+ Accept step 4.trigger" << endl;
             counter[event_tag][4] += event->get_mc_w();
 
-            if (selectedJets.size() == 0)
-            {
-                counter[event_tag][5]++;
+            if (selectedJets.size() == 0) {
+                counter[event_tag][5] += event->get_mc_w();
                 event->fill_BDT_tree(bdt_tree);
+                if (event->get_decay_mode() == DECAY_LJ) {
+                    counter[event_tag][8] += event->get_mc_w();
+                }
             }
 
-            if ((selectedJets.size() == 1) && (selectedBJets.size() == 0))
-            {
-                counter[event_tag][6]++;
+            if ((selectedJets.size() == 1) && (selectedBJets.size() == 0)) {
+                counter[event_tag][6] += event->get_mc_w();
                 event->fill_BDT_tree(bdt_tree);
+                if (event->get_decay_mode() == DECAY_LJ) {
+                    counter[event_tag][9] += event->get_mc_w();
+                }
+
+            }
+
+            if (event->get_decay_mode() == DECAY_LJ) {
+                counter[event_tag][7] += event->get_mc_w();
             }
 
 /*
@@ -504,8 +491,7 @@ int main(int argc, const char *argv[])
             event->fill_dump_tree(tW_tree);
         }
     }
-    catch (exception &e)
-    {
+    catch (exception &e) {
         cout << "error:" << e.what() << endl;
         cout << "File Name:" << fname << " is not valid!" << endl << endl << endl;
     }
@@ -523,30 +509,30 @@ int main(int argc, const char *argv[])
     emu_jet2_evid.close();
     mumu_jet2_evid.close();
 #endif
-    for (int i = 0; i < 4; i++)
-    {
-        if (i == 2)
-            continue;
+//    for (int i = 0; i < 4; i++)
+//    {
+//        if (i == 2)
+//            continue;
 
-        cout << "=== ";
-        switch (i)
-        {
-            case EE:
-                cout << "EE";
-                break;
-            case EMu:
-                cout << "EMu";
-                break;
-            case MuMu:
-                cout << "MuMu";
-                break;
-            default:
-                cout << "None";
-        }
-        cout << " channel ===" << endl;
-        for (int j = 0; j < 7; j++)
-            cout << "Step " << j << " events " << counter[i][j] << endl;
-    }
+    int i = EMu;
+    cout << "=== ";
+//    switch (i) {
+//        case EE:
+//            cout << "EE";
+//            break;
+//        case EMu:
+            cout << "EMu";
+//            break;
+//        case MuMu:
+//            cout << "MuMu";
+//            break;
+//        default:
+//            cout << "None";
+//    }
+    cout << " channel ===" << endl;
+    for (int j = 0; j < 10; j++)
+        cout << "Counter " << j << " value " << counter[i][j] << endl;
+//    }
 
     return 0;
 }
