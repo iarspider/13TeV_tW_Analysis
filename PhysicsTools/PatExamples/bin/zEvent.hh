@@ -49,8 +49,7 @@ struct zVertex
     float z, dof, RHO;
 };
 */
-Double_t HTsum(vector<TLorentzVector *> v)
-{
+Double_t HTsum(vector<TLorentzVector *> v) {
     Double_t result = 0;
 
     for (auto it = v.begin(); it != v.end(); it++)
@@ -59,8 +58,7 @@ Double_t HTsum(vector<TLorentzVector *> v)
     return result;
 }
 
-Double_t PTsum(vector<TLorentzVector *> v)
-{
+Double_t PTsum(vector<TLorentzVector *> v) {
     TLorentzVector result;
 
     for (auto it = v.begin(); it != v.end(); it++)
@@ -69,13 +67,11 @@ Double_t PTsum(vector<TLorentzVector *> v)
     return result.Pt();
 }
 
-Double_t Et(TLorentzVector v)
-{
+Double_t Et(TLorentzVector v) {
     return sqrt(v.Mag2() + pow(v.Pt(), 2));
 }
 
-class zEvent
-{
+class zEvent {
 private:
     vector<zLepton> leptons;
     vector<zJet> jets;
@@ -92,33 +88,27 @@ private:
     double lumiWeight;
 
 public:
-    ULong64_t getEvID() const
-    {
+    ULong64_t getEvID() const {
         return ev_event;
     }
 
-    bool getIsData() const
-    {
+    bool getIsData() const {
         return is_data;
     }
 
-    const vector<zHLT> &getTriggers() const
-    {
+    const vector<zHLT> &getTriggers() const {
         return triggers;
     }
 
-    const TLorentzVector &getMET() const
-    {
+    const TLorentzVector &getMET() const {
         return MET;
     }
 
-    bool isMETok() const
-    {
+    bool isMETok() const {
         return isMETok_;
     }
 
-    bool isTrgOk(const int type) const
-    {
+    bool isTrgOk(const int type) const {
         return isTrgOk_[type];
     }
 
@@ -127,23 +117,19 @@ public:
         return puNtrueInteractons;
     }*/
 
-    const vector<zLepton> &getLeptons() const
-    {
+    const vector<zLepton> &getLeptons() const {
         return leptons;
     }
 
-    const vector<zJet> &getJets() const
-    {
+    const vector<zJet> &getJets() const {
         return jets;
     }
 
-    void setLumiWeight(double w)
-    {
+    void setLumiWeight(double w) {
         lumiWeight = w;
     }
 
-    Float_t get_mc_w()
-    {
+    Float_t get_mc_w() {
         return mc_w_sign;
     }
 
@@ -151,8 +137,7 @@ private:
     vector<zFlag> event_flags;
 
 public:
-    void add_flag(zFlag flag)
-    {
+    void add_flag(zFlag flag) {
         auto it = std::find_if(event_flags.begin(), event_flags.end(),
                                [flag](zFlag item) { return flag.first == item.first; });
         if (it != event_flags.end())
@@ -161,13 +146,11 @@ public:
         event_flags.push_back(flag);
     }
 
-    void add_flag(string name, bool value)
-    {
+    void add_flag(string name, bool value) {
         add_flag(make_pair(name, value));
     }
 
-    int get_flag(string flag_name)
-    {
+    int get_flag(string flag_name) {
         auto it = std::find_if(event_flags.begin(), event_flags.end(),
                                [flag_name](zFlag item) { return flag_name == item.first; });
         if (it != event_flags.end())
@@ -178,8 +161,7 @@ public:
 
     zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
                                         reader(BTagEntry::OP_MEDIUM, "central"),
-                                        rc("rcdata.2016.v3")
-    {
+                                        rc("rcdata.2016.v3") {
         reader.load(calib,                // calibration instance
                     BTagEntry::FLAV_B,    // btag flavour
                     "mujets");               // measurement type
@@ -189,8 +171,7 @@ public:
         MuIsoFile = new TFile *[2];
         MuIsoHist = new TH2F *[2];
 
-        if (epoch == "MC")
-        {
+        if (epoch == "MC") {
             is_data = false;
             MuIdFile[0] = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
             MuIdHist[0] = (TH2F *) ((TDirectoryFile *) MuIdFile[0]->Get(
@@ -208,14 +189,16 @@ public:
                     "abseta_pt_ratio");
             EmIdFile = new TFile("egammaEffi.txt_EGM2D.root");
             EmIdHist = (TH2F *) EmIdFile->Get("EGamma_SF2D");
+            TriggerSFFile = new TFile("TriggerSF_emu2016_pt.root");
+            TriggerSFHist = (TH2D *) TriggerSFFile->Get("lepton_pt_2D_sf");
         }
-        else
-        {
+        else {
             is_data = true;
 //            data_epoch = epoch;
             MuIdHist = NULL;
             MuIsoHist = NULL;
             EmIdHist = NULL;
+            TriggerSFHist = NULL;
         }
         tree->SetBranchStatus("*", 0);
 //        this->pt_cut_ = 20;
@@ -305,20 +288,16 @@ public:
         LOAD_BRANCH(tree, mu_numberOfMatchedStations)
         LOAD_BRANCH(tree, mu_numberOfValidPixelHits)
         LOAD_BRANCH(tree, mu_trackerLayersWithMeasurement)
-        LOAD_BRANCH(tree, mc_index)
-        LOAD_BRANCH(tree, mc_pdgId)
-        LOAD_BRANCH(tree, mc_mother_index)
-        LOAD_BRANCH(tree, mc_mother_pdgId)
+        LOAD_BRANCH(tree, LHE_status)
+        LOAD_BRANCH(tree, LHE_pdgid)
     }
 
-    Int_t getMc_trueNumInteractions() const
-    {
+    Int_t getMc_trueNumInteractions() const {
         return mc_trueNumInteractions;
     }
 
 private:
-    void reset()
-    {
+    void reset() {
         leptons.clear();
         jets.clear();
         triggers.clear();
@@ -329,10 +308,8 @@ private:
         decay_mode = -1;
     }
 
-    void read_electrons()
-    {
-        for (UInt_t i = 0; i < gsf_eta->size(); i++)
-        {
+    void read_electrons() {
+        for (UInt_t i = 0; i < gsf_eta->size(); i++) {
             auto j = static_cast<vector<zLepton>::size_type>(i);
 #ifdef SYNC_EX
             if (gsf_pt->at(j) < 20.)
@@ -355,21 +332,17 @@ private:
         }
     }
 
-    void read_muons()
-    {
-        for (UInt_t i = 0; i < mu_gt_pt->size(); i++)
-        {
+    void read_muons() {
+        for (UInt_t i = 0; i < mu_gt_pt->size(); i++) {
             auto j = static_cast<vector<zLepton>::size_type>(i);
             if (mu_gt_pt->at(j) < 20.)
                 continue;
             TLorentzVector v;
             double pt = mu_gt_pt->at(j);
-            if (is_data)
-            {
+            if (is_data) {
                 pt *= rc.kScaleDT(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0, 0);
             }
-            else
-            {
+            else {
                 pt *= rc.kScaleAndSmearMC(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j),
                                           mu_trackerLayersWithMeasurement->at(j), gRandom->Rndm(), gRandom->Rndm(),
                                           0, 0);
@@ -382,10 +355,8 @@ private:
         }
     }
 
-    void read_jets()
-    {
-        for (UInt_t i = 0; i < jet_pt->size(); i++)
-        {
+    void read_jets() {
+        for (UInt_t i = 0; i < jet_pt->size(); i++) {
             auto j = static_cast<vector<zJet>::size_type>(i);
             TLorentzVector v;
             v.SetPtEtaPhiE(jet_pt->at(j), jet_eta->at(j), jet_phi->at(j), jet_energy->at(j));
@@ -396,8 +367,7 @@ private:
     }
 
 
-    void read_MET()
-    {
+    void read_MET() {
 #ifdef SYNC_EX
         MET = TLorentzVector(MET_nominal_Px, MET_nominal_Py, 0, 0);
 #else
@@ -411,8 +381,7 @@ private:
             isMETok_ = isMETok_ && trig_Flag_eeBadScFilter_accept;
     }
 
-    void read_check_trigger()
-    {
+    void read_trigger() {
         // EE
         isTrgOk_[EE] = (trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept + trig_HLT_Ele27_WPTight_Gsf_accept != 0);
 
@@ -433,40 +402,36 @@ private:
         isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
     }
 
-    void get_decay_mode()
-    {
-        //TODO: Get decay mode (1: fully leptonic, 2: fully hadronic, 3: semileptonic)
-        /*
-        int nt = -1;
-        int nW = -1;
-        int nWt = -1;
-        for (UInt_t i = 0; i < mc_pdgId->size(); i++)
-            if (abs(mc_pdgId->at(i)) == 6)
-                nt = static_cast<int>(i);
+    void read_decay_mode() {
+        int nlep = 0;
+        for (UInt_t i = 0; i < LHE_pdgid->size(); i++) {
+            if (LHE_status->at(i) != 1)
+                continue;
 
-        if (nt == -1)
-            return;
+            if ((abs(LHE_pdgid->at(i)) == 11) || (abs(LHE_pdgid->at(i)) == 13) || (abs(LHE_pdgid->at(i)) == 15))
+                nlep++;
+        }
 
-        */
-
+        if (nlep == 0)
+            decay_mode = DECAY_JJ;
+        if (nlep == 1)
+            decay_mode = DECAY_LJ;
+        if (nlep == 2)
+            decay_mode = DECAY_LL;
     }
 
-    void update_mc_w()
-    {
+    void update_mc_w() {
         // Apply SFs to MC
         double jet_scalefactor = 1.0;
-        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++)
-        {
+        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++) {
             jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
                                                        static_cast<float>(it->Pt()));
         }
 
         mc_w_sign *= jet_scalefactor;
 
-        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++)
-        {
-            if (it->is_muon())
-            {
+        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++) {
+            if (it->is_muon()) {
                 double mu_id_sf[2] = {MuIdHist[0]->GetBinContent(MuIdHist[0]->FindBin(abs(it->Eta()), it->Pt())),
                                       MuIdHist[1]->GetBinContent(MuIdHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
                 double mu_iso_sf[2] = {MuIsoHist[0]->GetBinContent(MuIsoHist[0]->FindBin(abs(it->Eta()), it->Pt())),
@@ -477,19 +442,22 @@ private:
                 mc_w_sign *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
                 mc_w_sign *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
             }
-            else
-            {
+            else {
                 double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
                 mc_w_sign *= em_id_sf;
             }
         }
 
         mc_w_sign *= lumiWeight;
+
+        int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
+        int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
+        Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
+        mc_w_sign *= trigWeight;
     }
 
 public:
-    bool read_event(TTree *tree, Long64_t id)
-    {
+    bool read_event(TTree *tree, Long64_t id) {
         reset();
         tree->GetEntry(id);
 
@@ -502,7 +470,7 @@ public:
         read_jets();
         clean_jets();
         read_MET();
-        read_check_trigger();
+        read_trigger();
 
         copy_if(getLeptons().begin(), getLeptons().end(), back_inserter(selectedLeptons),
                 [](const zLepton &part) { return part.is_selected(); });
@@ -513,9 +481,8 @@ public:
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
 
-        if (!this->is_data)
-        {
-            get_decay_mode();
+        if (!this->is_data) {
+            read_decay_mode();
             update_mc_w();
         }
 
@@ -628,10 +595,8 @@ private:
     BTagCalibrationReader reader;
 
     // mc information
-    vector<int> *mc_index;
-    vector<int> *mc_pdgId;
-    vector<vector<int> > *mc_mother_index;
-    vector<vector<int> > *mc_mother_pdgId;
+    vector<int> *LHE_status;
+    vector<int> *LHE_pdgid;
 
     TFile **MuIdFile;
     TH2F **MuIdHist;
@@ -642,6 +607,9 @@ private:
     TFile *EmIdFile;
     TH2F *EmIdHist;
 
+    TFile *TriggerSFFile;
+    TH2D *TriggerSFHist;
+
     RoccoR rc;
 
     int decay_mode;
@@ -649,10 +617,8 @@ private:
     vector<zLepton> selectedLeptons;
     vector<zJet> selectedJets, selectedBJets;
 public:
-    void clean_jets()
-    {
-        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
-        {
+    void clean_jets() {
+        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++) {
             bool jet_flag = std::all_of(leptons.begin(), leptons.end(),
                                         [thisJet](const zLepton &thisLepton) {
                                             return !(thisLepton.is_selected() && thisJet->deltaR(thisLepton) <= 0.4);
@@ -662,8 +628,7 @@ public:
         }
     }
 
-    void fill_dump_tree(TTree *tree)
-    {
+    void fill_dump_tree(TTree *tree) {
 #ifdef SYNC_EX
         std::vector<TLorentzVector> *JetV, *LepV;
         std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC, *LepIsoVal;
@@ -757,8 +722,7 @@ public:
 #endif
     }
 
-    void fill_BDT_tree(TTree *tree)
-    {
+    void fill_BDT_tree(TTree *tree) {
         TLorentzVector lep1(selectedLeptons.at(0));
         TLorentzVector lep2(selectedLeptons.at(1));
         TLorentzVector bjet1(0, 0, 0, 0);
@@ -881,8 +845,7 @@ public:
         if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag &f) { return f.first == "EE"; }) !=
             event_flags.end())
             chan = EE;
-        else
-        {
+        else {
             if (std::find_if(event_flags.begin(), event_flags.end(), [](zFlag &f) { return f.first == "EMu"; }) !=
                 event_flags.end())
                 chan = EMu;
@@ -895,6 +858,7 @@ public:
 
         tree->Fill();
     }
+
 };
 
 #endif //INC_13TEV_TW_ANALYSIS_ZEVENT_HH
