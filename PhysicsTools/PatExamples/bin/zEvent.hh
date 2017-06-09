@@ -454,10 +454,14 @@ private:
 
         mc_w_sign *= lumiWeight;
 
-        int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
-        int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
-        Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
-        mc_w_sign *= trigWeight;
+        if (selectedLeptons.size() > 1) {
+            int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
+            int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
+            Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
+            mc_w_sign *= trigWeight;
+        }
+
+
     }
 
 public:
