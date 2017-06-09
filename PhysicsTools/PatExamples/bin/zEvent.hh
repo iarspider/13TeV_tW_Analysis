@@ -422,6 +422,8 @@ private:
             decay_mode = DECAY_LJ;
         if (nlep == 2)
             decay_mode = DECAY_LL;
+        if (nlep > 2)
+            decay_mode = -1;
     }
 
     void update_mc_w() {
