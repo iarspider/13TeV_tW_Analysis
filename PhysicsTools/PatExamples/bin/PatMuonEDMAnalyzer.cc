@@ -192,7 +192,7 @@ int main(int argc, const char *argv[]) {
     vector<zJet> selectedBJets;
 //    vector<llPair_t> llPairs;
 
-    try {
+//    try {
 
         TFile *inFile = TFile::Open(infile.c_str());
 
@@ -490,11 +490,11 @@ int main(int argc, const char *argv[]) {
 */
             event->fill_dump_tree(tW_tree);
         }
-    }
-    catch (exception &e) {
-        cout << "error:" << e.what() << endl;
-        cout << "File Name:" << fname << " is not valid!" << endl << endl << endl;
-    }
+//    }
+//    catch (exception &e) {
+//        cout << "error:" << e.what() << endl;
+//        cout << "File Name:" << fname << " is not valid!" << endl << endl << endl;
+//    }
 
 #ifdef SYNC_EX
     ee_lep_evid.close();
