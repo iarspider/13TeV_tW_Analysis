@@ -204,7 +204,7 @@ int main(int argc, const char *argv[]) {
     TTree *rTree = (TTree *) inFile->Get("IIHEAnalysis");
     zEvent *event = new zEvent(rTree, parser.retrieve<string>("epoch"));
     vector<float> puMC, puData;
-
+/*
     if (!event->getIsData()) {
         TH1D hPileupMC("h", "h", 750, 0, 75);
 
@@ -223,14 +223,16 @@ int main(int argc, const char *argv[]) {
         }
 
     }
-    /*
+    / *
     else
     {
         puMC.push_back(0);
         puData.push_back(0);
     }
     */
-    reweight::LumiReWeighting LumiWeights_(puMC, puData);
+    // reweight::LumiReWeighting LumiWeights_(puMC, puData);
+    reweight::LumiReWeighting LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
+                                           "h", "pileup");
 
     for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++) {
         counter[EE][0]++;

@@ -8,7 +8,7 @@
 #include <TH1D.h>
 
 int main(int, char **) {
-    TFile f("MyMCTruePileupHistogram", "RECREATE");
+    TFile f("MyMCTruePileupHistogram.root", "RECREATE");
     f.cd();
     TChain ch("IIHEAnalysis");
     TFileCollection fc("dum", "", "xrd.list");
