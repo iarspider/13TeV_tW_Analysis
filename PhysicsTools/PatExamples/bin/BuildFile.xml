@@ -15,6 +15,7 @@
 <environment>
   <library name="roccor" file="RoccoR.cc"></library>
   <bin   file="PatMuonEDMAnalyzer.cc"><lib name="roccor"/></bin>
+  <bin   file="LumiProfiler.cc"></bin>
 <!--  <bin   file="PatMuonFWLiteAnalyzer.cc"></bin>
   <bin   file="PatBasicFWLiteAnalyzer.cc"></bin>
   <bin   file="PatBasicFWLiteJetAnalyzer.cc"></bin>
