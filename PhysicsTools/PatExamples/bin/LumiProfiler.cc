@@ -12,7 +12,7 @@ int main(int, char **) {
     f.cd();
     TChain ch("IIHEAnalysis");
     TFileCollection fc("dum", "", "xrd.list");
-    ch.AddFileInfoList(fc.GetList());
+    ch.AddFileInfoList(static_cast<TCollection*>(fc.GetList()));
     Int_t mc_trueNumInteractions;
     ch.SetBranchStatus("*", 0);
     ch.SetBranchStatus("mc_trueNumInteractions", 1);
