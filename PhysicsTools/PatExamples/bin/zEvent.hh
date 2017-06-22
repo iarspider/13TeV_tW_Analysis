@@ -168,9 +168,9 @@ public:
 
     zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
                                         reader(BTagEntry::OP_MEDIUM, "central"),
-                                        rc("rcdata.2016.v3"),
                                         LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
-                                           "h", "pileup") {
+                                                     "h", "pileup"),
+                                        rc("rcdata.2016.v3") {
         reader.load(calib,                // calibration instance
                     BTagEntry::FLAV_B,    // btag flavour
                     "mujets");               // measurement type
@@ -441,7 +441,7 @@ private:
 
         cout << "Start reweighting: weight = " << mc_w_sign << endl;
         mc_w_sign *= jet_scalefactor;
-        cout << "After applying b-tag SF: weight = "<< mc_w_sign << endl;
+        cout << "After applying b-tag SF: weight = " << mc_w_sign << endl;
 
         for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++) {
             if (it->is_muon()) {
@@ -456,24 +456,24 @@ private:
                 mu_sf *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
                 mu_sf *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
                 mc_w_sign *= mu_sf;
-                cout << "After applying muon id/iso SF: weight = "<< mc_w_sign << endl;
+                cout << "After applying muon id/iso SF: weight = " << mc_w_sign << endl;
             }
             else {
                 double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
                 mc_w_sign *= em_id_sf;
-                cout << "After applying electron id SF: weight = "<< mc_w_sign << endl;
+                cout << "After applying electron id SF: weight = " << mc_w_sign << endl;
             }
         }
 
         mc_w_sign *= lumiWeight;
-        cout << "After applying pileup SF: weight = "<< mc_w_sign << endl;
+        cout << "After applying pileup SF: weight = " << mc_w_sign << endl;
 
         if (selectedLeptons.size() > 1) {
             int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
             int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
             Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
             mc_w_sign *= trigWeight;
-            cout << "After applying trigger SF: weight = "<< mc_w_sign << endl;
+            cout << "After applying trigger SF: weight = " << mc_w_sign << endl;
         }
     }
 
