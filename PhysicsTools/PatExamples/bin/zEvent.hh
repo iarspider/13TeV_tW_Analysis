@@ -434,7 +434,9 @@ private:
                                                        static_cast<float>(it->Pt()));
         }
 
+        cout << "Start reweighting: weight = " << mc_w_sign << endl;
         mc_w_sign *= jet_scalefactor;
+        cout << "After applying b-tag SF: weight = "<< mc_w_sign << endl;
 
         for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++) {
             if (it->is_muon()) {
@@ -445,25 +447,29 @@ private:
                                                MuIsoHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
 
 
-                mc_w_sign *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
-                mc_w_sign *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
+                double mu_sf = 1.;
+                mu_sf *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
+                mu_sf *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
+                mc_w_sign *= mu_sf;
+                cout << "After applying muon id/iso SF: weight = "<< mc_w_sign << endl;
             }
             else {
                 double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
                 mc_w_sign *= em_id_sf;
+                cout << "After applying electron id SF: weight = "<< mc_w_sign << endl;
             }
         }
 
         mc_w_sign *= lumiWeight;
+        cout << "After applying pileup SF: weight = "<< mc_w_sign << endl;
 
         if (selectedLeptons.size() > 1) {
             int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
             int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
             Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
             mc_w_sign *= trigWeight;
+            cout << "After applying trigger SF: weight = "<< mc_w_sign << endl;
         }
-
-
     }
 
 public:
