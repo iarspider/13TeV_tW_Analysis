@@ -43,6 +43,7 @@ using namespace std;
 
 typedef std::pair<std::string, bool> zFlag;
 
+
 /*
 struct zVertex
 {
@@ -86,6 +87,8 @@ private:
 
     //int puNtrueInteractons;
     double lumiWeight;
+
+    reweight::LumiReWeighting LumiWeights_;
 
 public:
     ULong64_t getEvID() const {
@@ -165,7 +168,9 @@ public:
 
     zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
                                         reader(BTagEntry::OP_MEDIUM, "central"),
-                                        rc("rcdata.2016.v3") {
+                                        rc("rcdata.2016.v3"),
+                                        LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
+                                           "h", "pileup") {
         reader.load(calib,                // calibration instance
                     BTagEntry::FLAV_B,    // btag flavour
                     "mujets");               // measurement type
@@ -498,6 +503,8 @@ public:
                 [](const zJet &jet) { return jet.is_bjet(); });
 
         if (!this->is_data) {
+//            setLumiWeight(LumiWeights_.weight(getMc_trueNumInteractions()));
+            lumiWeight = LumiWeights_.weight(mc_trueNumInteractions);
             read_decay_mode();
             update_mc_w();
         }

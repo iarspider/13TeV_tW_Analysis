@@ -231,8 +231,8 @@ int main(int argc, const char *argv[]) {
     }
     */
     // reweight::LumiReWeighting LumiWeights_(puMC, puData);
-    reweight::LumiReWeighting LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
-                                           "h", "pileup");
+//    reweight::LumiReWeighting LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
+//                                           "h", "pileup");
 
     for (Long64_t evtID = 0; evtID < rTree->GetEntriesFast(); evtID++) {
         counter[EE][0]++;
@@ -241,8 +241,8 @@ int main(int argc, const char *argv[]) {
 
 //            cout << "evtID=" << evtID<< endl;
         event->read_event(rTree, evtID);
-        if (!event->getIsData())
-            event->setLumiWeight(LumiWeights_.weight(event->getMc_trueNumInteractions()));
+//        if (!event->getIsData())
+//            event->setLumiWeight(LumiWeights_.weight(event->getMc_trueNumInteractions()));
 
         if (!event->getIsData() && (event->get_decay_mode() == -1)) {
             cout << "WARN: Too many leptons in LHE data!" << endl;
