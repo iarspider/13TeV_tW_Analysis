@@ -89,87 +89,140 @@ private:
     double lumiWeight;
 
     reweight::LumiReWeighting LumiWeights_;
-
-public:
-    ULong64_t getEvID() const {
-        return ev_event;
-    }
-
-    bool getIsData() const {
-        return is_data;
-    }
-
-    const vector<zHLT> &getTriggers() const {
-        return triggers;
-    }
-
-    const TLorentzVector &getMET() const {
-        return MET;
-    }
-
-    bool isMETok() const {
-        return isMETok_;
-    }
-
-    bool isTrgOk(const int type) const {
-        return isTrgOk_[type];
-    }
-
-    /*int getPuNtrueInteractons() const
-    {
-        return puNtrueInteractons;
-    }*/
-
-    const vector<zLepton> &getLeptons() const {
-        return leptons;
-    }
-
-    const vector<zJet> &getJets() const {
-        return jets;
-    }
-
-    void setLumiWeight(double w) {
-        lumiWeight = w;
-    }
-
-    Float_t get_mc_w() {
-        return mc_w_sign;
-    }
-
-private:
     vector<zFlag> event_flags;
 
+    Bool_t trig_Flag_BadPFMuonFilter_accept;
+    Bool_t trig_Flag_BadChargedCandidateFilter_accept;
+    ULong64_t ev_event;
+    Int_t mc_trueNumInteractions;
+    //Int_t mc_PU_NumInteractions;
+    bool is_data;
+    Float_t mc_w_sign;
+    string data_epoch;
+
+    // Primary vertex
+    UInt_t pv_n;
+    vector<float> *pv_z;
+    vector<float> *pv_ndof;
+    vector<float> *pv_normalizedChi2;
+    vector<bool> *pv_isValid;
+    vector<bool> *pv_isFake;
+
+    // Electron?
+    UInt_t gsf_n;
+    // vector<float> *gsf_energy;
+    // vector<float> *gsf80_energy;
+    vector<float> *gsf_pt;
+    vector<float> *gsf80_pt;
+    vector<float> *gsf_eta;
+    vector<float> *gsf_phi;
+    vector<int> *gsf_charge;
+    vector<bool> *gsf_VIDTight;
+    vector<float> *gsf_dxy_firstPVtx;
+    vector<float> *gsf_dz_firstPVtx;
+    vector<float> *gsf_relIso;
+    vector<float> *gsf_sc_eta;
+
+    // Muon
+    UInt_t mu_n;
+    vector<int> *mu_gt_charge;
+    vector<float> *mu_gt_pt;
+    vector<float> *mu_gt_eta;
+    vector<float> *mu_gt_phi;
+    vector<float> *mu_gt_d0;
+    vector<float> *mu_gt_dz;
+    vector<float> *mu_gt_dz_beamspot;
+    vector<float> *mu_gt_dz_firstPVtx;
+    vector<float> *mu_gt_dxy;
+    vector<float> *mu_gt_dxy_beamspot;
+    vector<float> *mu_gt_dxy_firstPVtx;
+    vector<bool> *mu_isTightMuon;
+    vector<float> *mu_isoTrackerBased03;
+    vector<float> *mu_pfIsoDbCorrected04;
+    vector<float> *mu_dB;
+    vector<bool> *mu_isGlobalMuon;
+    vector<bool> *mu_isPFMuon;
+    vector<float> *mu_gt_normalizedChi2;
+    vector<int> *mu_numberOfValidMuonHits;
+    vector<int> *mu_numberOfMatchedStations;
+    vector<int> *mu_numberOfValidPixelHits;
+    vector<int> *mu_trackerLayersWithMeasurement;
+
+    // Jet
+    UInt_t jet_n;
+    vector<float> *jet_pt;
+    vector<float> *jet_eta;
+    vector<float> *jet_phi;
+    vector<float> *jet_energy;
+    vector<float> *jet_CSVv2;
+    vector<bool> *jet_isJetIDLoose;
+    vector<float> *jet_Smeared_pt;
+    vector<float> *jet_Smeared_energy;
+
+    // MET
+    Float_t MET_nominal_Px;
+    Float_t MET_nominal_Py;
+    Float_t MET_T1Txy_Px;
+    Float_t MET_T1Txy_Py;
+
+    // Trigger
+    Int_t trig_Flag_HBHENoiseFilter_accept;
+    Int_t trig_Flag_HBHENoiseIsoFilter_accept;
+    Int_t trig_Flag_globalTightHalo2016Filter_accept;
+    Int_t trig_Flag_goodVertices_accept;
+    Int_t trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept;
+    Int_t trig_Flag_eeBadScFilter_accept;
+
+    //ee triggers
+    Int_t trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept;
+    Int_t trig_HLT_Ele27_WPTight_Gsf_accept;
+
+    //mumu triggers
+    Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept;
+    Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept;
+    Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
+    Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
+    Int_t trig_HLT_IsoMu24_accept;
+    Int_t trig_HLT_IsoTkMu24_accept;
+
+    //emu
+    Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept;
+    Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept;
+    Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
+    Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
+
+    // calibration
+    BTagCalibration calib;
+    BTagCalibrationReader reader;
+
+    // mc information
+    vector<int> *LHE_status;
+    vector<int> *LHE_pdgid;
+
+    TFile **MuIdFile;
+    TH2F **MuIdHist;
+
+    TFile **MuIsoFile;
+    TH2F **MuIsoHist;
+
+    TFile *EmIdFile;
+    TH2F *EmIdHist;
+
+    TFile *TriggerSFFile;
+    TH2D *TriggerSFHist;
+
+    RoccoR rc;
+
+    int decay_mode;
+
+    vector<zLepton> selectedLeptons;
+    vector<zJet> selectedJets, selectedBJets;
+
 public:
-    void add_flag(zFlag flag) {
-        auto it = std::find_if(event_flags.begin(), event_flags.end(),
-                               [flag](zFlag item) { return flag.first == item.first; });
-        if (it != event_flags.end())
-            event_flags.erase(it);
-
-        event_flags.push_back(flag);
-    }
-
-    void add_flag(string name, bool value) {
-        add_flag(make_pair(name, value));
-    }
-
-    int get_flag(string flag_name) {
-        auto it = std::find_if(event_flags.begin(), event_flags.end(),
-                               [flag_name](zFlag item) { return flag_name == item.first; });
-        if (it != event_flags.end())
-            return it->second ? 0 : 1;
-        else
-            return -1;
-    }
-
-    int get_decay_mode() {
-        return decay_mode;
-    }
-
-    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
-                                        reader(BTagEntry::OP_MEDIUM, "central"),
-                                        LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
+    zEvent(TTree *tree, string epoch) : LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
                                                      "h", "pileup"),
+                                        calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
+                                        reader(BTagEntry::OP_MEDIUM, "central"),
                                         rc("rcdata.2016.v3") {
         reader.load(calib,                // calibration instance
                     BTagEntry::FLAV_B,    // btag flavour
@@ -301,183 +354,6 @@ public:
         LOAD_BRANCH(tree, LHE_pdgid)
     }
 
-    Int_t getMc_trueNumInteractions() const {
-        return mc_trueNumInteractions;
-    }
-
-private:
-    void reset() {
-        leptons.clear();
-        jets.clear();
-        triggers.clear();
-        event_flags.clear();
-        selectedLeptons.clear();
-        selectedJets.clear();
-        selectedBJets.clear();
-        decay_mode = -1;
-    }
-
-    void read_electrons() {
-        for (UInt_t i = 0; i < gsf_eta->size(); i++) {
-            auto j = static_cast<vector<zLepton>::size_type>(i);
-#ifdef SYNC_EX
-            if (gsf_pt->at(j) < 20.)
-                continue;
-#else
-            if (gsf80_pt->at(j) < 20.)
-                continue;
-#endif
-
-            TLorentzVector v;
-#ifdef SYNC_EX
-            v.SetPtEtaPhiM(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
-#else
-            v.SetPtEtaPhiM(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
-#endif
-            zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
-                                           gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
-                                           gsf_dz_firstPVtx->at(j));
-            leptons.push_back(thisElectron);
-        }
-    }
-
-    void read_muons() {
-        for (UInt_t i = 0; i < mu_gt_pt->size(); i++) {
-            auto j = static_cast<vector<zLepton>::size_type>(i);
-            if (mu_gt_pt->at(j) < 20.)
-                continue;
-            TLorentzVector v;
-            double pt = mu_gt_pt->at(j);
-            if (is_data) {
-                pt *= rc.kScaleDT(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0, 0);
-            }
-            else {
-                pt *= rc.kScaleAndSmearMC(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j),
-                                          mu_trackerLayersWithMeasurement->at(j), gRandom->Rndm(), gRandom->Rndm(),
-                                          0, 0);
-            }
-            v.SetPtEtaPhiM(pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
-            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0,
-                                       mu_pfIsoDbCorrected04->at(j),
-                                       mu_isTightMuon->at(j), true, 0, 0);
-            leptons.push_back(thisMuon);
-        }
-    }
-
-    void read_jets() {
-        for (UInt_t i = 0; i < jet_pt->size(); i++) {
-            auto j = static_cast<vector<zJet>::size_type>(i);
-            TLorentzVector v;
-            v.SetPtEtaPhiE(jet_pt->at(j), jet_eta->at(j), jet_phi->at(j), jet_energy->at(j));
-            zJet thisJet = zJet(v, 0, jet_CSVv2->at(j), jet_isJetIDLoose->at(j));
-            jets.push_back(thisJet);
-        }
-        jets.shrink_to_fit();
-    }
-
-
-    void read_MET() {
-#ifdef SYNC_EX
-        MET = TLorentzVector(MET_nominal_Px, MET_nominal_Py, 0, 0);
-#else
-        MET = TLorentzVector(MET_T1Txy_Px, MET_T1Txy_Py, 0, 0);
-#endif
-        isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
-                   trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
-                   trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
-                   trig_Flag_HBHENoiseFilter_accept && trig_Flag_HBHENoiseIsoFilter_accept;
-        if (is_data)
-            isMETok_ = isMETok_ && trig_Flag_eeBadScFilter_accept;
-    }
-
-    void read_trigger() {
-        // EE
-        isTrgOk_[EE] = (trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept + trig_HLT_Ele27_WPTight_Gsf_accept != 0);
-
-        // EMu
-        Int_t isTrgOk_EMu = trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept * (is_data ? 1 : 0);
-        isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept * (is_data ? 1 : 0);
-        isTrgOk_EMu += trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
-        isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
-        isTrgOk_EMu += trig_HLT_Ele27_WPTight_Gsf_accept;
-        isTrgOk_EMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
-        isTrgOk_[EMu] = (isTrgOk_EMu != 0);
-
-        Int_t isTrgOk_MuMu = trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
-        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
-        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
-        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
-        isTrgOk_MuMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
-        isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
-    }
-
-    void read_decay_mode() {
-        int nlep = 0;
-        for (UInt_t i = 0; i < LHE_pdgid->size(); i++) {
-            if (LHE_status->at(i) != 1)
-                continue;
-
-            if ((abs(LHE_pdgid->at(i)) == 11) || (abs(LHE_pdgid->at(i)) == 13) || (abs(LHE_pdgid->at(i)) == 15))
-                nlep++;
-        }
-
-        if (nlep == 0)
-            decay_mode = DECAY_JJ;
-        if (nlep == 1)
-            decay_mode = DECAY_LJ;
-        if (nlep == 2)
-            decay_mode = DECAY_LL;
-        if (nlep > 2)
-            decay_mode = -1;
-    }
-
-    void update_mc_w() {
-        // Apply SFs to MC
-        double jet_scalefactor = 1.0;
-        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++) {
-            jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
-                                                       static_cast<float>(it->Pt()));
-        }
-
-        cout << "Start reweighting: weight = " << mc_w_sign << endl;
-        mc_w_sign *= jet_scalefactor;
-        cout << "After applying b-tag SF: weight = " << mc_w_sign << endl;
-
-        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++) {
-            if (it->is_muon()) {
-                double mu_id_sf[2] = {MuIdHist[0]->GetBinContent(MuIdHist[0]->FindBin(abs(it->Eta()), it->Pt())),
-                                      MuIdHist[1]->GetBinContent(MuIdHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
-                double mu_iso_sf[2] = {MuIsoHist[0]->GetBinContent(MuIsoHist[0]->FindBin(abs(it->Eta()), it->Pt())),
-                                       MuIsoHist[1]->GetBinContent(
-                                               MuIsoHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
-
-
-                double mu_sf = 1.;
-                mu_sf *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
-                mu_sf *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
-                mc_w_sign *= mu_sf;
-                cout << "After applying muon id/iso SF: weight = " << mc_w_sign << endl;
-            }
-            else {
-                double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
-                mc_w_sign *= em_id_sf;
-                cout << "After applying electron id SF: weight = " << mc_w_sign << endl;
-            }
-        }
-
-        mc_w_sign *= lumiWeight;
-        cout << "After applying pileup SF: weight = " << mc_w_sign << endl;
-
-        if (selectedLeptons.size() > 1) {
-            int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
-            int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
-            Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
-            mc_w_sign *= trigWeight;
-            cout << "After applying trigger SF: weight = " << mc_w_sign << endl;
-        }
-    }
-
-public:
     bool read_event(TTree *tree, Long64_t id) {
         reset();
         tree->GetEntry(id);
@@ -512,134 +388,83 @@ public:
         return true;
     }
 
-private:
-    Bool_t trig_Flag_BadPFMuonFilter_accept;
-    Bool_t trig_Flag_BadChargedCandidateFilter_accept;
-    ULong64_t ev_event;
-    Int_t mc_trueNumInteractions;
-    //Int_t mc_PU_NumInteractions;
-    bool is_data;
-    Float_t mc_w_sign;
-    string data_epoch;
 
-    // Primary vertex
-    UInt_t pv_n;
-    vector<float> *pv_z;
-    vector<float> *pv_ndof;
-    vector<float> *pv_normalizedChi2;
-    vector<bool> *pv_isValid;
-    vector<bool> *pv_isFake;
+    ULong64_t getEvID() const {
+        return ev_event;
+    }
 
-    // Electron?
-    UInt_t gsf_n;
-    // vector<float> *gsf_energy;
-    // vector<float> *gsf80_energy;
-    vector<float> *gsf_pt;
-    vector<float> *gsf80_pt;
-    vector<float> *gsf_eta;
-    vector<float> *gsf_phi;
-    vector<int> *gsf_charge;
-    vector<bool> *gsf_VIDTight;
-    vector<float> *gsf_dxy_firstPVtx;
-    vector<float> *gsf_dz_firstPVtx;
-    vector<float> *gsf_relIso;
-    vector<float> *gsf_sc_eta;
+    bool getIsData() const {
+        return is_data;
+    }
 
-    // Muon
-    UInt_t mu_n;
-    vector<int> *mu_gt_charge;
-    vector<float> *mu_gt_pt;
-    vector<float> *mu_gt_eta;
-    vector<float> *mu_gt_phi;
-    vector<float> *mu_gt_d0;
-    vector<float> *mu_gt_dz;
-    vector<float> *mu_gt_dz_beamspot;
-    vector<float> *mu_gt_dz_firstPVtx;
-    vector<float> *mu_gt_dxy;
-    vector<float> *mu_gt_dxy_beamspot;
-    vector<float> *mu_gt_dxy_firstPVtx;
-    vector<bool> *mu_isTightMuon;
-    vector<float> *mu_isoTrackerBased03;
-    vector<float> *mu_pfIsoDbCorrected04;
-    vector<float> *mu_dB;
-    vector<bool> *mu_isGlobalMuon;
-    vector<bool> *mu_isPFMuon;
-    vector<float> *mu_gt_normalizedChi2;
-    vector<int> *mu_numberOfValidMuonHits;
-    vector<int> *mu_numberOfMatchedStations;
-    vector<int> *mu_numberOfValidPixelHits;
-    vector<int> *mu_trackerLayersWithMeasurement;
+    const vector<zHLT> &getTriggers() const {
+        return triggers;
+    }
 
-    // Jet
-    UInt_t jet_n;
-    vector<float> *jet_pt;
-    vector<float> *jet_eta;
-    vector<float> *jet_phi;
-    vector<float> *jet_energy;
-    vector<float> *jet_CSVv2;
-    vector<bool> *jet_isJetIDLoose;
-    vector<float> *jet_Smeared_pt;
-    vector<float> *jet_Smeared_energy;
+    const TLorentzVector &getMET() const {
+        return MET;
+    }
 
-    // MET
-    Float_t MET_nominal_Px;
-    Float_t MET_nominal_Py;
-    Float_t MET_T1Txy_Px;
-    Float_t MET_T1Txy_Py;
+    bool isMETok() const {
+        return isMETok_;
+    }
 
-    // Trigger
-    Int_t trig_Flag_HBHENoiseFilter_accept;
-    Int_t trig_Flag_HBHENoiseIsoFilter_accept;
-    Int_t trig_Flag_globalTightHalo2016Filter_accept;
-    Int_t trig_Flag_goodVertices_accept;
-    Int_t trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept;
-    Int_t trig_Flag_eeBadScFilter_accept;
+    bool isTrgOk(const int type) const {
+        return isTrgOk_[type];
+    }
 
-    //ee triggers
-    Int_t trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept;
-    Int_t trig_HLT_Ele27_WPTight_Gsf_accept;
+    /*int getPuNtrueInteractons() const
+    {
+        return puNtrueInteractons;
+    }*/
 
-    //mumu triggers
-    Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept;
-    Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept;
-    Int_t trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
-    Int_t trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
-    Int_t trig_HLT_IsoMu24_accept;
-    Int_t trig_HLT_IsoTkMu24_accept;
+    const vector<zLepton> &getLeptons() const {
+        return leptons;
+    }
 
-    //emu
-    Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept;
-    Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept;
-    Int_t trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
-    Int_t trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
+    const vector<zJet> &getJets() const {
+        return jets;
+    }
 
-    // calibration
-    BTagCalibration calib;
-    BTagCalibrationReader reader;
+    void setLumiWeight(double w) {
+        lumiWeight = w;
+    }
 
-    // mc information
-    vector<int> *LHE_status;
-    vector<int> *LHE_pdgid;
+    Float_t get_mc_w() {
+        return mc_w_sign;
+    }
 
-    TFile **MuIdFile;
-    TH2F **MuIdHist;
+    void add_flag(zFlag flag) {
+        auto it = std::find_if(event_flags.begin(), event_flags.end(),
+                               [flag](zFlag item) { return flag.first == item.first; });
+        if (it != event_flags.end())
+            event_flags.erase(it);
 
-    TFile **MuIsoFile;
-    TH2F **MuIsoHist;
+        event_flags.push_back(flag);
+    }
 
-    TFile *EmIdFile;
-    TH2F *EmIdHist;
+    void add_flag(string name, bool value) {
+        add_flag(make_pair(name, value));
+    }
 
-    TFile *TriggerSFFile;
-    TH2D *TriggerSFHist;
+    int get_flag(string flag_name) {
+        auto it = std::find_if(event_flags.begin(), event_flags.end(),
+                               [flag_name](zFlag item) { return flag_name == item.first; });
+        if (it != event_flags.end())
+            return it->second ? 0 : 1;
+        else
+            return -1;
+    }
 
-    RoccoR rc;
+    int get_decay_mode() {
+        return decay_mode;
+    }
 
-    int decay_mode;
 
-    vector<zLepton> selectedLeptons;
-    vector<zJet> selectedJets, selectedBJets;
-public:
+    Int_t getMc_trueNumInteractions() const {
+        return mc_trueNumInteractions;
+    }
+
     void clean_jets() {
         for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++) {
             bool jet_flag = std::all_of(leptons.begin(), leptons.end(),
@@ -882,6 +707,177 @@ public:
         tree->Fill();
     }
 
+private:
+    void reset() {
+        leptons.clear();
+        jets.clear();
+        triggers.clear();
+        event_flags.clear();
+        selectedLeptons.clear();
+        selectedJets.clear();
+        selectedBJets.clear();
+        decay_mode = -1;
+    }
+
+    void read_electrons() {
+        for (UInt_t i = 0; i < gsf_eta->size(); i++) {
+            auto j = static_cast<vector<zLepton>::size_type>(i);
+#ifdef SYNC_EX
+            if (gsf_pt->at(j) < 20.)
+                continue;
+#else
+            if (gsf80_pt->at(j) < 20.)
+                continue;
+#endif
+
+            TLorentzVector v;
+#ifdef SYNC_EX
+            v.SetPtEtaPhiM(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
+#else
+            v.SetPtEtaPhiM(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
+#endif
+            zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
+                                           gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
+                                           gsf_dz_firstPVtx->at(j));
+            leptons.push_back(thisElectron);
+        }
+    }
+
+    void read_muons() {
+        for (UInt_t i = 0; i < mu_gt_pt->size(); i++) {
+            auto j = static_cast<vector<zLepton>::size_type>(i);
+            if (mu_gt_pt->at(j) < 20.)
+                continue;
+            TLorentzVector v;
+            double pt = mu_gt_pt->at(j);
+            if (is_data) {
+                pt *= rc.kScaleDT(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0, 0);
+            }
+            else {
+                pt *= rc.kScaleAndSmearMC(mu_gt_charge->at(j), pt, mu_gt_eta->at(j), mu_gt_phi->at(j),
+                                          mu_trackerLayersWithMeasurement->at(j), gRandom->Rndm(), gRandom->Rndm(),
+                                          0, 0);
+            }
+            v.SetPtEtaPhiM(pt, mu_gt_eta->at(j), mu_gt_phi->at(j), 0.10566);
+            zLepton thisMuon = zLepton(v, mu_gt_charge->at(j), 0,
+                                       mu_pfIsoDbCorrected04->at(j),
+                                       mu_isTightMuon->at(j), true, 0, 0);
+            leptons.push_back(thisMuon);
+        }
+    }
+
+    void read_jets() {
+        for (UInt_t i = 0; i < jet_pt->size(); i++) {
+            auto j = static_cast<vector<zJet>::size_type>(i);
+            TLorentzVector v;
+            v.SetPtEtaPhiE(jet_pt->at(j), jet_eta->at(j), jet_phi->at(j), jet_energy->at(j));
+            zJet thisJet = zJet(v, 0, jet_CSVv2->at(j), jet_isJetIDLoose->at(j));
+            jets.push_back(thisJet);
+        }
+        jets.shrink_to_fit();
+    }
+
+
+    void read_MET() {
+#ifdef SYNC_EX
+        MET = TLorentzVector(MET_nominal_Px, MET_nominal_Py, 0, 0);
+#else
+        MET = TLorentzVector(MET_T1Txy_Px, MET_T1Txy_Py, 0, 0);
+#endif
+        isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
+                   trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
+                   trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
+                   trig_Flag_HBHENoiseFilter_accept && trig_Flag_HBHENoiseIsoFilter_accept;
+        if (is_data)
+            isMETok_ = isMETok_ && trig_Flag_eeBadScFilter_accept;
+    }
+
+    void read_trigger() {
+        // EE
+        isTrgOk_[EE] = (trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept + trig_HLT_Ele27_WPTight_Gsf_accept != 0);
+
+        // EMu
+        Int_t isTrgOk_EMu = trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_EMu += trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept;
+        isTrgOk_EMu += trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept;
+        isTrgOk_EMu += trig_HLT_Ele27_WPTight_Gsf_accept;
+        isTrgOk_EMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
+        isTrgOk_[EMu] = (isTrgOk_EMu != 0);
+
+        Int_t isTrgOk_MuMu = trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept * (is_data ? 1 : 0);
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept;
+        isTrgOk_MuMu += trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept;
+        isTrgOk_MuMu += trig_HLT_IsoMu24_accept + trig_HLT_IsoTkMu24_accept;
+        isTrgOk_[MuMu] = (isTrgOk_MuMu != 0);
+    }
+
+    void read_decay_mode() {
+        int nlep = 0;
+        for (UInt_t i = 0; i < LHE_pdgid->size(); i++) {
+            if (LHE_status->at(i) != 1)
+                continue;
+
+            if ((abs(LHE_pdgid->at(i)) == 11) || (abs(LHE_pdgid->at(i)) == 13) || (abs(LHE_pdgid->at(i)) == 15))
+                nlep++;
+        }
+
+        if (nlep == 0)
+            decay_mode = DECAY_JJ;
+        if (nlep == 1)
+            decay_mode = DECAY_LJ;
+        if (nlep == 2)
+            decay_mode = DECAY_LL;
+        if (nlep > 2)
+            decay_mode = -1;
+    }
+
+    void update_mc_w() {
+        // Apply SFs to MC
+        double jet_scalefactor = 1.0;
+        for (auto it = selectedBJets.begin(); it != selectedBJets.end(); it++) {
+            jet_scalefactor *= reader.eval_auto_bounds("central", BTagEntry::FLAV_B, static_cast<float>(it->Eta()),
+                                                       static_cast<float>(it->Pt()));
+        }
+
+        cout << "Start reweighting: weight = " << mc_w_sign << endl;
+        mc_w_sign *= jet_scalefactor;
+        cout << "After applying b-tag SF: weight = " << mc_w_sign << endl;
+
+        for (auto it = selectedLeptons.begin(); it != selectedLeptons.end(); it++) {
+            if (it->is_muon()) {
+                double mu_id_sf[2] = {MuIdHist[0]->GetBinContent(MuIdHist[0]->FindBin(abs(it->Eta()), it->Pt())),
+                                      MuIdHist[1]->GetBinContent(MuIdHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
+                double mu_iso_sf[2] = {MuIsoHist[0]->GetBinContent(MuIsoHist[0]->FindBin(abs(it->Eta()), it->Pt())),
+                                       MuIsoHist[1]->GetBinContent(
+                                               MuIsoHist[1]->FindBin(abs(it->Eta()), it->Pt()))};
+
+
+                double mu_sf = 1.;
+                mu_sf *= mu_id_sf[0] * mu_iso_sf[0] * lumEraBCDEF / lumEraBCDEFGH;
+                mu_sf *= mu_id_sf[1] * mu_iso_sf[1] * lumEraGH / lumEraBCDEFGH;
+                mc_w_sign *= mu_sf;
+                cout << "After applying muon id/iso SF: weight = " << mc_w_sign << endl;
+            }
+            else {
+                double em_id_sf = EmIdHist->GetBinContent(EmIdHist->FindBin(it->get_etaSC(), it->Pt()));
+                mc_w_sign *= em_id_sf;
+                cout << "After applying electron id SF: weight = " << mc_w_sign << endl;
+            }
+        }
+
+        mc_w_sign *= lumiWeight;
+        cout << "After applying pileup SF: weight = " << mc_w_sign << endl;
+
+        if (selectedLeptons.size() > 1) {
+            int binX = TriggerSFHist->GetXaxis()->FindBin(selectedLeptons.at(0).Pt());
+            int binY = TriggerSFHist->GetYaxis()->FindBin(selectedLeptons.at(1).Pt());
+            Double_t trigWeight = TriggerSFHist->GetBinContent(binX, binY);
+            mc_w_sign *= trigWeight;
+            cout << "After applying trigger SF: weight = " << mc_w_sign << endl;
+        }
+    }
 };
 
 #endif //INC_13TEV_TW_ANALYSIS_ZEVENT_HH
