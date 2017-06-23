@@ -295,39 +295,40 @@ int main(int argc, const char *argv[]) {
 
         copy_if(selectedJets.begin(), selectedJets.end(), back_inserter(selectedBJets),
                 [](const zJet &jet) { return jet.is_bjet(); });
-
+#ifdef SYNC_EX
         cout << "=== BEGIN EVENT " << evtID << " (" << event->getEvID() << ")" << endl;
         cout << "Raw: # leptons = " << event->getLeptons().size() << ", # jets = " << event->getJets().size()
              << endl;
         cout << "Sel: # leptons = " << selectedLeptons.size() << ", # jets = " << selectedJets.size();
         cout << ", # bjets = " << selectedBJets.size() << endl;
-
+#endif
 
         if (!event->isMETok()) {
             event->fill_dump_tree(tW_tree);
-            cout << "- Reject step 0.1" << endl;
+//            cout << "- Reject step 0.1" << endl;
             continue;
         }
         else
             event->add_flag("pass_met_filters", true);
 
         if (selectedLeptons.size() >= 2) {
-            cout << "=== New ll candidate " << evtID << "(" << event->getEvID() << ") ===" << endl;
             event->add_flag("is_ll", true);
 
             auto leading_l = selectedLeptons.at(0);
             auto other_l = selectedLeptons.at(1);
             ll = leading_l + other_l;
 
+#ifdef SYNC_EX
+            cout << "=== New ll candidate " << evtID << "(" << event->getEvID() << ") ===" << endl;
             cout << "Leptons: " << selectedLeptons.size() << endl;
             cout << "Leading: " << leading_l << endl;
             cout << "Second: " << other_l << endl;
             cout << "Dileption: " << "(Pt, Eta, Phi, E) = (" << ll.Pt() << ", " << ll.Eta() << ", " << ll.Phi()
                  << ", "
                  << ll.E() << "), M = " << ll.Mag() << endl;
-
+#endif
             if (!leading_l.is_samesign(other_l) && leading_l.Pt() > 25 && ll.Mag() > 20) {
-                cout << "+ Accept step 1" << endl;
+//                cout << "+ Accept step 1" << endl;
                 if (leading_l.is_muon() && other_l.is_muon())
                     event_tag = MuMu;
                 else if (!(leading_l.is_muon() || other_l.is_muon()))
@@ -339,29 +340,29 @@ int main(int argc, const char *argv[]) {
         else {
             event->add_flag("no_ll", true);
             event->fill_dump_tree(tW_tree);
-            cout << "- Reject step 1" << endl;
+//            cout << "- Reject step 1" << endl;
             continue;
         }
 
         counter[event_tag][1]++;
 
         if (event_tag == EE) {
-            cout << "Event type: EE" << endl;
 #ifdef SYNC_EX
             ee_lep_evid << event->getEvID() << endl;
+            cout << "Event type: EE" << endl;
 #endif
             event->add_flag("EE", true);
         }
         else if (event_tag == EMu) {
-            cout << "Event type: EMu" << endl;
 #ifdef SYNC_EX
+            cout << "Event type: EMu" << endl;
             emu_lep_evid << event->getEvID() << endl;
 #endif
             event->add_flag("EMu", true);
         }
         else if (event_tag == MuMu) {
-            cout << "Event type: MuMu" << endl;
 #ifdef SYNC_EX
+            cout << "Event type: MuMu" << endl;
             mumu_lep_evid << event->getEvID() << endl;
 #endif
             event->add_flag("MuMu", true);
@@ -380,39 +381,39 @@ int main(int argc, const char *argv[]) {
             massFlag = false;
 
         if (massFlag) {
-            cout << "- Reject step 2" << endl;
+//            cout << "- Reject step 2" << endl;
             event->fill_dump_tree(tW_tree);
             continue;
         }
         else {
             event->add_flag("pass_dilepton_mass", true);
-            cout << "+ Accept step 2" << endl;
+//            cout << "+ Accept step 2" << endl;
         }
 
 
         counter[event_tag][2]++;
-
+/*
         cout << "METx: " << event->getMET().Px() << ", METy: " << event->getMET().Py() << ", MET: "
-             << event->getMET().Pt() << endl;
+             << event->getMET().Pt() << endl;*/
         if (event_tag != EMu) {
             if (event->getMET().Pt() <= 40) {
                 event->fill_dump_tree(tW_tree);
-                cout << "- Reject step 3" << endl;
+//                cout << "- Reject step 3" << endl;
                 continue;
             }
         }
         event->add_flag("pass_met", true);
-        cout << "+ Accept step 3" << endl;
+//        cout << "+ Accept step 3" << endl;
 
         counter[event_tag][3]++;
 
         if (!event->isTrgOk(event_tag)) {
-            cout << "- Reject step 4.trigger" << endl;
+//            cout << "- Reject step 4.trigger" << endl;
             event->fill_dump_tree(tW_tree);
             continue;
         }
         event->add_flag("pass_trigger", true);
-        cout << "+ Accept step 4.trigger" << endl;
+//        cout << "+ Accept step 4.trigger" << endl;
         counter[event_tag][4] += event->get_mc_w();
 
         if (selectedJets.size() == 0) {
