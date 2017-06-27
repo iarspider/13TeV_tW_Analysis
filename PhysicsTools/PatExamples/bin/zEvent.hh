@@ -219,9 +219,7 @@ private:
     vector<zJet> selectedJets, selectedBJets;
 
 public:
-    zEvent(TTree *tree, string epoch) : LumiWeights_("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
-                                                     "h", "pileup"),
-                                        calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
+    zEvent(TTree *tree, string epoch) : calib("csvv2", "CSVv2_Moriond17_B_H.csv"),
                                         reader(BTagEntry::OP_MEDIUM, "central"),
                                         rc("rcdata.2016.v3") {
         reader.load(calib,                // calibration instance
@@ -235,6 +233,8 @@ public:
 
         if (epoch == "MC") {
             is_data = false;
+            LumiWeights_ = reweight::LumiReWeighting("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
+                         "h", "pileup");
             MuIdFile[0] = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
             MuIdHist[0] = (TH2F *) ((TDirectoryFile *) MuIdFile[0]->Get(
                     "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
