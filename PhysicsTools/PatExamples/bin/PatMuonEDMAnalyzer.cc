@@ -133,10 +133,10 @@ int main(int argc, const char *argv[]) {
 
     //vector<zEvent> events;
 //    double cNetEvWt = 0;
-    Float_t counter[4][11] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    Float_t counter[4][12] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
     cout << boolalpha;
 #ifdef TW_SYNC
@@ -435,6 +435,10 @@ int main(int argc, const char *argv[]) {
 
         if (event->get_decay_mode() == DECAY_LJ) {
             counter[event_tag][7] += event->get_mc_w();
+        }
+
+        if (event->get_decay_mode() == DECAY_LL) {
+            counter[event_tag][11] += event->get_mc_w();
         }
 
 /*
