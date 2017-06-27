@@ -133,10 +133,10 @@ int main(int argc, const char *argv[]) {
 
     //vector<zEvent> events;
 //    double cNetEvWt = 0;
-    Float_t counter[4][12] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
+    Float_t counter[4][14] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                              {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
     cout << boolalpha;
 #ifdef TW_SYNC
@@ -422,6 +422,9 @@ int main(int argc, const char *argv[]) {
             if (event->get_decay_mode() == DECAY_LJ) {
                 counter[event_tag][8] += event->get_mc_w();
             }
+            if (event->get_decay_mode() == DECAY_JJ) {
+                counter[event_tag][12] += event->get_mc_w();
+            }
         }
 
         if ((selectedJets.size() == 1) && (selectedBJets.size() == 0)) {
@@ -430,7 +433,9 @@ int main(int argc, const char *argv[]) {
             if (event->get_decay_mode() == DECAY_LJ) {
                 counter[event_tag][9] += event->get_mc_w();
             }
-
+            if (event->get_decay_mode() == DECAY_JJ) {
+                counter[event_tag][13] += event->get_mc_w();
+            }
         }
 
         if (event->get_decay_mode() == DECAY_LJ) {
@@ -541,7 +546,7 @@ int main(int argc, const char *argv[]) {
 //            cout << "None";
 //    }
     cout << " channel ===" << endl;
-    for (int j = 0; j < 11; j++)
+    for (int j = 0; j < 14; j++)
         cout << "Counter " << j << " value " << counter[i][j] << endl;
 //    }
 

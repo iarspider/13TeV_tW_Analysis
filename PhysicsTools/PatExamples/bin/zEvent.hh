@@ -234,7 +234,7 @@ public:
         if (epoch == "MC") {
             is_data = false;
             LumiWeights_ = reweight::LumiReWeighting("MyMCTruePileupHistogram.root", "MyDataTruePileupHistogram.root",
-                         "h", "pileup");
+                                                     "h", "pileup");
             MuIdFile[0] = new TFile("MuID_EfficienciesAndSF_BCDEF.root");
             MuIdHist[0] = (TH2F *) ((TDirectoryFile *) MuIdFile[0]->Get(
                     "MC_NUM_TightID_DEN_genTracks_PAR_pt_eta"))->Get(
@@ -256,7 +256,7 @@ public:
         }
         else {
             is_data = true;
-//            data_epoch = epoch;
+            data_epoch = epoch;
             MuIdHist = NULL;
             MuIsoHist = NULL;
             EmIdHist = NULL;
@@ -264,9 +264,11 @@ public:
         }
         tree->SetBranchStatus("*", 0);
 //        this->pt_cut_ = 20;
-        LOAD_BRANCH(tree, mc_w_sign)
         LOAD_BRANCH(tree, ev_event)
-        LOAD_BRANCH(tree, mc_trueNumInteractions)
+        if (!this->is_data) {
+            LOAD_BRANCH(tree, mc_w_sign)
+            LOAD_BRANCH(tree, mc_trueNumInteractions)
+        }
         // LOAD_BRANCH(tree, mc_PU_NumInteractions)
         LOAD_BRANCH(tree, pv_n)
         LOAD_BRANCH(tree, pv_z)
@@ -311,8 +313,8 @@ public:
         LOAD_BRANCH(tree, jet_energy)
         LOAD_BRANCH(tree, jet_CSVv2)
         LOAD_BRANCH(tree, jet_isJetIDLoose)
-        LOAD_BRANCH(tree, jet_Smeared_pt)
-        LOAD_BRANCH(tree, jet_Smeared_energy)
+//        LOAD_BRANCH(tree, jet_Smeared_pt)
+//        LOAD_BRANCH(tree, jet_Smeared_energy)
 #ifdef SYNC_EX
         LOAD_BRANCH(tree, MET_nominal_Px)
         LOAD_BRANCH(tree, MET_nominal_Py)
@@ -330,18 +332,60 @@ public:
         LOAD_BRANCH(tree, trig_Flag_BadPFMuonFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_BadChargedCandidateFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_eeBadScFilter_accept)
-        LOAD_BRANCH(tree, trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+
+        //emu triggers
         LOAD_BRANCH(tree, trig_HLT_Ele27_WPTight_Gsf_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept)
         LOAD_BRANCH(tree, trig_HLT_IsoMu24_accept)
         LOAD_BRANCH(tree, trig_HLT_IsoTkMu24_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept)
-        LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+        if (is_data) {
+            if (data_epoch.find("2016H") != data_epoch.npos) {
+                LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+                LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+                trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept = 0;
+                trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept = 0;
+            }
+            else {
+                LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept)
+                LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept)
+                trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept = 0;
+                trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept = 0;
+            }
+        }
+        else {
+            LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+            LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+            LOAD_BRANCH(tree, trig_HLT_Mu8_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_accept)
+            LOAD_BRANCH(tree, trig_HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_accept)
+        }
+
+        //ee triggers
+        LOAD_BRANCH(tree, trig_HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_accept)
+        // + trig_HLT_Ele27_WPTight_Gsf_accept
+
+        //mumu triggers
+        if (is_data) {
+            if (data_epoch.find("2016H") == data_epoch.npos) {
+                LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept)
+                LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept)
+                trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept = 0;
+                trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept = 0;
+            }
+            else {
+                LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept)
+                LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept)
+                trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept = 0;
+                trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept = 0;
+            }
+        }
+        else {
+            LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_accept)
+            LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_accept)
+            LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_accept)
+            LOAD_BRANCH(tree, trig_HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_accept)
+        }
+        // + trig_HLT_IsoMu24_accept, trig_HLT_IsoTkMu24_accept
+
+
         LOAD_BRANCH(tree, mu_dB)
         LOAD_BRANCH(tree, mu_isGlobalMuon)
         LOAD_BRANCH(tree, mu_isPFMuon)
@@ -350,8 +394,10 @@ public:
         LOAD_BRANCH(tree, mu_numberOfMatchedStations)
         LOAD_BRANCH(tree, mu_numberOfValidPixelHits)
         LOAD_BRANCH(tree, mu_trackerLayersWithMeasurement)
-        LOAD_BRANCH(tree, LHE_status)
-        LOAD_BRANCH(tree, LHE_pdgid)
+        if (!is_data) {
+            LOAD_BRANCH(tree, LHE_status)
+            LOAD_BRANCH(tree, LHE_pdgid)
+        }
     }
 
     bool read_event(TTree *tree, Long64_t id) {
