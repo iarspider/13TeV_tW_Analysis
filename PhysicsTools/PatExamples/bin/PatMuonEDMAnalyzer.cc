@@ -418,7 +418,7 @@ int main(int argc, const char *argv[]) {
 
         if (selectedJets.size() == 0) {
             counter[event_tag][5] += event->get_mc_w();
-            event->fill_BDT_tree(bdt_tree);
+//            event->fill_BDT_tree(bdt_tree);
             if (event->get_decay_mode() == DECAY_LJ) {
                 counter[event_tag][8] += event->get_mc_w();
             }
@@ -429,7 +429,7 @@ int main(int argc, const char *argv[]) {
 
         if ((selectedJets.size() == 1) && (selectedBJets.size() == 0)) {
             counter[event_tag][6] += event->get_mc_w();
-            event->fill_BDT_tree(bdt_tree);
+//            event->fill_BDT_tree(bdt_tree);
             if (event->get_decay_mode() == DECAY_LJ) {
                 counter[event_tag][9] += event->get_mc_w();
             }
@@ -505,6 +505,7 @@ int main(int argc, const char *argv[]) {
             }
 */
         event->fill_dump_tree(tW_tree);
+        event->fill_BDT_tree(bdt_tree);
     }
 //    }
 //    catch (exception &e) {
