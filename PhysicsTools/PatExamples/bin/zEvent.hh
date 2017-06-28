@@ -44,12 +44,6 @@ using namespace std;
 typedef std::pair<std::string, bool> zFlag;
 
 
-/*
-struct zVertex
-{
-    float z, dof, RHO;
-};
-*/
 Double_t HTsum(vector<TLorentzVector *> v) {
     Double_t result = 0;
 
@@ -77,7 +71,6 @@ private:
     vector<zLepton> leptons;
     vector<zJet> jets;
 
-//    vector<zVertex> vertices;
     vector<zHLT> triggers;
     TLorentzVector MET;
     bool isMETok_;
@@ -85,17 +78,12 @@ private:
     bool BadChargedCandidateFilter_;
     bool BadPFMuonFilter_;
 
-    //int puNtrueInteractons;
-    double lumiWeight;
-
-    reweight::LumiReWeighting LumiWeights_;
     vector<zFlag> event_flags;
 
     Bool_t trig_Flag_BadPFMuonFilter_accept;
     Bool_t trig_Flag_BadChargedCandidateFilter_accept;
     ULong64_t ev_event;
     Int_t mc_trueNumInteractions;
-    //Int_t mc_PU_NumInteractions;
     bool is_data;
     Float_t mc_w_sign;
     string data_epoch;
@@ -108,10 +96,8 @@ private:
     vector<bool> *pv_isValid;
     vector<bool> *pv_isFake;
 
-    // Electron?
+    // Electron
     UInt_t gsf_n;
-    // vector<float> *gsf_energy;
-    // vector<float> *gsf80_energy;
     vector<float> *gsf_pt;
     vector<float> *gsf80_pt;
     vector<float> *gsf_eta;
@@ -199,6 +185,7 @@ private:
     vector<int> *LHE_status;
     vector<int> *LHE_pdgid;
 
+    // SF stuff
     TFile **MuIdFile;
     TH2F **MuIdHist;
 
@@ -210,6 +197,10 @@ private:
 
     TFile *TriggerSFFile;
     TH2D *TriggerSFHist;
+
+    double lumiWeight;
+
+    reweight::LumiReWeighting LumiWeights_;
 
     RoccoR rc;
 
@@ -263,13 +254,12 @@ public:
             TriggerSFHist = NULL;
         }
         tree->SetBranchStatus("*", 0);
-//        this->pt_cut_ = 20;
         LOAD_BRANCH(tree, ev_event)
         if (!this->is_data) {
             LOAD_BRANCH(tree, mc_w_sign)
             LOAD_BRANCH(tree, mc_trueNumInteractions)
         }
-        // LOAD_BRANCH(tree, mc_PU_NumInteractions)
+
         LOAD_BRANCH(tree, pv_n)
         LOAD_BRANCH(tree, pv_z)
         LOAD_BRANCH(tree, pv_ndof)
@@ -277,12 +267,7 @@ public:
         LOAD_BRANCH(tree, pv_isValid)
         LOAD_BRANCH(tree, pv_isFake)
         LOAD_BRANCH(tree, gsf_n)
-#ifdef SYNC_EX
-        LOAD_BRANCH(tree, gsf_pt)
-#else
         LOAD_BRANCH(tree, gsf80_pt)
-//        gsf_pt = gsf80_pt;
-#endif
         LOAD_BRANCH(tree, gsf_eta)
         LOAD_BRANCH(tree, gsf_phi)
         LOAD_BRANCH(tree, gsf_charge)
@@ -313,17 +298,8 @@ public:
         LOAD_BRANCH(tree, jet_energy)
         LOAD_BRANCH(tree, jet_CSVv2)
         LOAD_BRANCH(tree, jet_isJetIDLoose)
-//        LOAD_BRANCH(tree, jet_Smeared_pt)
-//        LOAD_BRANCH(tree, jet_Smeared_energy)
-#ifdef SYNC_EX
-        LOAD_BRANCH(tree, MET_nominal_Px)
-        LOAD_BRANCH(tree, MET_nominal_Py)
-#else
         LOAD_BRANCH(tree, MET_T1Txy_Px)
         LOAD_BRANCH(tree, MET_T1Txy_Py)
-//        MET_nominal_Px = MET_T1Txy_Px;
-//        MET_nominal_Py = MET_T1Txy_Py;
-#endif
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_HBHENoiseIsoFilter_accept)
         LOAD_BRANCH(tree, trig_Flag_globalTightHalo2016Filter_accept)
@@ -425,7 +401,6 @@ public:
                 [](const zJet &jet) { return jet.is_bjet(); });
 
         if (!this->is_data) {
-//            setLumiWeight(LumiWeights_.weight(getMc_trueNumInteractions()));
             lumiWeight = LumiWeights_.weight(mc_trueNumInteractions);
             read_decay_mode();
             update_mc_w();
@@ -458,11 +433,6 @@ public:
     bool isTrgOk(const int type) const {
         return isTrgOk_[type];
     }
-
-    /*int getPuNtrueInteractons() const
-    {
-        return puNtrueInteractons;
-    }*/
 
     const vector<zLepton> &getLeptons() const {
         return leptons;
@@ -523,97 +493,6 @@ public:
     }
 
     void fill_dump_tree(TTree *tree) {
-#ifdef SYNC_EX
-        std::vector<TLorentzVector> *JetV, *LepV;
-        std::vector<float> *JetCh, *LepCh, *LepDxy, *LepDz, *LepEtaSC, *LepIsoVal;
-        std::vector<int> *LepWhere;
-        std::vector<bool> *JetB, *JetClean, *JetSel, *JetLoose, *LepSel, *LepIso, *LepTight, *LepMuon;
-        std::vector<string> *flags;
-
-        JetV = new std::vector<TLorentzVector>();
-        LepV = new std::vector<TLorentzVector>();
-        JetCh = new std::vector<float>();
-        LepCh = new std::vector<float>();
-
-        JetB = new std::vector<bool>();
-        JetClean = new std::vector<bool>();
-        JetSel = new std::vector<bool>();
-        JetLoose = new std::vector<bool>();
-        LepSel = new std::vector<bool>();
-        LepWhere = new std::vector<int>();
-        LepIso = new std::vector<bool>();
-        LepIsoVal = new std::vector<float>();
-        LepTight = new std::vector<bool>();
-        LepMuon = new std::vector<bool>();
-        LepDxy = new std::vector<float>();
-        LepDz = new std::vector<float>();
-        LepEtaSC = new std::vector<float>();
-
-        flags = new std::vector<string>();
-
-        for (auto thisLepton = leptons.begin(); thisLepton != leptons.end(); thisLepton++)
-        {
-            LepV->push_back(static_cast<TLorentzVector>(*thisLepton));
-            LepCh->push_back(thisLepton->get_charge());
-            LepSel->push_back(thisLepton->is_selected());
-            LepWhere->push_back(thisLepton->where());
-            LepIso->push_back(thisLepton->is_iso());
-            LepTight->push_back(thisLepton->is_tight());
-            LepMuon->push_back(thisLepton->is_muon());
-            LepDxy->push_back(thisLepton->get_d0());
-            LepDz->push_back(thisLepton->get_dz());
-            LepEtaSC->push_back(thisLepton->get_etaSC());
-            LepIsoVal->push_back(thisLepton->get_Iso());
-        }
-
-        for (auto thisJet = jets.begin(); thisJet != jets.end(); thisJet++)
-        {
-            JetV->push_back(static_cast<TLorentzVector>(*thisJet));
-            JetCh->push_back(thisJet->get_charge());
-            JetSel->push_back(thisJet->is_selected());
-            JetClean->push_back(thisJet->is_clean());
-            JetB->push_back(thisJet->is_bjet());
-            JetLoose->push_back(thisJet->is_loose());
-        }
-
-        for (auto thisFlag = event_flags.begin(); thisFlag != event_flags.end(); thisFlag++)
-        {
-            if (thisFlag->second)
-                flags->push_back(thisFlag->first);
-        }
-
-        tree->SetBranchAddress("LeptonVec", &LepV);
-        tree->SetBranchAddress("LeptonCharge", &LepCh);
-        tree->SetBranchAddress("LeptonSelected", &LepSel);
-        tree->SetBranchAddress("LeptonWhere", &LepWhere);
-        tree->SetBranchAddress("LeptonIsIso", &LepIso);
-        tree->SetBranchAddress("LeptonIsTight", &LepTight);
-        tree->SetBranchAddress("LeptonIsMuon", &LepMuon);
-        tree->SetBranchAddress("LeptonDxy", &LepDxy);
-        tree->SetBranchAddress("LeptonDz", &LepDz);
-        tree->SetBranchAddress("LeptonEtaSC", &LepEtaSC);
-        tree->SetBranchAddress("LeptonIso", &LepIsoVal);
-
-        tree->SetBranchAddress("JetVec", &JetV);
-        tree->SetBranchAddress("JetCharge", &JetCh);
-        tree->SetBranchAddress("JetSelected", &JetSel);
-        tree->SetBranchAddress("JetIsClean", &JetClean);
-        tree->SetBranchAddress("JetIsBJet", &JetB);
-        tree->SetBranchAddress("JetIsLoose", &JetLoose);
-
-        bool isMetOk = isMETok();
-        TLorentzVector *pMet = &MET;
-
-        tree->SetBranchAddress("MetVec", &pMet);
-        tree->SetBranchAddress("MetOK", &isMetOk);
-        tree->SetBranchAddress("MetBadCCF", &BadChargedCandidateFilter_);
-        tree->SetBranchAddress("MetBadPFM", &BadPFMuonFilter_);
-
-        tree->SetBranchAddress("Flags", &flags);
-        tree->SetBranchAddress("eventID", &ev_event);
-
-        tree->Fill();
-#endif
     }
 
     void fill_BDT_tree(TTree *tree) {
@@ -768,20 +647,12 @@ private:
     void read_electrons() {
         for (UInt_t i = 0; i < gsf_eta->size(); i++) {
             auto j = static_cast<vector<zLepton>::size_type>(i);
-#ifdef SYNC_EX
-            if (gsf_pt->at(j) < 20.)
-                continue;
-#else
             if (gsf80_pt->at(j) < 20.)
                 continue;
-#endif
 
             TLorentzVector v;
-#ifdef SYNC_EX
-            v.SetPtEtaPhiM(gsf_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
-#else
             v.SetPtEtaPhiM(gsf80_pt->at(j), gsf_eta->at(j), gsf_phi->at(j), 0.000511);
-#endif
+
             zLepton thisElectron = zLepton(v, gsf_charge->at(j), gsf_sc_eta->at(j), 0,
                                            gsf_VIDTight->at(j), false, gsf_dxy_firstPVtx->at(j),
                                            gsf_dz_firstPVtx->at(j));
@@ -825,11 +696,8 @@ private:
 
 
     void read_MET() {
-#ifdef SYNC_EX
-        MET = TLorentzVector(MET_nominal_Px, MET_nominal_Py, 0, 0);
-#else
         MET = TLorentzVector(MET_T1Txy_Px, MET_T1Txy_Py, 0, 0);
-#endif
+
         isMETok_ = trig_Flag_BadChargedCandidateFilter_accept && trig_Flag_BadPFMuonFilter_accept &&
                    trig_Flag_EcalDeadCellTriggerPrimitiveFilter_accept &&
                    trig_Flag_globalTightHalo2016Filter_accept && trig_Flag_goodVertices_accept &&
