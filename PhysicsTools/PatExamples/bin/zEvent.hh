@@ -269,6 +269,9 @@ public:
             LOAD_BRANCH(tree, mc_w_sign)
             LOAD_BRANCH(tree, mc_trueNumInteractions)
         }
+        else {
+            mc_w_sign = 1.0;
+        }
         // LOAD_BRANCH(tree, mc_PU_NumInteractions)
         LOAD_BRANCH(tree, pv_n)
         LOAD_BRANCH(tree, pv_z)
